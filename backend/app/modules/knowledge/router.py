@@ -12,7 +12,7 @@ from urllib.parse import quote
 from anyio import to_thread
 from fastapi.responses import StreamingResponse
 
-from fastapi import (APIRouter, Depends, File, Form, Header, HTTPException, Path as PathParam, Query, Request,
+from fastapi import (APIRouter, Body, Depends, File, Form, Header, HTTPException, Path as PathParam, Query, Request,
                      UploadFile, status)
 from pydantic import BaseModel, ValidationError
 
@@ -33,7 +33,7 @@ from .schemas import (
     InnovationSummary,
     InnovationUpdate,
 )
-from .assess import AssessmentUnavailable, assess, credibility
+from .assess import AssessmentUnavailable, assess, credibility, parse, record
 from .service import KnowledgeService, get_knowledge_service
 from .settings import load_knowledge_settings
 from .taxonomy import (ASSESSMENT_CRITERIA, AUDIENCE_LABELS, CATEGORY_LABELS, CRITERIA_VERSION,
@@ -176,15 +176,20 @@ async def refresh_innovation(service: Service, innovation_id: InnovationId, inno
 @router.post("/innovations/{innovation_id}/assess", response_model=InnovationSummary,
              summary="Oceń innowację według kryteriów", dependencies=_admin["dependencies"],
              responses={**_admin["responses"], **_not_found_response})
-async def assess_innovation(service: Service, innovation_id: InnovationId):
+async def assess_innovation(service: Service, innovation_id: InnovationId,
+                            proposal: Annotated[dict | None, Body(embed=True)] = None):
     """Score the card against the five FAQ criteria and recommend recipients, a path and measures.
     Credibility follows fixed rules; the other criteria are model estimates marked "szacunek".
-    Notes edited by staff or confirmed by a source are kept. Raises 503 when Gemini is unavailable."""
+    Notes edited by staff or confirmed by a source are kept. Raises 503 when Gemini is unavailable.
+    An optional `proposal` is a model answer produced offline (scripts/assess_innovations.py --engine codex);
+    it goes through the same parsing and merge, and Gemini is not called."""
     with _not_found():
         item = await service.get(innovation_id)
         try:
-            proposed, maturity = await assess(item)
+            proposed, maturity = parse(proposal, item, record(item)) if proposal is not None else await assess(item)
         except AssessmentUnavailable as exc:
+            if proposal is not None:
+                raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, f"Invalid proposal: {exc}") from exc
             # The rule-based credibility needs no model; store it and report the rest as unavailable.
             await service.apply_credibility(innovation_id, credibility(item))
             code = status.HTTP_429_TOO_MANY_REQUESTS if exc.rate_limited else status.HTTP_503_SERVICE_UNAVAILABLE

@@ -71,7 +71,7 @@ def _note(raw: object, text: str, source_url: str | None) -> AssessmentNote | No
                           score=score if isinstance(score, int) and 1 <= score <= 5 else None)
 
 
-def _schema() -> dict:
+def schema() -> dict:
     note = {"type": "object", "properties": {"score": {"type": "integer", "minimum": 1, "maximum": 5},
                                              "rationale": {"type": "string"}, "quote": {"type": "string"}},
             "required": ["score", "rationale", "quote"]}
@@ -96,7 +96,7 @@ def _schema() -> dict:
     }
 
 
-def _instruction() -> str:
+def instruction() -> str:
     criteria = "\n".join(f"- {label}: {meaning}" for label, meaning in ASSESSMENT_CRITERIA.values())
     stages = ", ".join(f"{m.value} ({label})" for m, label in MATURITY_LABELS.items())
     audiences = ", ".join(f"{a.value} ({label})" for a, label in AUDIENCE_LABELS.items())
@@ -123,7 +123,7 @@ def _instruction() -> str:
     )
 
 
-def _record(item: InnovationSummary) -> str:
+def record(item: InnovationSummary) -> str:
     parts = [card_text(item), f"Obszar: {item.area}" if item.area else "", f"Region: {item.region}" if item.region else "",
              f"Źródło: {item.source_name}" if item.source_name else "",
              f"Status: {'potwierdzone wdrożenie' if item.verification == 'potwierdzona' else 'kandydat z rejestru'}"]
@@ -137,7 +137,7 @@ async def assess(item: InnovationSummary) -> tuple[InnovationAssessment, Maturit
     chat = load_chat_settings()
     if chat.gemini_api_key is None:
         raise AssessmentUnavailable("GEMINI_API_KEY is not configured")
-    record = _record(item)
+    text = record(item)
     client = genai.Client(
         api_key=chat.gemini_api_key.get_secret_value(), vertexai=False, enterprise=False,
         http_options=types.HttpOptions(api_version=chat.api_version, timeout=chat.provider_timeout_seconds * 1000,
@@ -145,11 +145,11 @@ async def assess(item: InnovationSummary) -> tuple[InnovationAssessment, Maturit
     )
     try:
         response = await client.aio.models.generate_content(
-            model=chat.model, contents=record,
+            model=chat.model, contents=text,
             config=types.GenerateContentConfig(
-                system_instruction=_instruction(), candidate_count=1, max_output_tokens=2048, temperature=0.2,
+                system_instruction=instruction(), candidate_count=1, max_output_tokens=2048, temperature=0.2,
                 automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-                response_mime_type="application/json", response_json_schema=_schema(),
+                response_mime_type="application/json", response_json_schema=schema(),
                 thinking_config=types.ThinkingConfig(thinking_level=chat.thinking_level, include_thoughts=False),
             ),
         )
@@ -161,7 +161,7 @@ async def assess(item: InnovationSummary) -> tuple[InnovationAssessment, Maturit
     finally:
         await client.aio.aclose()
         client.close()
-    return parse(payload, item, record)
+    return parse(payload, item, text)
 
 
 def parse(payload: dict, item: InnovationSummary, record: str) -> tuple[InnovationAssessment, Maturity]:

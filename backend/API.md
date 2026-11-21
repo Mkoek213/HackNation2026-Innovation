@@ -266,6 +266,9 @@ Admin-only `POST /api/v1/knowledge/innovations/{id}/assess` scores the card agai
 A field is replaced only while it is empty or still equals the previous automatic proposal, so staff edits and
 source-confirmed notes survive. Candidates also take the estimated `maturity`. When Gemini is unavailable only the
 rule-based credibility is stored, every other note stays, and the route returns 429 (quota or overload) or 503.
+An optional JSON body `{"proposal": {...}}` carries a model answer already produced offline in the same schema
+(`assess_innovations.py --engine codex`); it goes through the same parsing and merge without calling Gemini, and an
+unusable proposal returns 422.
 `backend/scripts/assess_innovations.py` runs it for every card not yet on the current `criteria_version`.
 
 Admin-only `PUT /api/v1/knowledge/innovations/{id}/refresh` accepts card metadata as JSON

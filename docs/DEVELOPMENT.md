@@ -73,7 +73,7 @@ cd ..
 set -a && . ./.env && set +a
 uv --project backend run python backend/scripts/upload_innovations.py --api "http://localhost:${BACKEND_PORT}" --dry-run
 uv --project backend run python backend/scripts/upload_innovations.py --api "http://localhost:${BACKEND_PORT}"
-uv --project backend run python backend/scripts/assess_innovations.py --api "http://localhost:${BACKEND_PORT}"
+uv --project backend run python backend/scripts/assess_innovations.py --api "http://localhost:${BACKEND_PORT}" --engine codex
 docker compose exec backend python scripts/seed_demo.py               # demo users, topics and activity
 ```
 
@@ -84,7 +84,9 @@ Sources, filters and limitations are recorded in [the data source investigation]
 
 From the root, run `bash backend/scripts/refresh_innovations.sh --dry-run` to inspect source
 counts, or omit `--dry-run` to publish. Limit a run to one feed using `--source` with
-`deployments`, `fundusze`, `cordis`, `interreg` or `radon`. A publishing run then calls `assess_innovations.py`, which scores cards that have no assessment on the current criteria. The wrapper uses the backend virtual environment,
+`deployments`, `fundusze`, `cordis`, `interreg` or `radon`. A publishing run then calls `assess_innovations.py`, which scores cards that have no assessment on the current criteria.
+It uses the local Codex CLI (`--engine codex`, the ChatGPT subscription) when `codex` is installed, so Gemini credits are spent only by the running app; set `ASSESS_ENGINE=gemini` to let the server call Gemini instead.
+The wrapper uses the backend virtual environment,
 the root `.env` and a local lock. The backend must be running. Output includes counts and
 per-source or per-record errors. A failed download leaves the last successful cards in place.
 
