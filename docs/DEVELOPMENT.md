@@ -85,7 +85,7 @@ Sources, filters and limitations are recorded in [the data source investigation]
 From the root, run `bash backend/scripts/refresh_innovations.sh --dry-run` to inspect source
 counts, or omit `--dry-run` to publish. Limit a run to one feed using `--source` with
 `deployments`, `fundusze`, `cordis`, `interreg` or `radon`. A publishing run then calls `assess_innovations.py`, which scores cards that have no assessment on the current criteria.
-It uses the local Codex CLI (`--engine codex`, the ChatGPT subscription) when `codex` is installed, so Gemini credits are spent only by the running app; set `ASSESS_ENGINE=gemini` to let the server call Gemini instead.
+It uses the local Codex CLI (`--engine codex`, the ChatGPT subscription) when `codex` is installed. Codex generates the assessment, and the backend can still call Gemini to update the search vector if the card text changes. Set `ASSESS_ENGINE=gemini` to use Gemini to generate the assessment as well.
 The wrapper uses the backend virtual environment,
 the root `.env` and a local lock. The backend must be running. Output includes counts and
 per-source or per-record errors. A failed download leaves the last successful cards in place.
