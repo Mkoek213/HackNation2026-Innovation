@@ -22,7 +22,7 @@ DocumentRole = Literal["summary", "full"]
 
 INNOVATION_ID_PATTERN = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
 InnovationArea = Literal["technologia", "edukacja", "administracja"]
-Verification = Literal["kandydat", "potwierdzona"]
+Verification = Literal["zgloszone", "kandydat", "potwierdzona"]  # zgloszone: user submission, not yet reviewed
 
 
 class AssessmentNote(BaseModel):

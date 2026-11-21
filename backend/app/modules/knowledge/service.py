@@ -373,7 +373,8 @@ class KnowledgeService:
         return found
 
     async def list_innovations(self, category: Category | None = None) -> list[InnovationSummary]:
-        return await self.store.list_innovations(category)
+        """Every card, including unreviewed submissions (admin listing)."""
+        return await self.store.list_innovations(category, include_submitted=True)
 
     async def catalog(self, *, query: str, category: Category | None, area: InnovationArea | None,
                       region: str | None, maturity: Maturity | None, confirmed_only: bool,

@@ -34,9 +34,10 @@ ChatMessage.source_metadata = column_property(select(chat_sources.c.sources).whe
 ChatMessage.artifact_links = column_property(select(chat_message_artifacts.c.artifact_ids).where(
     chat_message_artifacts.c.message_id == ChatMessage.id).correlate_except(chat_message_artifacts).scalar_subquery())
 
-GREETING = ("Cześć! Pomogę Ci opisać i zgłosić innowację, sprawdzić podobne rozwiązania "
-            "albo znaleźć rozwiązanie do wdrożenia. Opisz, czego potrzebujesz - wspólnie wybierzemy kolejny krok.")
-STARTERS = ["Chcę zgłosić innowację z mojej szkoły lub uczelni", "Czy ktoś już rozwiązał podobny problem?", "Szukam rozwiązania do wdrożenia w gminie"]
+GREETING = ("Cześć! Pomogę Ci znaleźć polskie rozwiązanie, które już działa, porównać je według kryteriów Radaru "
+            "i zaplanować wdrożenie. Opisz, czego potrzebuje Twoja instytucja.")
+STARTERS = ["Szukam rozwiązania do wdrożenia w gminie", "Porównaj rozwiązania do cyfrowej nauki w szkole",
+            "Chcę zgłosić istniejące rozwiązanie do Radaru"]
 
 
 def now():

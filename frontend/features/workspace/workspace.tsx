@@ -19,19 +19,20 @@ const base = "workspace/conversations";
 const waitMessage = "Poczekaj na odpowiedź. Wysyłanie i edycja wiadomości są chwilowo wyłączone.";
 const artifactTypes: Record<Artifact["type"], string> = { idea_card: "Karta innowacji", application_draft: "Zgłoszenie do Radaru", adaptation_plan: "Plan wdrożenia" };
 const matterTypes: Record<MatterLink["type"], string> = { ...artifactTypes, note: "Notatka" };
-// Fixed messages of the opt-in innovation submission creator; the agent switches the mode with its idea_creator tool.
+// Fixed messages of the opt-in candidate report creator (backend/app/chat/creator.py); the agent switches the mode with its idea_creator tool.
 const creatorMessages = {
-  finish: "Zakończ kreator i zapisz zgłoszenie w Moich sprawach.",
+  start: "Chcę zgłosić istniejące rozwiązanie do Radaru. Poprowadź mnie krok po kroku.",
+  finish: "Zakończ kreator i przekaż zgłoszenie do weryfikacji.",
   cancel: "Przerwij kreator bez zapisywania zgłoszenia.",
 };
 // Ready-made openings of a new conversation; the person fills in each "…" before sending.
 const starters = [
+  { title: "Znajdź rozwiązanie do wdrożenia", text: "Reprezentuję … (gminę, szkołę, firmę). Szukamy rozwiązania problemu … Co już działa w Polsce?" },
+  { title: "Porównaj rozwiązania", text: "Porównaj rozwiązania do … według poziomu wdrożenia, wiarygodności i potencjału zastosowania." },
   { title: "Sprawdź dowody wdrożenia", text: "Sprawdź, gdzie rozwiązanie … zostało użyte. Podaj źródło i opisz warunki wdrożenia." },
-  { title: "Sprawdź, czy to już istnieje", text: "Mamy pomysł na … Czy w bazie są podobne rozwiązania?" },
-  { title: "Znajdź rozwiązanie do wdrożenia", text: "Reprezentuję … (gminę, szkołę, firmę). Szukamy rozwiązania problemu … Co jest w bazie?" },
-  { title: "Zaplanuj wdrożenie", text: "Chcemy wdrożyć innowację … w … Od czego zacząć i czego będziemy potrzebować?" },
-  { title: "Ścieżka rozwoju", text: "Nasza innowacja … jest na etapie … Jakie są możliwe ścieżki rozwoju, transferu lub komercjalizacji?" },
-  { title: "Szukam partnera", text: "Rozwijamy … Szukamy partnera do pilotażu lub finansowania. Kto mógłby być zainteresowany?" },
+  { title: "Sprawdź, czy to już istnieje", text: "Chcemy rozwiązać problem … Czy ktoś w Polsce już to zrobił?" },
+  { title: "Zaplanuj wdrożenie", text: "Chcemy wdrożyć rozwiązanie … w … Od czego zacząć, kto powinien być zaangażowany i jak zmierzyć efekt?" },
+  { title: "Zgłoś kandydata do Radaru", text: creatorMessages.start },
 ];
 // Fixed demo accounts. The visitor never types credentials; missing accounts are registered on entry.
 const demoAccounts = {
@@ -484,24 +485,26 @@ function Suggestions({ label, items, disabled, onSend }: { label: string; items:
   </nav>;
 }
 
-/** Matters saved by one answer, with a prominent link when the idea creator saved its application input. */
+/** Matters saved by one answer, and a confirmation when the creator submitted a candidate for review. */
 function SavedMatters({ matters, creator }: { matters?: MatterLink[]; creator?: CreatorState | null }) {
-  if (!matters?.length) return null;
-  const finished = creator && !creator.active && creator.matter_id ? matters.find(m => m.id === creator.matter_id) : undefined;
+  const submitted = creator && !creator.active && creator.innovation_id ? creator.submitted_title : null;
+  if (!matters?.length && !submitted) return null;
   return <>
-    {finished && <p className="creator-saved">Zapisano zgłoszenie „{finished.title}”. <Link className="creator-saved-link" href={`/matters/${finished.id}`}>Zobacz w Moich sprawach</Link></p>}
-    <p className="innovation-label">Zapisane w Moich sprawach</p>
-    <ul className="saved-matters">{matters.map(matter => <li key={matter.id}><Link href={`/matters/${matter.id}`}>{matter.title}</Link> <span className="saved-matter-type">({matterTypes[matter.type]})</span></li>)}</ul>
+    {submitted && <p className="creator-saved">Przekazano zgłoszenie „{submitted}” do weryfikacji. Zespół PCI sprawdzi źródło przed publikacją w bazie innowacji.</p>}
+    {Boolean(matters?.length) && <>
+      <p className="innovation-label">Zapisane w Moich sprawach</p>
+      <ul className="saved-matters">{matters?.map(matter => <li key={matter.id}><Link href={`/matters/${matter.id}`}>{matter.title}</Link> <span className="saved-matter-type">({matterTypes[matter.type]})</span></li>)}</ul>
+    </>}
   </>;
 }
 
-/** Progress of the opt-in idea creator: states are text, not colour only, and announced politely. */
+/** Progress of the opt-in candidate report creator: states are text, not colour only, and announced politely. */
 function CreatorPanel({ creator, disabled, onSend }: { creator: CreatorState; disabled: boolean; onSend: (text: string) => void }) {
   const next = creator.steps.findIndex(step => !step.done);
   const total = creator.steps.length;
   return <section className="creator-panel" aria-labelledby="creator-title">
     <div aria-live="polite">
-      <h2 id="creator-title">Kreator zgłoszenia</h2>
+      <h2 id="creator-title">Zgłoszenie kandydata</h2>
       <p className="creator-progress">{next === -1 ? `Wszystkie kroki uzupełnione (${total} z ${total})` : `Krok ${next + 1} z ${total}: ${creator.steps[next].label}`}</p>
       <ol className="creator-steps">{creator.steps.map((step, index) => <li key={step.key} className={step.done ? "is-done" : index === next ? "is-current" : undefined} aria-current={index === next ? "step" : undefined}>
         <span className="creator-step-mark" aria-hidden="true">{step.done ? "✓" : index + 1}</span>
@@ -509,9 +512,9 @@ function CreatorPanel({ creator, disabled, onSend }: { creator: CreatorState; di
       </li>)}</ol>
     </div>
     <div className="creator-actions">
-      <Button size="sm" disabled={disabled} onClick={() => onSend(creatorMessages.finish)}>Zapisz zgłoszenie</Button>
+      <Button size="sm" disabled={disabled} onClick={() => onSend(creatorMessages.finish)}>Przekaż do weryfikacji</Button>
       <Button size="sm" variant="outline" disabled={disabled} onClick={() => onSend(creatorMessages.cancel)}>Zakończ kreator</Button>
     </div>
-    <p className="field-help">Jeśli nie znasz odpowiedzi, napisz „nie wiem”. Zakończenie kreatora nie usuwa zebranych informacji.</p>
+    <p className="field-help">Jeśli nie znasz odpowiedzi, napisz „nie wiem”. Przerwanie kreatora nie usuwa zebranych informacji z rozmowy.</p>
   </section>;
 }

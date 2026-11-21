@@ -104,12 +104,15 @@ class RetrievalTools:
             async with asyncio.timeout(self.timeout):
                 service = await self.factory()
                 if name == "search_innovations":
-                    hits = await service.retrieve(args.query, categories=args.categories, pool=5, confirmed_only=True)
+                    # Candidates are searchable too; each packet carries verification and assessment to tell them apart.
+                    hits = await service.retrieve(args.query, categories=args.categories, pool=6)
                     self.search_status = "ok" if hits else "empty"
                     self.searched = self.searched or bool(hits)
                     return {"status": "ok" if hits else "empty", "candidates": [
                         self.packet(h.innovation, h.retrieval_score, h.evidence) for h in hits]}
                 meta = await service.get(args.innovation_id)
+                if meta.verification == "zgloszone":
+                    raise InnovationNotFound(args.innovation_id)  # unreviewed submissions stay out of answers
                 # Use the public retrieval boundary to reread indexed source passages too.
                 hits = await service.retrieve(meta.title, pool=5)
                 evidence = [e for h in hits if h.innovation.id == meta.id for e in h.evidence]

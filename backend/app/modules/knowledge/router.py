@@ -54,18 +54,24 @@ async def knowledge_service() -> KnowledgeService:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(e)) from e
 
 
-async def require_admin(request: Request, db: DatabaseDep,
-                        x_admin_token: Annotated[str | None, Header(alias=ADMIN_TOKEN_HEADER)] = None) -> None:
+async def is_admin(request: Request, db: DatabaseDep,
+                   x_admin_token: Annotated[str | None, Header(alias=ADMIN_TOKEN_HEADER)] = None) -> bool:
     """Demo-grade protection for writes: a logged-in admin session (the admin panel), or the shared
     secret from RADAR_ADMIN_TOKEN for scripts. Not a substitute for real authorization."""
     expected = load_knowledge_settings().admin_token
     if expected is not None and x_admin_token is not None \
             and hmac.compare_digest(x_admin_token.encode(), expected.encode()):
-        return
+        return True
     user = await get_optional_user(request, db)
-    if user is not None and user.is_admin:
-        return
-    raise HTTPException(status.HTTP_403_FORBIDDEN, f"Admin session or valid {ADMIN_TOKEN_HEADER} required.")
+    return user is not None and user.is_admin
+
+
+async def require_admin(admin: Annotated[bool, Depends(is_admin)]) -> None:
+    if not admin:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, f"Admin session or valid {ADMIN_TOKEN_HEADER} required.")
+
+
+Admin = Annotated[bool, Depends(is_admin)]
 
 
 @contextmanager
@@ -139,8 +145,10 @@ async def _save_uploads(files: list[UploadFile], directory: Path) -> list[Path]:
 
 
 @router.get("/innovations",response_model=list[InnovationSummary], summary="Lista innowacji")
-async def list_innovations(service: Service, category: Category | None = Query(default=None)):
-    return await service.list_innovations(category)
+async def list_innovations(service: Service, admin: Admin, category: Category | None = Query(default=None)):
+    """All cards; unreviewed user submissions are listed for staff only."""
+    items = await service.list_innovations(category)
+    return items if admin else [item for item in items if item.verification != "zgloszone"]
 
 
 @router.get("/catalog", response_model=CatalogPage, summary="Wyszukaj innowacje")
@@ -210,9 +218,12 @@ async def draft_innovation(files: Annotated[list[UploadFile], File(description="
 
 @router.get("/innovations/{innovation_id}", response_model=InnovationSummary,
             responses=_not_found_response, summary="Innowacja")
-async def get_innovation(service: Service, innovation_id: InnovationId):
+async def get_innovation(service: Service, admin: Admin, innovation_id: InnovationId):
     with _not_found():
-        return await service.get(innovation_id)
+        item = await service.get(innovation_id)
+    if item.verification == "zgloszone" and not admin:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Innovation not found")
+    return item
 
 
 @router.put("/innovations/{innovation_id}", response_model=IngestResult, summary="Dodaj lub zastąp innowację",

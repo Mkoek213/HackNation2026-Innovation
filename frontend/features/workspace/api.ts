@@ -3,7 +3,10 @@ export type Innovation = { id: string; title: string; solution: string; source_u
 export type Artifact = { id: string; type: "idea_card" | "application_draft" | "adaptation_plan"; title: string; content_markdown: string; revision: number; updated_at: string };
 export type SourceMetadata = { id: string; title: string; url?: string | null; publication_date?: string | null; geography?: string | null; source_file?: string | null; page_start?: number | null; page_end?: number | null };
 export type MatterLink = { id: number; title: string; type: "idea_card" | "application_draft" | "adaptation_plan" | "note"; status: "draft" | "ready" | "sent"; revision: number };
-export type CreatorState = { active: boolean; steps: { key: string; label: string; done: boolean }[]; matter_id: number | null };
+export type CreatorState = {
+  active: boolean; steps: { key: string; label: string; done: boolean }[]; matter_id: number | null;
+  innovation_id: string | null; submitted_title: string | null;
+};
 export type Operation = { id: number; key: string; content: string; status: "processing" | "completed" | "failed"; result: { answer: string; innovations: Innovation[]; artifacts?: Artifact[]; sources?: SourceMetadata[]; matters?: MatterLink[]; creator?: CreatorState | null; suggestions?: string[]; outcome: "matched" | "no_match" | "unavailable" } | null };
 export type Thread = { id: number; title: string | null; pending: boolean; last_activity_at: string };
 export type Detail = Thread & { operations: Operation[] };

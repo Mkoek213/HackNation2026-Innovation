@@ -157,10 +157,12 @@ class CreatorStep(Contract):
 
 
 class CreatorState(Contract):
-    """Guided idea creator progress after a workspace turn."""
+    """Guided candidate report progress after a workspace turn."""
     active: bool
     steps: list[CreatorStep] = Field(default_factory=list)
     matter_id: int | None = None
+    innovation_id: str | None = None
+    submitted_title: str | None = None
 
 
 class ChatResponse(Contract):

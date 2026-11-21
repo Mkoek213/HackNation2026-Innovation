@@ -19,6 +19,7 @@ from qdrant_client import AsyncQdrantClient, models
 from .schemas import DocumentRole, InnovationMeta, InnovationSummary
 from .taxonomy import Category
 
+SUBMITTED = "zgloszone"  # user submission awaiting staff review: hidden from the catalog and chat
 DENSE = "dense"
 SPARSE = "bm25"
 _NS = uuid.UUID("6f1f8a3e-2a51-4b0e-9a57-6e0c6a1f0b11")
@@ -152,18 +153,20 @@ class QdrantStore:
                 break
         return out
 
-    async def list_innovations(self, category: Category | None = None, *,
-                               confirmed_only: bool = False) -> list[InnovationSummary]:
+    async def list_innovations(self, category: Category | None = None, *, confirmed_only: bool = False,
+                               include_submitted: bool = False) -> list[InnovationSummary]:
         must = [_match("kind", "card")]
         if category is not None:
             must.append(_match("categories", category.value))
         if confirmed_only:
             must.append(_match("verification", "potwierdzona"))
+        must_not = [] if include_submitted else [_match("verification", SUBMITTED)]
         out: list[InnovationSummary] = []
         offset = None
         while True:
             records, offset = await self.client.scroll(
-                self.collection, scroll_filter=models.Filter(must=must), limit=256, offset=offset, with_payload=True,
+                self.collection, scroll_filter=models.Filter(must=must, must_not=must_not), limit=256, offset=offset,
+                with_payload=True,
             )
             out.extend(card_payload_to_summary(r.payload) for r in records)
             if offset is None:
@@ -248,7 +251,8 @@ class QdrantStore:
             must.append(models.FieldCondition(
                 key="categories", match=models.MatchAny(any=[c.value for c in categories]),
             ))
-        return models.Filter(must=must)
+        # Unreviewed user submissions never reach retrieval, so their text cannot steer chat answers.
+        return models.Filter(must=must, must_not=[_match("verification", SUBMITTED)])
 
     @staticmethod
     def _by_innovation(innovation_id: str) -> models.FilterSelector:

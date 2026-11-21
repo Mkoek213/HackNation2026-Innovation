@@ -15,7 +15,7 @@ export type Assessment = {
 };
 export type Discovery = {
   area: keyof typeof innovationAreas | null; region: string | null; checked_at: string | null;
-  verification: "potwierdzona" | "kandydat"; assessment: Assessment;
+  verification: "potwierdzona" | "kandydat" | "zgloszone"; assessment: Assessment;
 };
 export type Innovation = {
   id: string; title: string; categories: string[]; primary_category: string;

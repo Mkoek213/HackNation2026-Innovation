@@ -9,8 +9,10 @@ from .schemas import Contract
 from .store import now
 
 FIELDS = {
-    "role": ("Kim jest rozmówca", "twórca, pracownik instytucji, potencjalny wdrażający, partner lub inwestor"),
-    "institution": ("Instytucja", "szkoła, uczelnia, samorząd lub inna instytucja, w której powstała innowacja"),
+    "role": ("Kim jest rozmówca", "pracownik instytucji, potencjalny wdrażający, firma, inwestor lub innowator"),
+    "source_url": ("Link do źródła", "adres strony z opisem rozwiązania lub dowodem jego zastosowania"),
+    "institution": ("Instytucja", "szkoła, uczelnia, samorząd, firma lub inna instytucja, która stworzyła lub stosuje rozwiązanie"),
+    "deployment": ("Gdzie już działa", "instytucje lub miejsca, w których rozwiązanie jest stosowane albo pilotowane"),
     "location": ("Lokalizacja", "dobrowolnie podana miejscowość, gmina lub powiat"),
     "idea": ("Innowacja", "istota rozwiązania opisana przez użytkownika"),
     "problem": ("Problem", "jaki problem lub potrzebę rozwiązuje"),

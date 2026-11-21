@@ -199,10 +199,11 @@ function AssessmentFields({ profile, onChange, disabled }: {
       </label>
       <label className="field-block">Status weryfikacji
         <select className="select" value={profile.verification} onChange={e => onChange({ verification: e.target.value as Discovery["verification"] })}>
+          <option value="zgloszone">Zgłoszenie użytkownika (ukryte)</option>
           <option value="kandydat">Kandydat do weryfikacji</option>
           <option value="potwierdzona">Potwierdzone użycie</option>
         </select>
-        <span className="field-help">Potwierdzenie wymaga etapu pilotażu lub wdrożenia oraz uzasadnienia ze źródłem rzeczywistego użycia.</span>
+        <span className="field-help">Zgłoszenia użytkowników są ukryte w katalogu i czacie do zmiany statusu. Potwierdzenie wymaga etapu pilotażu lub stosowania oraz uzasadnienia ze źródłem rzeczywistego użycia.</span>
       </label>
       {profile.area === "technologia" && <label className="field-block">TRL (opcjonalnie)
         <Input type="number" min={1} max={9} value={assessment.trl ?? ""} onChange={e => {
