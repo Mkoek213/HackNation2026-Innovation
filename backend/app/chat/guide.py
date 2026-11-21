@@ -103,8 +103,9 @@ class Guide:
         except ValidationError:
             return {"kind": "guide", "status": "invalid_arguments"}
         user_messages = self.user_messages[:1] if args.new_case else self.user_messages
+        # A bare "-" is a substring of "e-usług"; a quote must carry at least one letter or digit.
         valid = {name: value.strip() for name, value in args.facts.model_dump(exclude_none=True).items()
-                 if value.strip() and any(value.strip() in message for message in user_messages)}
+                 if any(ch.isalnum() for ch in value) and any(value.strip() in message for message in user_messages)}
         rejected = [name for name, value in args.facts.model_dump(exclude_none=True).items() if value.strip() and name not in valid]
         if args.new_case:
             self.user_messages = user_messages

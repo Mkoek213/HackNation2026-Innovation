@@ -22,7 +22,7 @@ from .guide import GUIDE_TOOL_NAMES, GUIDE_TOOLS, Guide, consumed_guide
 from .response import ROUTING, ROUTING_TOOLS, Route, review_answer
 from .matters import MATTER_TOOL_NAMES, MATTER_TOOLS, MatterTools, consumed_matter, matter_note
 from .suggestions import suggest_followups
-from .creator import CREATOR_TOOL_NAMES, CREATOR_TOOLS, CreatorTools, consumed_creator, creator_note, state as creator_state, next_question as creator_question
+from .creator import CREATOR_TOOL_NAMES, CREATOR_TOOLS, STEPS, CreatorTools, consumed_creator, creator_note, state as creator_state, next_question as creator_question
 
 CONVERSATION_TOOLS = GUIDE_TOOLS + TOOLS + SOURCE_TOOLS + ARTIFACT_TOOLS
 ALL_TOOLS = CONVERSATION_TOOLS
@@ -379,6 +379,16 @@ class ChatService:
                             if creator_step and not route.creator_step_answer and isinstance(call.args.get("facts"), dict):
                                 # A side question must not complete the step via a later model tool call.
                                 arguments = {**call.args, "facts": {k: v for k, v in call.args["facts"].items() if k != creator_step}}
+                            if creator and guide.creator.get("active") and isinstance(arguments.get("facts"), dict):
+                                # One answer (often "nie wiem") must not fill a second step; the model copies it despite the prompt.
+                                steps = {key for key, _ in STEPS}
+                                taken = {str(v).strip(): k for k, v in guide.facts.items() if k in steps and v}
+                                kept = {}
+                                for k, v in arguments["facts"].items():
+                                    if k in steps and taken.setdefault(str(v).strip(), k) != k:
+                                        continue
+                                    kept[k] = v
+                                arguments = {**arguments, "facts": kept}
                             result = await guide.execute(arguments)
                             case_reset = case_reset or guide.case_started_at != prior_case
                         elif call.name in SOURCE_TOOL_NAMES:

@@ -40,6 +40,8 @@ SUGGEST_TOOLS = [types.Tool(function_declarations=[types.FunctionDeclaration(
 
 async def suggest_followups(provider, *, request, answer, innovations=(), creator_active=False):
     """Best-effort 2-4 suggestions; an empty list on any provider or validation failure."""
+    if creator_active:  # a clicked suggestion would be saved as the step answer, so only the skip remains
+        return ["Nie wiem, przejdźmy dalej"] if answer.rstrip().endswith("?") else []
     packet = {"latest_user_message": request[:2000], "assistant_answer": answer[:4000],
               "innovations": [m.title for m in innovations], "idea_creator_active": creator_active}
     contents = [types.Content(role="user", parts=[types.Part(text=json.dumps(packet, ensure_ascii=False))])]
