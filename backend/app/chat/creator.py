@@ -43,8 +43,8 @@ ADMINISTRATION = ("urząd", "urzęd", "gmin", "powiat", "samorząd", "administra
 class IdeaCreator(Contract):
     action: Literal["start", "finish", "cancel"] = Field(description=(
         "start: the user asked to be guided step by step through reporting an existing solution to Radar "
-        "(e.g. the 'Zgłoś kandydata' button). finish: the steps are done or the user asks to finish; then the candidate "
-        "is submitted for staff review. cancel: the user wants to stop the creator without submitting."))
+        "(e.g. the 'Zgłoś kandydata' button). finish: every step is filled in; then the candidate is submitted for staff "
+        "review (an earlier finish is refused; the user can submit early with the button). cancel: the user wants to stop the creator without submitting."))
     title: str | None = Field(default=None, max_length=200, description="finish only: short Polish name of the solution.")
 
 
@@ -143,6 +143,11 @@ class CreatorTools:
             await self.guide.save()
             return {"kind": "creator", "status": "cancelled",
                     "message": "Kreator wyłączony; zebrane informacje pozostają w rozmowie. Wróć do zwykłej rozmowy."}
+        left = missing(self.guide)
+        if left:  # only the user's button submits an incomplete report (see preset)
+            return {"kind": "creator", "status": "incomplete", "missing": [label for _, label in left],
+                    "message": f"Nie przekazuj jeszcze zgłoszenia. Zadaj jedno pytanie o krok: {left[0][1]}. "
+                               "Użytkownik może przekazać zgłoszenie wcześniej przyciskiem „Przekaż do weryfikacji”."}
         return await self.finish(args)
 
     async def finish(self, args):
@@ -227,7 +232,8 @@ def creator_note(guide):
         "w polu tego kroku (Link do źródła to source_url, Na czym polega to solution, Gdzie już działa to deployment, "
         "Dowód zastosowania to evidence). Daj krótki, szczery feedback, bez automatycznych pochwał. "
         "Odpowiedź 'nie wiem' lub pominięcie zapisz jako dokładny cytat użytkownika i przejdź dalej. Nie pytaj ponownie o uzupełnione kroki. "
-        "Gdy wszystkie kroki są uzupełnione albo użytkownik chce zakończyć, wywołaj idea_creator(finish) z krótką nazwą rozwiązania. "
+        "Gdy wszystkie kroki są uzupełnione, wywołaj idea_creator(finish) z krótką nazwą rozwiązania. Gdy użytkownik chce zakończyć "
+        "wcześniej, wskaż mu przycisk „Przekaż do weryfikacji”. "
         "Gdy użytkownik chce przerwać, wywołaj idea_creator(cancel). Pytania niezwiązane z kreatorem obsłuż normalnie i wróć do kroku. "
         "Postęp: " + json.dumps(steps, ensure_ascii=False) +
         (f". Następny krok: {left[0][1]}." if left else ". Wszystkie kroki uzupełnione: zaproponuj przekazanie zgłoszenia.")
