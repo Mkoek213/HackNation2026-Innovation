@@ -11,7 +11,7 @@ import httpx
 
 from import_deployments import records
 
-SOURCES = ("deployments", "interreg", "radon")
+SOURCES = ("deployments", "interreg", "radon", "cordis", "fundusze")
 HERE = Path(__file__).resolve().parent
 
 

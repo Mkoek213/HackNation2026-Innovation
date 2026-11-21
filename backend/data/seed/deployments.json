@@ -1,0 +1,517 @@
+[
+ {
+  "meta": {
+   "title": "e-Doręczenia · elektroniczna korespondencja z urzędami",
+   "categories": [
+    "ict"
+   ],
+   "primary_category": "ict",
+   "innovation_type": "procesowa",
+   "institution_type": "instytucja-publiczna",
+   "institution": "Ministerstwo Cyfryzacji · urzędy w całej Polsce",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Ministerstwo Cyfryzacji",
+   "source_url": "https://www.gov.pl/web/cyfryzacja/100-mln-przesylek-w-e-doreczeniach-cyfrowa-korespondencja-z-urzedami-stala-sie-standardem",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "area": "administracja",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Według Ministerstwa Cyfryzacji (sierpień 2026) wysłano ponad 100 mln przesyłek, a w Bazie Adresów Elektronicznych jest 4,6 mln adresów.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/100-mln-przesylek-w-e-doreczeniach-cyfrowa-korespondencja-z-urzedami-stala-sie-standardem"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Urząd doręcza pismo z mocą prawną listu poleconego bez druku i bez wizyty na poczcie.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/100-mln-przesylek-w-e-doreczeniach-cyfrowa-korespondencja-z-urzedami-stala-sie-standardem"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Usługa jest powszechna dla podmiotów publicznych. Korzyść w danej instytucji zależy od integracji z jej systemem obiegu dokumentów.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/100-mln-przesylek-w-e-doreczeniach-cyfrowa-korespondencja-z-urzedami-stala-sie-standardem"
+    },
+    "next_step": "Kancelaria urzędu może zmierzyć udział korespondencji wysyłanej elektronicznie i koszt wysyłki papierowej przed i po pełnym przejściu na e-Doręczenia.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Elektroniczny odpowiednik listu poleconego za potwierdzeniem odbioru w korespondencji z urzędami.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Według Ministerstwa Cyfryzacji (sierpień 2026) wysłano ponad 100 mln przesyłek, a w Bazie Adresów Elektronicznych jest 4,6 mln adresów."
+   },
+   "id": "gov-e-doreczenia"
+  }
+ },
+ {
+  "meta": {
+   "title": "e-Recepta · elektroniczna recepta w każdej aptece",
+   "categories": [
+    "jakosc-zycia"
+   ],
+   "primary_category": "jakosc-zycia",
+   "innovation_type": "technologiczna",
+   "institution_type": "instytucja-publiczna",
+   "institution": "Centrum e-Zdrowia · apteki i placówki medyczne w całej Polsce",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Centrum e-Zdrowia (pacjent.gov.pl)",
+   "source_url": "https://pacjent.gov.pl/e-recepta",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "area": "technologia",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Centrum e-Zdrowia opisuje e-receptę jako dokument, który zastąpił papierową receptę i jest realizowany w każdej aptece w Polsce.",
+     "source_url": "https://pacjent.gov.pl/e-recepta"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Pacjent może kupić każdy lek z recepty w innej aptece, a recepta jest zawsze czytelna i zapisana na koncie.",
+     "source_url": "https://pacjent.gov.pl/e-recepta"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Usługa jest powszechna. Wnioski dla innych instytucji dotyczą modelu centralnego rejestru i kodu dostępu wysyłanego SMS-em.",
+     "source_url": "https://pacjent.gov.pl/e-recepta"
+    },
+    "next_step": "Instytucja projektująca podobną e-usługę może przeanalizować model kodu dostępu i zmierzyć odsetek spraw załatwionych bez wizyty.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Elektroniczna recepta realizowana na podstawie czterocyfrowego kodu, zapisana na Internetowym Koncie Pacjenta.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Centrum e-Zdrowia opisuje e-receptę jako dokument, który zastąpił papierową receptę i jest realizowany w każdej aptece w Polsce."
+   },
+   "id": "gov-e-recepta"
+  }
+ },
+ {
+  "meta": {
+   "title": "ePłatności dla samorządów",
+   "categories": [
+    "ict"
+   ],
+   "primary_category": "ict",
+   "innovation_type": "procesowa",
+   "institution_type": "instytucja-publiczna",
+   "institution": "Centralny Ośrodek Informatyki · wdrożenie w Bydgoszczy",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Ministerstwo Cyfryzacji",
+   "source_url": "https://www.gov.pl/web/cyfryzacja/ponad-milion-platnosci-bez-kolejek-cyfrowe-oplaty-urzedowe-staja-sie-standardem",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "region": "Kujawsko-pomorskie",
+   "area": "administracja",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Bydgoszcz obsłużyła pierwszą transakcję. Według raportu z maja 2026 r. w Polsce wykonano ponad 1,1 mln transakcji.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/ponad-milion-platnosci-bez-kolejek-cyfrowe-oplaty-urzedowe-staja-sie-standardem"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Mieszkaniec reguluje należność urzędową z poziomu aplikacji, bez ręcznego przepisywania danych do przelewu.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/ponad-milion-platnosci-bez-kolejek-cyfrowe-oplaty-urzedowe-staja-sie-standardem"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Usługa działa w dużych miastach i mniejszych gminach. Zakres należności i połączenie z systemem księgowym zależą od urzędu.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/ponad-milion-platnosci-bez-kolejek-cyfrowe-oplaty-urzedowe-staja-sie-standardem"
+    },
+    "next_step": "Wydział finansowy gminy może uzgodnić z COI obsługę jednej należności po sprawdzeniu integracji. W pilotażu zmierzyć odsetek wpłat online.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Płatności online dla mieszkańców. Podatki lokalne i inne należności urzędowe można opłacić cyfrowo w mObywatelu.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Bydgoszcz obsłużyła pierwszą transakcję. Według raportu z maja 2026 r. w Polsce wykonano ponad 1,1 mln transakcji."
+   },
+   "id": "gov-eplatnosci"
+  }
+ },
+ {
+  "meta": {
+   "title": "EZD RP · elektroniczny obieg dokumentów",
+   "categories": [
+    "ict"
+   ],
+   "primary_category": "ict",
+   "innovation_type": "technologiczna",
+   "institution_type": "instytucja-publiczna",
+   "institution": "NASK-PIB · wdrożenie w Białymstoku",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Portal EZD RP",
+   "source_url": "https://www.gov.pl/web/ezd-rp/770-zrealizowanych-wdrozen-produkcyjnych-ezd-rp",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "region": "Podlaskie",
+   "area": "technologia",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Urząd Marszałkowski Województwa Podlaskiego w Białymstoku uruchomił EZD RP produkcyjnie 2 stycznia 2024 r.",
+     "source_url": "https://www.gov.pl/web/ezd-rp/770-zrealizowanych-wdrozen-produkcyjnych-ezd-rp"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "System pozwala rejestrować i przekazywać dokumenty w elektronicznym obiegu spraw urzędu.",
+     "source_url": "https://www.gov.pl/web/ezd-rp/770-zrealizowanych-wdrozen-produkcyjnych-ezd-rp"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Źródło opisuje wdrożenia w wielu instytucjach. W nowym urzędzie trzeba sprawdzić integracje, migrację i organizację pracy.",
+     "source_url": "https://www.gov.pl/web/ezd-rp/770-zrealizowanych-wdrozen-produkcyjnych-ezd-rp"
+    },
+    "next_step": "Sekretarz urzędu może ustalić z zespołem EZD RP warunki wdrożenia w jednym wydziale i zmierzyć czas od rejestracji pisma do jego przekazania.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "System do elektronicznego zarządzania dokumentacją i obiegu spraw między pracownikami urzędu.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Urząd Marszałkowski Województwa Podlaskiego w Białymstoku uruchomił EZD RP produkcyjnie 2 stycznia 2024 r."
+   },
+   "id": "gov-ezd-rp"
+  }
+ },
+ {
+  "meta": {
+   "title": "Laboratoria Przyszłości · wyposażenie szkół w sprzęt do nauki przez działanie",
+   "categories": [
+    "jakosc-zycia"
+   ],
+   "primary_category": "jakosc-zycia",
+   "innovation_type": "edukacyjna",
+   "institution_type": "szkola",
+   "institution": "Szkoły podstawowe w całej Polsce",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Ministerstwo Edukacji i Nauki",
+   "source_url": "https://www.gov.pl/web/nauka/niemal-miliard-zlotych-w-ramach-laboratoriow-przyszlosci-juz-w-szkolach-w-calej-polsce",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "area": "edukacja",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Do pierwszej odsłony zgłosiło się ponad 99% z niemal 12 tys. uprawnionych szkół, a niemal miliard złotych trafił już do szkół w całym kraju.",
+     "source_url": "https://www.gov.pl/web/nauka/niemal-miliard-zlotych-w-ramach-laboratoriow-przyszlosci-juz-w-szkolach-w-calej-polsce"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Szkoła sama wybiera wyposażenie z katalogu niemal 200 rodzajów sprzętu i wykorzystuje je na zajęciach projektowych.",
+     "source_url": "https://www.gov.pl/web/nauka/niemal-miliard-zlotych-w-ramach-laboratoriow-przyszlosci-juz-w-szkolach-w-calej-polsce"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Sprzęt jest już w większości szkół. Efekt zależy od przygotowania nauczycieli i scenariuszy zajęć, a nie od samego zakupu.",
+     "source_url": "https://www.gov.pl/web/nauka/niemal-miliard-zlotych-w-ramach-laboratoriow-przyszlosci-juz-w-szkolach-w-calej-polsce"
+    },
+    "next_step": "Dyrekcja może zaplanować jeden projekt uczniowski z użyciem sprzętu na semestr i zmierzyć liczbę godzin zajęć z jego wykorzystaniem.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Program finansowania drukarek 3D, mikrokontrolerów, robotów edukacyjnych i innego sprzętu do rozwijania kompetencji przyszłości w szkołach podstawowych.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Do pierwszej odsłony zgłosiło się ponad 99% z niemal 12 tys. uprawnionych szkół, a niemal miliard złotych trafił już do szkół w całym kraju."
+   },
+   "id": "gov-laboratoria-przyszlosci"
+  }
+ },
+ {
+  "meta": {
+   "title": "Ogólnopolska Sieć Edukacyjna (OSE) · szybki i bezpieczny internet w szkołach",
+   "categories": [
+    "ict"
+   ],
+   "primary_category": "ict",
+   "innovation_type": "technologiczna",
+   "institution_type": "instytucja-publiczna",
+   "institution": "NASK-PIB · szkoły w całej Polsce",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Ministerstwo Cyfryzacji",
+   "source_url": "https://www.gov.pl/web/cyfryzacja/ose-szybki-internet-w-szkolach-sprzet-dla-uczniow-i-nauczycieli",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "area": "edukacja",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Ministerstwo Cyfryzacji podało, że 18,5 tys. szkół podpisało umowy z OSE, a 14,6 tys. placówek było już podłączonych.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/ose-szybki-internet-w-szkolach-sprzet-dla-uczniow-i-nauczycieli"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Jeden operator publiczny dostarcza szkołom łącze, ochronę przed szkodliwymi treściami i zabezpieczenia sieci.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/ose-szybki-internet-w-szkolach-sprzet-dla-uczniow-i-nauczycieli"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Sieć obejmuje większość szkół. Szkoła spoza sieci sprawdza dostępność przyłącza i wewnętrzną infrastrukturę Wi-Fi.",
+     "source_url": "https://www.gov.pl/web/cyfryzacja/ose-szybki-internet-w-szkolach-sprzet-dla-uczniow-i-nauczycieli"
+    },
+    "next_step": "Organ prowadzący może sprawdzić, które szkoły nie korzystają z OSE, i zmierzyć dostępną przepustowość na ucznia przed i po podłączeniu.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Publiczna sieć telekomunikacyjna, która daje szkołom bezpłatny, szybki i filtrowany dostęp do internetu.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Ministerstwo Cyfryzacji podało, że 18,5 tys. szkół podpisało umowy z OSE, a 14,6 tys. placówek było już podłączonych."
+   },
+   "id": "gov-ose"
+  }
+ },
+ {
+  "meta": {
+   "title": "Lekcja:Enter · cyfrowe metody nauczania",
+   "categories": [
+    "jakosc-zycia"
+   ],
+   "primary_category": "jakosc-zycia",
+   "innovation_type": "edukacyjna",
+   "institution_type": "szkola",
+   "institution": "Konsorcjum Lekcja:Enter i uczestniczące szkoły",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Lekcja:Enter · organizatorzy programu",
+   "source_url": "https://lekcjaenter.pl/aktualnosci/zapraszamy-do-obejrzenia-filmu-podsumowujacego-nasz-projekt",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "area": "edukacja",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Organizatorzy podają, że z wdrożonego programu szkoleń skorzystało ponad 82 tys. nauczycieli z ponad 10 tys. szkół.",
+     "source_url": "https://lekcjaenter.pl/aktualnosci/zapraszamy-do-obejrzenia-filmu-podsumowujacego-nasz-projekt"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Model łączy szkolenie metodyczne z przygotowywaniem scenariuszy zajęć przez nauczycieli.",
+     "source_url": "https://lekcjaenter.pl/aktualnosci/zapraszamy-do-obejrzenia-filmu-podsumowujacego-nasz-projekt"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Wynik pokazuje zasięg szkoleń. Dostępność materiałów i efekty zastosowania metody w danej szkole wymagają sprawdzenia.",
+     "source_url": "https://lekcjaenter.pl/aktualnosci/zapraszamy-do-obejrzenia-filmu-podsumowujacego-nasz-projekt"
+    },
+    "next_step": "Dyrekcja może wypróbować jeden opublikowany scenariusz po sprawdzeniu dostępności materiałów i zebrać ocenę nauczycieli oraz uczniów.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Model doskonalenia nauczycieli w tworzeniu i prowadzeniu lekcji z wykorzystaniem narzędzi cyfrowych.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Organizatorzy podają, że z wdrożonego programu szkoleń skorzystało ponad 82 tys. nauczycieli z ponad 10 tys. szkół."
+   },
+   "id": "lekcja-enter"
+  }
+ },
+ {
+  "meta": {
+   "title": "PSeAP · Podkarpacki System e-Administracji Publicznej",
+   "categories": [
+    "ict"
+   ],
+   "primary_category": "ict",
+   "innovation_type": "procesowa",
+   "institution_type": "jst",
+   "institution": "Samorząd Województwa Podkarpackiego i partnerzy JST · Powiat Jasielski",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Powiat Jasielski (samorzad.gov.pl)",
+   "source_url": "https://samorzad.gov.pl/web/powiat-jasielski/pseap---podkarpacki-system-e-administracji-publicznej.",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "region": "Podkarpackie",
+   "area": "administracja",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Powiat Jasielski opisuje wdrożenie Systemu e-Usług Internetowych (SeUI) i Systemu Elektronicznego Obiegu Dokumentów (SEOD) w ramach PSeAP.",
+     "source_url": "https://samorzad.gov.pl/web/powiat-jasielski/pseap---podkarpacki-system-e-administracji-publicznej."
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Urzędy jednego województwa korzystają ze wspólnej platformy zamiast budować e-usługi osobno.",
+     "source_url": "https://samorzad.gov.pl/web/powiat-jasielski/pseap---podkarpacki-system-e-administracji-publicznej."
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Model wspólnej regionalnej platformy można powtórzyć w innym województwie. Wymaga to umów utrzymaniowych i integracji z ePUAP oraz e-Doręczeniami.",
+     "source_url": "https://samorzad.gov.pl/web/powiat-jasielski/pseap---podkarpacki-system-e-administracji-publicznej."
+    },
+    "next_step": "Sekretarz gminy może porównać, które e-usługi z PSeAP są aktywne, i zmierzyć udział spraw wszczętych elektronicznie.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Regionalne środowisko e-administracji dla urzędów samorządowych: wspólny system e-usług internetowych i elektroniczny obieg dokumentów.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Powiat Jasielski opisuje wdrożenie Systemu e-Usług Internetowych (SeUI) i Systemu Elektronicznego Obiegu Dokumentów (SEOD) w ramach PSeAP."
+   },
+   "id": "podkarpackie-pseap"
+  }
+ },
+ {
+  "meta": {
+   "title": "RaP STEAM · robotyka i programowanie w podkarpackich szkołach podstawowych",
+   "categories": [
+    "ict"
+   ],
+   "primary_category": "ict",
+   "innovation_type": "edukacyjna",
+   "institution_type": "jst",
+   "institution": "Samorząd Województwa Podkarpackiego · szkoły podstawowe regionu",
+   "authors": [],
+   "maturity": "pilotaz",
+   "source_name": "Gmina Grodzisko Dolne (samorzad.gov.pl)",
+   "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "region": "Podkarpackie",
+   "area": "edukacja",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Do projektu zgłosiło się 771 szkół podstawowych. Rozwiązania są testowane pilotażowo w Zespole Szkół w Grodzisku Górnym.",
+     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Samorząd województwa prowadzi jeden program robotyki dla setek szkół i najpierw testuje go w szkole z doświadczeniem w robotyce.",
+     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Model regionalnego programu można przenieść do innego województwa. Warunkiem jest finansowanie EFS+ i przygotowanie nauczycieli.",
+     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam"
+    },
+    "next_step": "Inny samorząd może poprosić o wyniki pilotażu w Grodzisku Górnym i zmierzyć liczbę uczniów uczestniczących w zajęciach robotyki.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Regionalny program nauczania robotyki z elementami programowania w szkołach podstawowych województwa podkarpackiego.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Do projektu zgłosiło się 771 szkół podstawowych. Rozwiązania są testowane pilotażowo w Zespole Szkół w Grodzisku Górnym."
+   },
+   "id": "podkarpackie-rap-steam"
+  }
+ },
+ {
+  "meta": {
+   "title": "Inteligentny System Monitoringu Przystanków w Rzeszowie",
+   "categories": [
+    "motoryzacja"
+   ],
+   "primary_category": "motoryzacja",
+   "innovation_type": "technologiczna",
+   "institution_type": "jst",
+   "institution": "Zarząd Transportu Miejskiego w Rzeszowie",
+   "authors": [],
+   "maturity": "stosowane",
+   "source_name": "Asseco Data Systems (opis wdrożenia wykonawcy)",
+   "source_url": "https://www.assecods.pl/en/case-studies/intelligent-bus-stop-monitoring-system",
+   "imported_at": "2026-11-21",
+   "checked_at": "2026-11-21",
+   "region": "Podkarpackie",
+   "area": "technologia",
+   "verification": "potwierdzona",
+   "assessment": {
+    "implementation": {
+     "basis": "potwierdzone",
+     "rationale": "Według opisu wykonawcy system zainstalowano na 47 przystankach w Rzeszowie i zintegrowano z systemem informacji pasażerskiej działającym od 2015 r.",
+     "source_url": "https://www.assecods.pl/en/case-studies/intelligent-bus-stop-monitoring-system"
+    },
+    "novelty": {
+     "basis": "szacunek",
+     "rationale": "Obraz z przystanków trafia do tego samego systemu, który zarządza informacją dla pasażerów.",
+     "source_url": "https://www.assecods.pl/en/case-studies/intelligent-bus-stop-monitoring-system"
+    },
+    "transfer": {
+     "basis": "szacunek",
+     "rationale": "Rozwiązanie pasuje do miast z istniejącym systemem informacji pasażerskiej. Opis pochodzi od wykonawcy, więc efekty wymagają potwierdzenia przez ZTM.",
+     "source_url": "https://www.assecods.pl/en/case-studies/intelligent-bus-stop-monitoring-system"
+    },
+    "next_step": "Zarząd transportu może poprosić ZTM Rzeszów o dane o incydentach i aktach wandalizmu przed i po wdrożeniu, a potem zaplanować pilotaż na kilku przystankach.",
+    "summary": "",
+    "recipients": [],
+    "path_rationale": "",
+    "measures": [],
+    "criteria_version": ""
+   },
+   "card": {
+    "problem": "",
+    "solution": "Monitoring wizyjny przystanków komunikacji miejskiej połączony z elektronicznym systemem informacji pasażerskiej.",
+    "novelty": "",
+    "target_users": "",
+    "evidence": "Według opisu wykonawcy system zainstalowano na 47 przystankach w Rzeszowie i zintegrowano z systemem informacji pasażerskiej działającym od 2015 r."
+   },
+   "id": "rzeszow-ismp"
+  }
+ }
+]

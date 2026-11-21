@@ -64,13 +64,17 @@ PostgreSQL initialises credentials only when its data volume is first created; c
 
 ```bash
 cd backend
-uv run python scripts/import_interreg.py --region Podkarpackie > data/seed/interreg.json
-uv run python scripts/import_radon.py --region Podkarpackie --limit 200 > data/seed/radon.json
+uv run python scripts/import_deployments.py > data/seed/deployments.json
+uv run python scripts/import_fundusze.py > data/seed/fundusze.json      # downloads about 60 MB
+uv run python scripts/import_cordis.py > data/seed/cordis.json          # downloads about 38 MB
+uv run python scripts/import_interreg.py > data/seed/interreg.json
+uv run python scripts/import_radon.py --limit 20 > data/seed/radon.json # about 40 minutes
 cd ..
 set -a && . ./.env && set +a
 uv --project backend run python backend/scripts/upload_innovations.py --api "http://localhost:${BACKEND_PORT}" --dry-run
 uv --project backend run python backend/scripts/upload_innovations.py --api "http://localhost:${BACKEND_PORT}"
-docker compose exec backend python scripts/seed_demo.py               # demo users, topics, partners and activity
+uv --project backend run python backend/scripts/assess_innovations.py --api "http://localhost:${BACKEND_PORT}"
+docker compose exec backend python scripts/seed_demo.py               # demo users, topics and activity
 ```
 
 `upload_innovations.py` reads every `backend/data/seed/*.json` and uses the same endpoint as the admin "Dokumenty" view, so cards land in Qdrant (`QDRANT_COLLECTION`) and files in S3.
@@ -79,8 +83,8 @@ Sources, filters and limitations are recorded in [the data source investigation]
 ### Daily source refresh
 
 From the root, run `bash backend/scripts/refresh_innovations.sh --dry-run` to inspect source
-counts, or omit `--dry-run` to publish. Limit a run to one feed using `--source deployments`,
-`--source interreg` or `--source radon`. The wrapper uses the backend virtual environment,
+counts, or omit `--dry-run` to publish. Limit a run to one feed using `--source` with
+`deployments`, `fundusze`, `cordis`, `interreg` or `radon`. Run `assess_innovations.py` afterwards to score new cards. The wrapper uses the backend virtual environment,
 the root `.env` and a local lock. The backend must be running. Output includes counts and
 per-source or per-record errors. A failed download leaves the last successful cards in place.
 

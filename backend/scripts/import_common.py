@@ -18,18 +18,21 @@ from app.modules.knowledge.taxonomy import Category, InnovationType, Institution
 # Polite identification for public open-data endpoints.
 USER_AGENT = "radar-innowacji-importer/1.0 (+https://pcinn.org)"
 
-# Word-prefix keywords per sector, matched on diacritic-free lowercase text.
+# Word-prefix keywords per sector (Polish, then English for EU records), matched on diacritic-free lowercase text.
 # shortcut: keyword lists miss synonyms; replace with the GLiDE classifier when imports grow.
 SECTOR_KEYWORDS: dict[Category, tuple[str, ...]] = {
     Category.AUTOMOTIVE: ("motoryzac", "samochod", "pojazd", "elektromobil", "transport", "drog", "akumulator", "silnik",
-                          "mobilnosc", "kolej", "rower"),
-    Category.AVIATION: ("lotnic", "samolot", "dron", "bezzalogow", "aero", "awionik", "lotnisk", "smiglowc"),
-    Category.SPACE: ("kosmicz", "satelit", "orbit", "astronom", "obserwacji ziemi", "teledetekc"),
+                          "mobilnosc", "kolej", "rower", "vehicle", "automotive", "batter", "mobility", "railway"),
+    Category.AVIATION: ("lotnic", "samolot", "dron", "bezzalogow", "aero", "awionik", "lotnisk", "smiglowc", "aircraft", "aviation", "drone", "airport"),
+    Category.SPACE: ("kosmicz", "satelit", "orbit", "astronom", "obserwacji ziemi", "teledetekc", "satellite", "space ", "earth observation"),
     Category.ICT: ("informaty", "cyfrow", "algorytm", "sztuczn", "uczenie maszyn", "oprogramowan", "dane ", "internet",
-                   "siec", "elektroni", "komputer", "aplikac", "cyberbezpiecz", "robot", "automaty", "e-uslug"),
+                   "siec", "elektroni", "komputer", "aplikac", "cyberbezpiecz", "robot", "automaty", "e-uslug", "digital", "software",
+                   "artificial intelligence", "machine learning", "cyber", "computing", "quantum"),
     Category.QUALITY_OF_LIFE: ("zdrow", "medycy", "leczen", "choro", "pacjent", "terapi", "klimat", "srodowisk", "energi",
                                "woda", "wody", "powietrz", "zywno", "rolnic", "edukac", "szkol", "spolecz", "senior",
-                               "bezpieczen", "ratown", "turyst", "kultur", "dziedzict", "przyrod", "ekolog", "odpad"),
+                               "bezpieczen", "ratown", "turyst", "kultur", "dziedzict", "przyrod", "ekolog", "odpad",
+                               "health", "medical", "patient", "disease", "climate", "energy", "water", "food",
+                               "agricult", "education", "social", "citizen", "heritage", "waste", "environment"),
 }
 TYPE_KEYWORDS: list[tuple[InnovationType, tuple[str, ...]]] = [
     (InnovationType.EDUCATIONAL, ("edukac", "szkol", "nauczan", "uczni", "dydakty", "kompetenc")),
@@ -57,12 +60,14 @@ def region_name(value: str | None) -> str | None:
     return next((name for name in REGIONS if plain(name) == plain(value)), None) if value else None
 
 
-def application_area(kind: InnovationType, institution: InstitutionType):
+def application_area(kind: InnovationType, institution: InstitutionType) -> str:
     if kind == InnovationType.EDUCATIONAL:
         return "edukacja"
     if institution == InstitutionType.LOCAL_GOVERNMENT:
         return "administracja"
-    return "technologia" if kind == InnovationType.TECHNOLOGICAL else None
+    if kind == InnovationType.TECHNOLOGICAL or institution in (InstitutionType.UNIVERSITY, InstitutionType.OTHER):
+        return "technologia"
+    return "administracja"  # organisational, process or social work of a public institution
 
 
 def plain(text: str) -> str:
@@ -91,7 +96,12 @@ def innovation_type(text: str, default: InnovationType) -> InnovationType:
     return first_match(text, TYPE_KEYWORDS) or default
 
 
+COMPANY_MARKERS = ("sp. z o.o", "sp.z o.o", "spolka", "s.a.", "sp. k.", "sp.j.", "sp. j.", "s.c.", "ltd", "gmbh")
+
+
 def institution_type(name: str) -> InstitutionType:
+    if any(marker in plain(name) for marker in COMPANY_MARKERS):
+        return InstitutionType.OTHER  # a company, even when named "Centrum" or "Instytut"
     return first_match(name, INSTITUTION_KEYWORDS) or InstitutionType.OTHER
 
 
@@ -109,6 +119,8 @@ def emit(metas: list[InnovationMeta]) -> None:
 
 assert sectors("Dron do inspekcji linii energetycznych")[0] in (Category.AVIATION, Category.QUALITY_OF_LIFE)
 assert sectors("Nic wspólnego") == [Category.OTHER]
+assert sectors("Satellite data for farmers")[0] in (Category.SPACE, Category.QUALITY_OF_LIFE)
 assert institution_type("Gmina Sanok") is InstitutionType.LOCAL_GOVERNMENT
 assert institution_type("Politechnika Rzeszowska") is InstitutionType.UNIVERSITY
+assert institution_type("Centrum Badawczo-Produkcyjne Alcor Sp. z o.o.") is InstitutionType.OTHER
 assert slug("PLSK.01.01-IP.01-0001/23") == "plsk-01-01-ip-01-0001-23"
