@@ -1,0 +1,27 @@
+DEBUG: "false"
+RESET_DB: "false"
+ADMIN_USERNAME: "admin"
+AUTH_TOKEN_LOCATION: "cookie"
+AUTH_COOKIE_SECURE: "true"
+AUTH_COOKIE_SAMESITE: "lax"
+USE_CSRF_PROTECTION: "true"
+CSRF_HEADER_NAME: "X-CSRF-Token"
+REQUIRE_TRUSTED_HOSTS: "false"
+PROXY_TRUSTED_HOSTS: '["*"]'
+FRONTEND_BASE_URL: "https://radar-frontend-CHANGE-ME.europe-central2.run.app"
+BACKEND_BASE_URL: "https://radar-backend-CHANGE-ME.europe-central2.run.app"
+ALLOWED_HOSTS: '["https://radar-frontend-CHANGE-ME.europe-central2.run.app"]'
+AI_BACKEND: "demo"
+QDRANT_COLLECTION: "radar_innovations"
+S3_ENDPOINT_URL: "https://storage.googleapis.com"
+S3_BUCKET: "CHANGE-ME-gcp-project-radar-documents"
+S3_REGION: "auto"
+AWS_REQUEST_CHECKSUM_CALCULATION: "when_required"
+AWS_RESPONSE_CHECKSUM_VALIDATION: "when_required"
+# Conversation tagging runs from Cloud Scheduler (deploy.ps1), not an in-process loop.
+TAGGING_SWEEP_SECONDS: "0"
+# Generous PoC chat budgets; paired with the workspace/proxy/request deadlines.
+CHAT_TOOL_CALL_BUDGET: "128"
+CHAT_INPUT_TOKEN_BUDGET: "250000"
+CHAT_OUTPUT_TOKEN_BUDGET: "8192"
+CHAT_TURN_DEADLINE_SECONDS: "600"

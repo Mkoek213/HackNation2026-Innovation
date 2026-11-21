@@ -1,0 +1,30 @@
+# Credentials and private workstation state
+.env
+.env.*
+!.env.example
+!.env.*.example
+.codex/
+
+# Temporary and editor files
+*.orig
+*.rej
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Python
+.venv/
+__pycache__/
+*.db
+*.db-shm
+*.db-wal
+
+# Python bytecode and isolated test cache
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Local source documents and downloaded embedding models
+projects/
+backend/.cache/

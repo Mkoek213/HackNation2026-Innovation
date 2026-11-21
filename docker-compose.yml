@@ -1,0 +1,110 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.19.2
+    volumes:
+      - qdrant-data:/qdrant/storage
+    restart: unless-stopped
+
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  s3:
+    image: chrislusf/seaweedfs:4.17
+    command: ["mini", "-dir=/data", "-ip.bind=0.0.0.0", "-admin.ui=false", "-webdav=false"]
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-radar-local}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-radar-local-secret}
+    ports:
+      - "127.0.0.1:${S3_PORT:-8333}:8333"
+    volumes:
+      - s3-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8333/status"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  s3-init:
+    build: &backend-build
+      context: ./backend
+      dockerfile: docker/Dockerfile
+    entrypoint: ["python", "-c"]
+    command:
+      - |
+        import os, boto3
+        from botocore.exceptions import ClientError
+        client = boto3.client('s3', endpoint_url=os.environ['S3_ENDPOINT_URL'],
+            aws_access_key_id=os.environ['S3_ACCESS_KEY_ID'],
+            aws_secret_access_key=os.environ['S3_SECRET_ACCESS_KEY'],
+            region_name=os.environ['S3_REGION'])
+        bucket = os.environ['S3_BUCKET']
+        try:
+            client.head_bucket(Bucket=bucket)
+        except ClientError as error:
+            if error.response['Error']['Code'] not in ('404', 'NoSuchBucket'):
+                raise
+            client.create_bucket(Bucket=bucket)
+    environment: &s3-environment
+      S3_ENDPOINT_URL: http://s3:8333
+      S3_BUCKET: ${S3_BUCKET:-radar-documents}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-radar-local}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-radar-local-secret}
+    depends_on:
+      s3:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    environment:
+      <<: *s3-environment
+      # Vector store + chat engine for /conversations (app/services); "demo" needs no external service.
+      AI_BACKEND: ${AI_BACKEND:-demo}
+    build:
+      context: ./backend
+      dockerfile: docker/Dockerfile
+    env_file: .env
+    ports:
+      - "${BACKEND_PORT}:8000"
+    depends_on:
+      qdrant:
+        condition: service_started
+      db:
+        condition: service_healthy
+      s3-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL: ${BACKEND_URL}
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+    env_file: .env
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  qdrant-data:
+  db-data:
+  s3-data:

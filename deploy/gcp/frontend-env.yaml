@@ -1,0 +1,4 @@
+BACKEND_URL: "https://radar-backend-CHANGE-ME.europe-central2.run.app"
+NEXT_PUBLIC_API_BASE_URL: "https://radar-backend-CHANGE-ME.europe-central2.run.app"
+FRONTEND_BASE_URL: "https://radar-frontend-CHANGE-ME.europe-central2.run.app"
+ALLOWED_HOSTS: '["https://radar-frontend-CHANGE-ME.europe-central2.run.app"]'

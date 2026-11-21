@@ -1,0 +1,583 @@
+{
+ "_comment": "Synthetic demo data for scripts/seed_demo.py. Users, ideas, reviews, sign-ups, partner profiles, participant counts and all activity are invented. Project texts are real records of the official Interreg 2021-2027 project list (interreg.gov.pl), imported by scripts/import_interreg.py.",
+ "tags": [
+  {
+   "name": "Edukacja i szkoły",
+   "description": "Innowacje dydaktyczne, organizacyjne i technologiczne w szkołach i przedszkolach.",
+   "subtags": [
+    {
+     "name": "Nowe metody nauczania",
+     "description": "Narzędzia i programy wspierające uczenie się."
+    },
+    {
+     "name": "Szkolne projekty technologiczne",
+     "description": "Rozwiązania budowane przez uczniów i nauczycieli."
+    }
+   ]
+  },
+  {
+   "name": "Samorząd i usługi publiczne",
+   "description": "Rozwiązania usprawniające pracę urzędów i usługi dla mieszkańców.",
+   "subtags": [
+    {
+     "name": "E-usługi",
+     "description": "Cyfrowe usługi i obsługa spraw online."
+    },
+    {
+     "name": "Współpraca międzygminna",
+     "description": "Wspólne projekty gmin, powiatów i regionów."
+    }
+   ]
+  },
+  {
+   "name": "Klimat i środowisko",
+   "description": "Adaptacja do zmian klimatu, energia, woda i ochrona przyrody.",
+   "subtags": [
+    {
+     "name": "Adaptacja do zmian klimatu",
+     "description": "Ograniczanie skutków ekstremalnych zjawisk pogodowych."
+    },
+    {
+     "name": "Energia i odpady",
+     "description": "Efektywność energetyczna, OZE i gospodarka odpadami."
+    }
+   ]
+  },
+  {
+   "name": "Zdrowie i opieka",
+   "description": "Rozwiązania dla ochrony zdrowia, profilaktyki i opieki.",
+   "subtags": [
+    {
+     "name": "Telemedycyna",
+     "description": "Opieka i diagnostyka na odległość."
+    },
+    {
+     "name": "Profilaktyka",
+     "description": "Programy zapobiegania chorobom."
+    }
+   ]
+  },
+  {
+   "name": "Mobilność i transport",
+   "description": "Transport publiczny, elektromobilność i bezpieczeństwo ruchu.",
+   "subtags": [
+    {
+     "name": "Elektromobilność",
+     "description": "Pojazdy elektryczne i infrastruktura ładowania."
+    },
+    {
+     "name": "Transport publiczny",
+     "description": "Organizacja i dostępność komunikacji."
+    }
+   ]
+  },
+  {
+   "name": "Lotnictwo i kosmos",
+   "description": "Technologie lotnicze, drony i wykorzystanie danych satelitarnych.",
+   "subtags": [
+    {
+     "name": "Drony",
+     "description": "Bezzałogowe statki powietrzne w usługach publicznych."
+    },
+    {
+     "name": "Dane satelitarne",
+     "description": "Wykorzystanie obserwacji Ziemi."
+    }
+   ]
+  },
+  {
+   "name": "Bezpieczeństwo i ratownictwo",
+   "description": "Zarządzanie kryzysowe, ratownictwo i ochrona ludności.",
+   "subtags": [
+    {
+     "name": "Zarządzanie kryzysowe",
+     "description": "Przygotowanie na sytuacje kryzysowe."
+    },
+    {
+     "name": "Ratownictwo",
+     "description": "Wyposażenie i współpraca służb ratowniczych."
+    }
+   ]
+  }
+ ],
+ "projects": [
+  {
+   "title": "Od Beskidu Niskiego po Solinę",
+   "tag": "Klimat i środowisko",
+   "subtag": "Adaptacja do zmian klimatu",
+   "teryt_code": "1863011",
+   "website_url": "https://interreg.gov.pl/wp-content/uploads/2026/11/Wykaz_projektow_Interreg_2021-2027_art_49_CPR_20261116.xlsx",
+   "summary": "Realizacja niniejszego projektu ma na celu wspieranie przystosowania się do zmian klimatu i zapobiegania ryzyku związanemu z klęskami żywiołowymi i katastrofami, a także odporności, z uwzględnieniem podejścia ekosystemowego, na…",
+   "solution": "Realizacja niniejszego projektu ma na celu wspieranie przystosowania się do zmian klimatu i zapobiegania ryzyku związanemu z klęskami żywiołowymi i katastrofami, a także odporności, z uwzględnieniem podejścia ekosystemowego, na polsko-słowackim pograniczu. Zakres projektu obejmuje realizację inwestycji dot. infrastruktury po obu stronach granicy. Po stronie polskiej przewidziano modernizację infrastruktury zabezpieczającej skarpę korpusu drogi wojewódzkiej nr 894 Lesko-Hoczew-Czarna na odcinku od km 32+142 do km 32+237. Przedmiotowa inwestycja jest zlokalizowana w miejscowości Chrewt. Zakres zadania obejmuje m.in.: rozbiórkę istniejącego umocnienia, wykonanie koszy siatkowo-kamiennych, oczyszczenie rowów z namułu wraz z przełożeniem ścieku z elementów betonowych prefabrykowanych, wykonanie sączka kamiennego oraz roboty wykończeniowe. Po stronie słowackiej przewidziano stabilizację osuwiska na drodze II/575 za wsią Palota. Przedmiotowy odcinek drogi za miejscowością Palota w km 35,829 – 38,974 w obrębie ewidencyjnym miejscowości Palota pod wpływem wód gruntowych, nieodpowiednich warunków geologicznych i złego stanu budowlano-technicznego przepustu wymaga remontu drogi z wykonaniem muru oporowego na przedmiotowej drodze w celu jej stabilizacji. Celem projektu po stronie słowackiej jest stabilizacja osuwiska wraz z poprawą stanu technicznego przepustu i kierunkowego odprowadzania wody. Celem prac budowlanych w ramach projektu będzie wybudowanie muru oporowego na fundamencie palowym z wykonaniem odwodnienia, wraz z realizacją modyfikacji przepustu poprzez wybetonowanie koryta cieku wodnego. Realizacja przedsięwzięcia przyczyni się do zwiększenia odporności na zjawiska ekstremalne na obszarze wsparcia u obu partnerów projektu, co przełoży się do ograniczenie zmian klimatycznych w regionie. Konsekwencją takich działań będzie poprawa stanu powietrza atmosferycznego i stanu klimatu, w szczególności na terenach obszarów Natura 2000 i w sąsiedztwie Bieszczadzkiego Parku Narodowego. Kurs przeliczeniowy EUR = 4,57 PLN (źródło: “Wieloletni plan finansowy państwa na lata 2022-2025\"). Realizácia tohto projektu je zameraná na podpora adaptácie na zmenu klímy a predchádzanie rizikám katastrof a odolnosť voči nim, so zreteľom na ekosystémový prístup v slovensko - poľskom pohraničí. Rozsah projektu zahŕňa investície do infraštruktúry na oboch stranách hranice. Na poľskej strane sa plánuje modernizácia infraštruktúry zabezpečujúcej násyp krajskej cesty č. 894 Lesko-Hoczew-Czarna na úseku od km 32+142 po km 32+237. Predmetná investícia sa nachádza v obci Chrewt. Rozsah úlohy zahŕňa: demoláciu existujúceho spevnenia, vybudovanie sieťových a kamenných košov, vyčistenie priekop od nánosov spolu s premiestnením vpustu z prefabrikovaných betónových prvkov, vybudovanie kamenného odvodnenia a dokončovacie práce. Na slovenskej strane sa plánuje stabilizácia zosuvu na ceste II/575 za obcou Palota. Predmetný úsek cesty za obcou Palota v staničení km 35,829 – 38,974 v k. ú. obce Palota vplyvom podzemných vôd, nevyhovujúcej geológie a zlým stavebno-technickým stavom priepustu je potrebná rekonštrukcia cesty s realizovaním oporného múra na predmetnej ceste za účelom jej stabilizovania. Účelom projektu na slovenskej strane je stabilizácia zosuvného územia vrátane zlepšenia technického stavu priepustu a usmerneného odvedenia vôd. Cieľom stavebných prác na projektu bude vybudovanie oporného múra na pilótovom základe z realizáciou odvodnenia vrátane úpravy priepustu vybetónovaním koryta vodného toku. Realizácia projektu prispeje k zvýšeniu odolnosti voči extrémnym udalostiam v podporovanom území oboch partnerov projektu, čo sa prejaví v znížení klimatických zmien v regióne. Výsledkom bude zlepšenie atmosférických a klimatických podmienok, najmä v oblastiach Natura 2000 a v blízkosti Bieszczadského národného parku. Výmenný kurz EUR = 4,57 PLN (zdroj: „Dlhodobý finančný plán na roky 2022-2025“).",
+   "problem": "",
+   "target_group": "Partnerzy projektu: Województwo Podkarpackie | Správa a údržba ciest Prešovského samosprávneho kraja",
+   "who_can_use": "Gminy, powiaty i instytucje publiczne o podobnych potrzebach, także po drugiej stronie granicy.",
+   "does_it_work": "Projekt PLSK.01.01-IP.01-0002/23 w programie Program Interreg Polska-Słowacja 2021-2027, realizacja 01.2024-12.2025, wydatki ogółem 1 307 776 EUR, dofinansowanie UE 80%.",
+   "authors": "Województwo Podkarpackie",
+   "participants": [
+    [
+     "1863011",
+     17
+    ],
+    [
+     null,
+     3
+    ]
+   ]
+  },
+  {
+   "title": "„Budujemy w Jaśle, stabilizujemy w Svidničke”",
+   "tag": "Klimat i środowisko",
+   "subtag": "Adaptacja do zmian klimatu",
+   "teryt_code": "1805",
+   "website_url": "https://interreg.gov.pl/wp-content/uploads/2026/11/Wykaz_projektow_Interreg_2021-2027_art_49_CPR_20261116.xlsx",
+   "summary": "Projekt jest odpowiedzią na wspólny problem jakim jest niedostateczne przystosowanie obszaru pogranicza PL-SK do postępujących zmian klimatu. Zjawiska pogodowe mogą stanowić zagrożenie dla bezpieczeństwa ludności pogranicza PL-SK i…",
+   "solution": "Projekt jest odpowiedzią na wspólny problem jakim jest niedostateczne przystosowanie obszaru pogranicza PL-SK do postępujących zmian klimatu. Zjawiska pogodowe mogą stanowić zagrożenie dla bezpieczeństwa ludności pogranicza PL-SK i powodować straty rzeczowe w infrastrukturze. Głównym celem projektu będzie zwiększenie odporności społeczności pogranicza PL-SK na zmiany klimatu i zjawiska ekstremalne poprzez rozwój zielonej i niebieskiej infrastruktury oraz budowę infrastruktury zabezpieczającej osuwiska, jak również zwiększenie świadomości mieszkańców w kierunku zachodzących zmian klimatycznych. Osiągnięcie celu głównego projektu nastąpi poprzez realizację celów szczegółowych takich jak: 1) Upowszechnianie rozwiązań architektonicznych i projektowych w kierunku tworzenia zielonej i błękitnej infrastruktury a także infrastruktury stabilizującej stoki przy wykorzystaniu rodzimych gatunków roślin 2) Realizacja przedsięwzięć inwestycyjnych poprzez samorządy oraz instytucje publiczne, które jako przykład dobrych praktyk będą wzorem proekologicznych rozwiązań dla innych instytucji oraz mieszkańców po obydwu stronach granicy 3) Wzmacnianie odpowiedzialności lokalnych mieszkańców za łagodzenie skutków klęsk żywiołowych. Osiągnięcie celów nastąpi poprzez wykonanie infrastruktury zabezpieczającej osuwisko w miejscowości Svidnička przez partnera słowackiego oraz wykonanie ogrodu deszczowego wraz z zielonym parkingiem oraz łąkami kwietnymi w Jaśle przez partnera polskiego. Działania inwestycyjne będą stanowić integralną część wspólnych działań informacyjno–edukacyjnych, w ramach których zostaną przeprowadzone w powiecie jasielskim warsztaty, seminarium oraz szkolenia, wytworzony zostanie film i wydany poradnik (realizacja PJ) oraz odbędzie się konferencja zorganizowana przez partnera słowackiego. Do przeliczenia budżetu PJ przyjęto kurs Euro 4,57 na podst. dok. „Wytyczne dotyczące stos. jednolitych wskaźników makroekonomicznych będących podstawą oszacowania skutków finansowych projektowanych ustaw” z dnia 29.04.2022. Projekt je reakciou na spoločný problém nedostatočnej adaptácie poľsko-slovenského pohraničia a jeho infraštruktúry na ochranu životného prostredia na prebiehajúce klimatické zmeny. Poveternostné javy,môžu predstavovať hrozbu pre bezpečnosť pohraničné obyvateľstva PL-SK a spôsobovať materiálne škody na infraštruktúre. Hlavným cieľom projektu bude zvýšenie odolnosti pohraničných obcí PL-SK voči zmene klímy a extrémnym javom prostredníctvom rozvoja zelenej a modrej infraštruktúry a budovania infraštruktúry na ochranu pred zosuvmi pôdy, ako aj zvýšenie povedomia verejnosti o zmene klímy. Hlavný cieľ projektu sa dosiahne prostredníctvom špecifických cieľov, ako sú: 1) Šírenie architektonických a dizajnérskych riešení zameraných na vytváranie zelenej a modrej infraštruktúry, ako aj infraštruktúry na stabilizáciu svahov s využitím pôvodných druhov rastlín. 2) Realizácia investičných projektov prostredníctvom miestnych samospráv a verejných inštitúcií, ktoré budú ako príklad dobrej praxe vzorom proekologických riešení pre ostatné inštitúcie a obyvateľov na oboch stranách hranice. 3) Posilnenie zodpovednosti miestnych obyvateľov za zmiernenie následkov prírodných katastrof. Ciele sa dosiahnu prostredníctvom vybudovania infraštruktúry na ochranu zosuvu pôdy v obci Svidnička slovenským partnerom a vybudovaním dažďovej záhrady so zeleným parkoviskom a kvetinovými lúkami v obci Jasło poľským partnerom. Investičné aktivity budú neoddeliteľnou súčasťou spoločných informačno-vzdelávacích aktivít, ktoré budú zahŕňať workshopy, seminár a školenie v okrese Jasło, výrobu filmu a vydanie príručky (realizácia PJ) a konferenciu organizovanú slovenským partnerom. Na prepočet rozpočtu PJ bol použitý výmenný kurz 4,57 eura na základe dokumentu \"Usmernenia k uplatňovaniu jednotných makroekonomických ukazovateľov ako základu pre odhad finančných vplyvov predpokladaných zákonov\" z 29. 4. 2022.",
+   "problem": "",
+   "target_group": "Partnerzy projektu: Powiat Jasielski | Správa a údržba ciest Prešovského samosprávneho kraja",
+   "who_can_use": "Gminy, powiaty i instytucje publiczne o podobnych potrzebach, także po drugiej stronie granicy.",
+   "does_it_work": "Projekt PLSK.01.01-IP.01-0009/23 w programie Program Interreg Polska-Słowacja 2021-2027, realizacja 08.2024-07.2026, wydatki ogółem 1 937 342 EUR, dofinansowanie UE 80%.",
+   "authors": "Powiat Jasielski",
+   "participants": [
+    [
+     "1805",
+     12
+    ],
+    [
+     "1863011",
+     5
+    ],
+    [
+     null,
+     3
+    ]
+   ]
+  },
+  {
+   "title": "Klimat pogranicza - działania transgraniczne zapobiegające skutkom zmian klimatycznych. Hraničná klíma - cezhraničné opatrenia na predchádzanie dôsledkom zmeny klímy.",
+   "tag": "Klimat i środowisko",
+   "subtag": "Adaptacja do zmian klimatu",
+   "teryt_code": "1817",
+   "website_url": "https://interreg.gov.pl/wp-content/uploads/2026/11/Wykaz_projektow_Interreg_2021-2027_art_49_CPR_20261116.xlsx",
+   "summary": "Najnowszy raport ONZ na temat globalnej oceny ograniczania ryzyka klęsk żywiołowych wykazał, że w ostatnich dziesięcioleciach liczba katastrof znacznie wzrosła. Raport ONZ pokazuje również, że częstotliwość występowania ekstremalnych…",
+   "solution": "Najnowszy raport ONZ na temat globalnej oceny ograniczania ryzyka klęsk żywiołowych wykazał, że w ostatnich dziesięcioleciach liczba katastrof znacznie wzrosła. Raport ONZ pokazuje również, że częstotliwość występowania ekstremalnych temperatur potroi się do 2030 roku. Skutki globalnego ocieplenia i zmian klimatycznych są również głównym powodem do niepokoju na obszarze transgranicznym objętym projektem, gdzie wzrasta liczba i intensywność klęsk żywiołowych, takich jak pożary, susze i powodzie. Rosnące temperatury związane z ociepleniem klimatu skutkują częstszymi i dłuższymi okresami suszy, co przekłada się na zwiększoną liczbę pożarów zarówno infrastruktury, jak i w środowiskach naturalnych, takich jak lasy, łąki, połoniny. Głównym wyzwaniem i potrzebą usług publicznych w tym kontekście jest zapewnienie bezpieczeństwa społecznościom lokalnym związanego z ochroną mienia, zdrowia i życia. Cel ogólny projektu: Wsparcie adaptacji do zmian klimatu i zapobiegania ryzyku klęsk żywiołowych na polsko-słowackim obszarze transgranicznym. Cele szczegółowe: - Opracowanie transgranicznych standardów monitorowania, gotowości, ostrzegania i reagowania na klęski żywiołowe przez władze lokalne oraz OSP na obszarze transgranicznym. - Wymiana doświadczeń, poprawa poziomu organizacji i umiejętności OSP w zakresie monitorowania, gotowości, ostrzegania i reagowania na klęski żywiołowe w obszarze transgranicznym. - Edukacja społeczności lokalnych w zakresie profilaktyki i zachowań podczas klęsk żywiołowych w obszarze transgranicznym. Zaplanowany projekt jest odpowiedzią na problemy, jakie pojawiły się w związku ze wzrostem liczby i częstotliwością klęsk żywiołowych, jakimi są brak standardów i procedur reakcji i współpracy różnych instytucji, niewystarczający poziom wiedzy i umiejętności strażaków na reagowanie na nowe zjawiska atmosferyczne, niski poziom wiedzy społeczności lokalnych w zakresie zapobiegania i zachowania się podczas klęsk żywiołowych oraz brak odpowiedniego wyposażenia i specjalistycznego sprzętu. Najnovšia správa OSN Global Assessment of Disaster Risk Reduction ukázala, že počet katastrof sa v posledných desaťročiach výrazne zvýšil. Správa OSN tiež ukazuje, že frekvencia extrémnych teplôt sa do roku 2030 strojnásobí. Účinky globálneho otepľovania a zmeny klímy sú tiež hlavným dôvodom obáv v oblasti cezhraničných projektov, kde sa zvyšuje počet a intenzita prírodných katastrof, ako sú požiare, suchá a záplavy. Rastúce teploty súvisiace s globálnym otepľovaním majú za následok častejšie a dlhšie obdobia sucha, čo sa premieta do zvýšeného počtu požiarov v infraštruktúre aj v prírodnom prostredí, ako sú lesy, lúky a lúky. Hlavnou výzvou a potrebou verejných služieb v tejto súvislosti je zabezpečiť bezpečnosť miestnych komunít súvisiacu s ochranou majetku, zdravia a života. Všeobecný cieľ projektu: Podpora adaptácie na zmenu klímy a prevencia rizika prírodných katastrof v poľsko-slovenskom prihraničnom priestore. Konkrétne ciele: - Rozvoj cezhraničných noriem pre monitorovanie, pripravenosť, varovanie a reakciu na prírodné katastrofy zo strany miestnych orgánov a dobrovoľných hasičských zborov v cezhraničnej oblasti. - Výmena skúseností, zlepšenie úrovne organizácie a zručností Zboru dobrovoľných hasičov v oblasti monitorovania, pripravenosti, varovania a reakcie na živelné pohromy v cezhraničnom území. - Vzdelávanie miestnych komunít v oblasti prevencie a správania sa pri prírodných katastrofách v cezhraničnom území. Pripravovaný projekt je reakciou na problémy, ktoré vznikli v súvislosti so zvyšujúcim sa počtom a frekvenciou živelných pohrôm, akými sú nedostatok štandardov a postupov reakcie a spolupráce rôznych inštitúcií, nedostatočná úroveň vedomostí a zručností hasičov na zásah na nové atmosférické javy, nízku úroveň vedomostí miestnych komunít v oblasti prevencie a správania sa počas prírodných katastrof a nedostatok vhodného vybavenia a špecializovaného vybavenia.",
+   "problem": "",
+   "target_group": "Partnerzy projektu: Gmina Komańcza | Gmina Besko | Obec Koškovce",
+   "who_can_use": "Gminy, powiaty i instytucje publiczne o podobnych potrzebach, także po drugiej stronie granicy.",
+   "does_it_work": "Projekt PLSK.01.01-IP.01-0009/24 w programie Program Interreg Polska-Słowacja 2021-2027, realizacja 06.2026-05.2028, wydatki ogółem 475 498 EUR, dofinansowanie UE 80%.",
+   "authors": "Gmina Komańcza",
+   "participants": [
+    [
+     "1817",
+     12
+    ],
+    [
+     "1863011",
+     5
+    ],
+    [
+     null,
+     3
+    ]
+   ]
+  },
+  {
+   "title": "Polsko-Słowacka Eurosztafeta Ratownicza – „Razem bezpieczniej w Europie”",
+   "tag": "Bezpieczeństwo i ratownictwo",
+   "subtag": "Ratownictwo",
+   "teryt_code": "1817",
+   "website_url": "https://interreg.gov.pl/wp-content/uploads/2026/11/Wykaz_projektow_Interreg_2021-2027_art_49_CPR_20261116.xlsx",
+   "summary": "W zakres Projektu wchodzi zakup sprzętu ratowniczego: sprzęt powodziowy, sprzęt pożarniczy, sprzęt do wypadków drogowych oraz inny sprzęt ratowniczy dla 5 jednostek ochotniczych straży pożarnych (OSP) w Mieście Spiskie Podegrodzie i Gminie…",
+   "solution": "W zakres Projektu wchodzi zakup sprzętu ratowniczego: sprzęt powodziowy, sprzęt pożarniczy, sprzęt do wypadków drogowych oraz inny sprzęt ratowniczy dla 5 jednostek ochotniczych straży pożarnych (OSP) w Mieście Spiskie Podegrodzie i Gminie Zagórz. Ponadto Projekt zakłada organizację wspólnych ćwiczeń jednostek OSP i młodzieżowych drużyn strażackich. Realizacja ćwiczeń oraz doposażenie jednostek OSP po obu stronach granicy oraz ich wspólna praca nad wypracowaniem transgranicznych procedur reagowania w sytuacjach kryzysowych mają za zadanie uskutecznić transgraniczny system ochrony ludności w kontekście negatywnych zjawisk wynikających ze zmian klimatycznych. Celem projektu jest zwiększenie zdolności reagowania na zagrożenia związane ze zmianami klimatycznymi, poprawa bezpieczeństwa przygranicznych społeczności oraz wzmocnienie współpracy transgranicznej między jednostkami OSP w PL i SK. Projekt zwiększa gotowość i zdolność jednostek OSP do skutecznego reagowania na różnorodne zagrożenia. Projekt wspiera przystosowanie się do zmian klimatycznych, zapobieganie ryzyku związanym z klęskami żywiołowymi oraz poprawę odporności społeczności przygranicznych. W dobie coraz częstszego występowania negatywnych skutków zmian klimatu, takich jak gwałtowne ulewy, śnieżyce czy huragany, czy zwiększającej się liczby instalacji fotowoltaicznych również narażonych na pożary, priorytetowym zadaniem staje się budowa skutecznych transgranicznych systemów ostrzegania i ochrony ludności cywilnej. Kluczowym elementem jest partycypacja społeczna, której nie zastąpią nawet najbardziej zaawansowane technologie. W sytuacjach kryzysowych integracja społeczności przygranicznych i umiejętność współpracy na poziomie transgranicznym z jednostkami administracji publicznej i służbami odpowiedzialnymi za bezpieczeństwo jest niezbędna. Kooperacja w zakresie bezpieczeństwa publicznego odbywa się poprzez tworzenie takich lokalnych transgranicznych partnerstw, co wpisuje się w główne założenia European Mechanism for Civil Protection. Do projektu patrí nákup záchranárskeho vybavenia: protipovodňové vybavenie, hasičské vybavenie, vybavenie na dopravné nehody a iné záchranárske vybavenie pre 5 jednotiek dobrovoľných hasičských zborov (DHZ) v Meste Spišské Podhradie a Obci Zagórz. Projekt tiež zahŕňa organizáciu spoločných cvičení jednotiek DHZ a mládežníckych hasičských tímov. Realizácia cvičení a doplnenie vybavenia jednotiek DHZ na oboch stranách hranice a ich spoločná práca na vypracovaní cezhraničných postupov reakcie v krízových situáciách majú za cieľ zefektívniť cezhraničný systém ochrany obyvateľstva v kontexte negatívnych javov vyplývajúcich zo zmien klímy. Cieľom projektu je zvýšiť schopnosť reakcie na hrozby spojené so zmenami klímy, zlepšiť bezpečnosť prihraničných komunít a posilniť cezhraničnú spoluprácu medzi jednotkami DHZ v PL a SK. Projekt zvyšuje pripravenosť a schopnosť jednotiek DHZ účinne reagovať na rôzne hrozby. Projekt podporuje prispôsobenie sa zmenám klímy, prevenciu rizík spojených s prírodnými katastrofami a zlepšenie odolnosti prihraničných komunít. V dobe čoraz častejšieho výskytu negatívnych dôsledkov zmien klímy, ako sú prudké dažde, snehové búrky či hurikány, alebo zvyšujúceho sa počtu fotovoltických inštalácií vystavených požiarom, sa prioritnou úlohou stáva budovanie účinných cezhraničných systémov varovania a ochrany civilného obyvateľstva. Kľúčovým prvkom je spoločenská participácia, ktorú nenahradia ani tie najpokročilejšie technológie. V krízových situáciách je nevyhnutná integrácia prihraničných komunít a schopnosť spolupráce na cezhraničnej úrovni s verejnými inštitúciami a službami zodpovednými za bezpečnosť. Kooperácia v oblasti verejnej bezpečnosti prebieha prostredníctvom tvorby takýchto miestnych cezhraničných partnerstiev, čo zapadá do hlavných zásad European Mechanism for Civil Protection.",
+   "problem": "",
+   "target_group": "Partnerzy projektu: Gmina Zagórz | Mesto Spišské Podhradie",
+   "who_can_use": "Gminy, powiaty i instytucje publiczne o podobnych potrzebach, także po drugiej stronie granicy.",
+   "does_it_work": "Projekt PLSK.01.01-IP.01-0011/24 w programie Program Interreg Polska-Słowacja 2021-2027, realizacja 05.2025-05.2027, wydatki ogółem 495 886 EUR, dofinansowanie UE 80%.",
+   "authors": "Gmina Zagórz",
+   "participants": [
+    [
+     "1817",
+     12
+    ],
+    [
+     "1863011",
+     5
+    ],
+    [
+     null,
+     3
+    ]
+   ]
+  },
+  {
+   "title": "Bezpieczne Pogranicze – współpraca transgraniczna Gmin należących do Związku Gmin Dorzecza Wisłoki i Preszowskiego Kraju Samorządowego",
+   "tag": "Bezpieczeństwo i ratownictwo",
+   "subtag": "Ratownictwo",
+   "teryt_code": "1863011",
+   "website_url": "https://interreg.gov.pl/wp-content/uploads/2026/11/Wykaz_projektow_Interreg_2021-2027_art_49_CPR_20261116.xlsx",
+   "summary": "Projekt będzie realizowany w ramach Programu Interreg Polska-Słowacja 2021-2027 w partnerstwie 20 podmiotów : - Związek Gmin Dorzecza Wisłoki (partner wiodący), - gminy polskie: Brzyska, Chorkówka, Dębowiec, Miasto Jasło, Gmina Jasło,…",
+   "solution": "Projekt będzie realizowany w ramach Programu Interreg Polska-Słowacja 2021-2027 w partnerstwie 20 podmiotów : - Związek Gmin Dorzecza Wisłoki (partner wiodący), - gminy polskie: Brzyska, Chorkówka, Dębowiec, Miasto Jasło, Gmina Jasło, Jedlicze, Kołaczyce, Krempna, Nowy Żmigród, Skołyszyn, Tarnowiec, - gminy słowackie: Nižná Polianka (główny partner transgraniczny), Jedlinka, Kurov, Lukov, Malcov, Rešov, Trnkov, Zlaté. Głównym celem projektu jest adaptacja do zmian klimatu i zapobieganie ryzykom wynikającym z zagrożeń środowiskowych, klęsk żywiołowych i katastrof naturalnych na obszarze polskich i słowackich gmin, co przełoży się na zwiększenie bezpieczeństwa i odporności na zmiany klimatu mieszkańców na obszarze wsparcia Programu Interreg. W ramach projektu przewidziano: - doposażenie jednostek Ochotniczej Straży Pożarnej w nowoczesny sprzęt ratowniczy, co przyczyni się do zwiększenia ich potencjału oraz wzrostu odporności obszaru wsparcia na negatywne zjawiska będące konsekwencjami zmian klimatu, - zakup i montaż pilotażowego systemu monitoringu wizyjnego w Gminie Krempna, - wspólne transgraniczne ćwiczenia różnych służb ratowniczych z obu krajów (ochotniczej i zawodowej straży pożarnej, Słowackiego Czerwonego Krzyża, zintegrowanego systemu ratowniczego Republiki Słowackiej, policji) w trudnym terenie leśnym, - szkolenia merytoryczne dla członków OSP z udzielania pierwszej pomocy oraz obsługi bezzałogowych dronów, - skierowane do mieszkańców polsko-słowackiego pogranicza różnorodne działania informacyjno-edukacyjne związane z tematyką projektu. W projekcie zastosowano jednolity kurs walutowy 1 EUR = 4,34 PLN zgodnie z ogłoszeniem o naborze. Projekt bude realizovaný v rámci programu Interreg Poľsko-Slovensko 2021-2027 v partnerstve s 20 subjektmi: - Združenie obcí povodia Wisłoka (vedúci partner), - poľské obce: Brzyska, Chorkówka, Dębowiec, Miasto Jasło, Gmina Jasło, Jedlicze, Kołaczyce, Krempna, Nowy Żmigród, Skołyszyn, Tarnowiec, - obce SR: Nižná Polianka (hlavný cezhraničný partner), Jedlinka, Kurov, Lukov, Malcov, Rešov, Trnkov, Zlaté. Hlavným cieľom projektu je adaptácia na zmenu klímy a predchádzanie rizikám vyplývajúcim z environmentálnych hrozieb, prírodných katastrof a živelných pohrôm na území poľských a slovenských samospráv, čo sa premietne do zvýšenia bezpečnosti a odolnosti voči klimatickým zmenám obyvateľov v oblasť podpory programu Interreg. Projekt zahŕňa: - vybavenie jednotiek dobrovoľných hasičov modernou záchrannou technikou, ktorá prispeje k zvýšeniu ich potenciálu a zvýšeniu odolnosti priestoru podpory voči negatívnym javom vyplývajúcim z klimatických zmien, - nákup a inštalácia pilotného video monitorovacieho systému v Gmine Krempná, - spoločné cezhraničné cvičenia rôznych záchranných zložiek oboch krajín (dobrovoľné a profesionálne hasičské zbory, Slovenský Červený kríž, integrovaný záchranný systém SR, polícia) v ťažkom lesnom teréne, - vecné školenie členov dobrovoľného hasičského zboru v poskytovaní prvej pomoci a obsluhe bezpilotných lietadiel, - rôzne informačné a vzdelávacie aktivity súvisiace s predmetom projektu adresované obyvateľom poľsko-slovenského pohraničia. Projekt používa jednotný výmenný kurz 1 EUR = 4,34 PLN v súlade s oznámením o nábore.",
+   "problem": "",
+   "target_group": "Partnerzy projektu: Związek Gmin Dorzecza Wisłoki | Gmina Brzyska | Gmina Chorkówka | Gmina Dębowiec | Gmina Jasło | Gmina Jedlicze | Gmina Kołaczyce | Gmina Krempna | Gmina Nowy Żmigród | Gmina Skołyszyn | Gmina Tarnowiec | Miasto Jasło | Obec Jedlinka | Obec Kurov | Obec Lukov | Obec Malcov | Obec Nižná Polianka GPT | Obec Rešov | Obec Trnkov | Obec Zlaté",
+   "who_can_use": "Gminy, powiaty i instytucje publiczne o podobnych potrzebach, także po drugiej stronie granicy.",
+   "does_it_work": "Projekt PLSK.01.01-IP.01-0016/24 w programie Program Interreg Polska-Słowacja 2021-2027, realizacja 07.2025-06.2027, wydatki ogółem 1 349 068 EUR, dofinansowanie UE 80%.",
+   "authors": "Związek Gmin Dorzecza Wisłoki",
+   "participants": [
+    [
+     "1863011",
+     17
+    ],
+    [
+     null,
+     3
+    ]
+   ]
+  },
+  {
+   "title": "Bezpieczne pogranicze – bezpieczn@ ludność",
+   "tag": "Bezpieczeństwo i ratownictwo",
+   "subtag": "Ratownictwo",
+   "teryt_code": "1807",
+   "website_url": "https://interreg.gov.pl/wp-content/uploads/2026/11/Wykaz_projektow_Interreg_2021-2027_art_49_CPR_20261116.xlsx",
+   "summary": "Projekt realizowany będzie na pograniczu Polski i Słowacji, w terenie obejmującym obszar pomiędzy gminą Rymanów a Kracunovce. Poważnym problemem występującym po stronie polskiej jak i słowackiej jest brak wypracowanych standardów i…",
+   "solution": "Projekt realizowany będzie na pograniczu Polski i Słowacji, w terenie obejmującym obszar pomiędzy gminą Rymanów a Kracunovce. Poważnym problemem występującym po stronie polskiej jak i słowackiej jest brak wypracowanych standardów i spójnego systemu reagowania w sytuacjach kryzysowych, w tym przygotowanego do działań w razie klęsk żywiołowych i katastrof ekologicznych oraz ostrzegania ludności. Dużym problemem jest, także jakość sprzętu strażackiego: przestarzałe wozy strażackie, niewystarczająca ilość wyposażenia. Głównym celem projektu jest zapobieganie negatywnym zjawiskom związanymi z klęskami żywiołowymi i katastrofami technologicznymi czy ekologicznymi oraz wspieranie przystosowania się do zmian klimatu organizacji i społeczności terenu pogranicza polsko – słowackiego w szczególności gmin Rymanów i Kracunoviec. Projekt składa się z kilku wspólnie uzupełniających się działań merytorycznych: wykonanie aplikacji mobilnej, zakup 2 wozów strażackich, cykl szkoleń i konferencji i zwiększenie poziomu wiedzy wśród mieszkańców. W wyniku realizacji projektu zostaną osiągnięte wskaźniki produktu: 1 transgraniczna aplikacja mobilna jako wspólnie opracowane działania pilotażowe (innowacyjne) zrealizowane w ramach projektu (RCO 84); oraz wspólne opracowanie rozwiązania (RCO 116); 2 organizacje współpracujące ponad granicami (RCO 87); 2 jako liczba jednostek służb ratowniczych doposażonych w sprzęt do prowadzenia akcji ratowniczych i usuwania skutków katastrof (PLRO 041); 1 cykl działań skierowanych do społeczności Polski i Słowacji jako liczba przeprowadzonych kampanii informacyjno-edukacyjnych kształtujących świadomość ekologiczną; 2 organizacje współpracujące ponad granicami po zakończeniu projektu (RCR 84); 1 jako innowacyjne rozwiązania przyjęte lub zastosowane ma większą skalę przez organizacje. Projekt sa bude realizovať na poľsko-slovenskom pohraničí, v oblasti medzi obcami Rymanów a Kračúnovce. Hlavným problémom, ktorý sa vyskytuje na poľskej aj slovenskej strane, je nedostatok vypracovaných noriem a uceleného systému reakcie na núdzové situácie, vrátane tých, ktoré sú pripravené na riešenie prírodných a environmentálnych katastrof a na varovanie obyvateľstva. Veľkým problémom je aj kvalita hasičského vybavenia: zastarané hasičské vozidlá, nedostatočné vybavenie.Hlavným cieľom projektu je predchádzať negatívnym javom súvisiacim s prírodnými a technologickými alebo ekologickými katastrofami a podporovať adaptáciu organizácií a komunít v poľsko-slovenskom pohraničí, najmä obcí Rymanów a Kračúnoviec, na zmenu klímy. Projekt pozostáva z niekoľkých spoločne sa dopĺňajúcich vecných aktivít: vývoj mobilnej aplikácie,nákup 2 hasičských vozidiel, séria školení a konferencií, zvýšiť úroveň povedomia miestnych obyvateľov. Výsledkom realizácie tohto projektu bude dosiahnutie nasledovných ukazovateľov : 1 cezhraničná mobilná aplikácia ako spoločne vyvinutá pilotná (inovatívna) aktivita realizovaná v rámci projektu (RCO 84); a spoločný vývoj riešenia (RCO 116); 2 organizácie spolupracujúce naprieč hranicami (RCO 87); 2 ako počet jednotiek záchrannej služby vybavených zariadením na vykonávanie záchranných akcií a odstraňovanie následkov katastrof (PLRO 041); 1 séria aktivít zameraných na poľskú a slovenskú komunitu ako počet uskutočnených informačných a vzdelávacích kampaní zameraných na formovanie environmentálneho povedomia; 2 organizácie, ktoré budú po ukončení projektu spolupracovať naprieč hranicami (RCR 84); 1 ako inovatívne riešenia prijaté alebo aplikované vo väčšom rozsahu príslušnými organizáciami. Kurs Euro = 4,7 zł źr. https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-pln.pl.html",
+   "problem": "",
+   "target_group": "Partnerzy projektu: Gmina Rymanów | Obec Kračúnovce",
+   "who_can_use": "Gminy, powiaty i instytucje publiczne o podobnych potrzebach, także po drugiej stronie granicy.",
+   "does_it_work": "Projekt PLSK.01.01-IP.01-0018/23 w programie Program Interreg Polska-Słowacja 2021-2027, realizacja 03.2024-01.2026, wydatki ogółem 905 342 EUR, dofinansowanie UE 80%.",
+   "authors": "Gmina Rymanów",
+   "participants": [
+    [
+     "1807",
+     12
+    ],
+    [
+     "1863011",
+     5
+    ],
+    [
+     null,
+     3
+    ]
+   ]
+  }
+ ],
+ "users": [
+  {
+   "username": "demo.anna",
+   "email": "demo.anna@example.org",
+   "teryt_code": "1863011"
+  },
+  {
+   "username": "demo.piotr",
+   "email": "demo.piotr@example.org",
+   "teryt_code": "1861011"
+  },
+  {
+   "username": "demo.katarzyna",
+   "email": "demo.katarzyna@example.org",
+   "teryt_code": "1862011"
+  },
+  {
+   "username": "demo.tomasz",
+   "email": "demo.tomasz@example.org",
+   "teryt_code": "1817011"
+  },
+  {
+   "username": "demo.ewa",
+   "email": "demo.ewa@example.org",
+   "teryt_code": "1805011"
+  },
+  {
+   "username": "demo.marek",
+   "email": "demo.marek@example.org",
+   "teryt_code": "1804011"
+  },
+  {
+   "username": "demo.joanna",
+   "email": "demo.joanna@example.org",
+   "teryt_code": "1803011"
+  },
+  {
+   "username": "demo.szkola",
+   "email": "demo.szkola@example.org",
+   "teryt_code": "1863011"
+  },
+  {
+   "username": "demo.gmina",
+   "email": "demo.gmina@example.org",
+   "teryt_code": "1817011"
+  },
+  {
+   "username": "demo.firma",
+   "email": "demo.firma@example.org",
+   "teryt_code": "1863011"
+  },
+  {
+   "username": "demo.fundusz",
+   "email": "demo.fundusz@example.org",
+   "teryt_code": "1863011"
+  },
+  {
+   "username": "demo.uczelnia",
+   "email": "demo.uczelnia@example.org",
+   "teryt_code": "1863011"
+  }
+ ],
+ "ideas": [
+  {
+   "author": "demo.szkola",
+   "title": "Szkolna sieć czujników jakości powietrza",
+   "essence": "Uczniowie technikum budują czujniki pyłu PM2.5 z gotowych modułów, a pomiary z sal lekcyjnych trafiają na wspólną mapę szkoły.",
+   "target_group": "Szkoły podstawowe i średnie, gminy",
+   "stage": "prototype",
+   "tag": "Edukacja i szkoły",
+   "teryt_code": "1863011",
+   "status": "published"
+  },
+  {
+   "author": "demo.gmina",
+   "title": "Wspólny system zapisów do żłobków dla kilku gmin",
+   "essence": "Jeden formularz online i wspólna lista oczekujących dla żłobków w sąsiednich gminach, z automatycznym powiadamianiem rodziców o wolnych miejscach.",
+   "target_group": "Gminy wiejskie i miejsko-wiejskie",
+   "stage": "idea",
+   "tag": "Samorząd i usługi publiczne",
+   "teryt_code": "1817011",
+   "status": "published"
+  },
+  {
+   "author": "demo.uczelnia",
+   "title": "Dron do inspekcji wałów przeciwpowodziowych",
+   "essence": "Studenci kół naukowych opracowali procedurę i oprogramowanie do analizy zdjęć z drona, które wskazuje uszkodzenia wałów.",
+   "target_group": "Gminy, spółki wodne, Wody Polskie",
+   "stage": "micro_scale_test",
+   "tag": "Lotnictwo i kosmos",
+   "teryt_code": "1863011",
+   "status": "submitted"
+  },
+  {
+   "author": "demo.ewa",
+   "title": "Biblioteka sprzętu do nauki programowania",
+   "essence": "Biblioteka gminna wypożycza szkołom zestawy robotów i płytek do nauki programowania wraz z gotowymi scenariuszami lekcji.",
+   "target_group": "Małe szkoły bez pracowni informatycznej",
+   "stage": "implemented",
+   "tag": "Edukacja i szkoły",
+   "teryt_code": "1805011",
+   "status": "published"
+  }
+ ],
+ "signups": [
+  {
+   "user": "demo.gmina",
+   "project": "Od Beskidu Niskiego po Solinę",
+   "teryt_code": "1817011",
+   "message": "Chcemy sprawdzić to rozwiązanie w naszej gminie."
+  },
+  {
+   "user": "demo.anna",
+   "project": "„Budujemy w Jaśle, stabilizujemy w Svidničke”",
+   "teryt_code": "1863011",
+   "message": "Interesuje mnie możliwość przeniesienia do Rzeszowa."
+  },
+  {
+   "user": "demo.tomasz",
+   "project": "Klimat pogranicza - działania transgraniczne zapobiegające skutkom zmian klimatycznych. Hraničná klíma - cezhraničné opatrenia na predchádzanie dôsledkom zmeny klímy.",
+   "teryt_code": "1817011",
+   "message": "Możemy udostępnić teren do pilotażu."
+  },
+  {
+   "user": "demo.joanna",
+   "project": "Polsko-Słowacka Eurosztafeta Ratownicza – „Razem bezpieczniej w Europie”",
+   "teryt_code": "1803011",
+   "message": "Szukamy podobnego rozwiązania dla powiatu dębickiego."
+  }
+ ],
+ "reviews": [
+  {
+   "user": "demo.gmina",
+   "project": "Od Beskidu Niskiego po Solinę",
+   "rating": 5,
+   "comment": "Dobrze opisany zakres, przydałaby się lista kosztów utrzymania."
+  },
+  {
+   "user": "demo.piotr",
+   "project": "„Budujemy w Jaśle, stabilizujemy w Svidničke”",
+   "rating": 4,
+   "comment": "Ciekawe, ale potrzebne są wyniki po zakończeniu projektu."
+  },
+  {
+   "user": "demo.katarzyna",
+   "project": "Klimat pogranicza - działania transgraniczne zapobiegające skutkom zmian klimatycznych. Hraničná klíma - cezhraničné opatrenia na predchádzanie dôsledkom zmeny klímy.",
+   "rating": 4,
+   "comment": "Warto dodać kontakt do koordynatora."
+  }
+ ],
+ "testers": [
+  {
+   "user": "demo.gmina",
+   "joined_days_ago": 35,
+   "phone": "+48 500 200 201",
+   "roles": [
+    "jst"
+   ],
+   "interests": [
+    "jakosc-zycia",
+    "ict"
+   ],
+   "tags": [
+    "Samorząd i usługi publiczne"
+   ],
+   "description": "Urząd gminy w Bieszczadach. Szukamy rozwiązań e-usług i adaptacji do zmian klimatu, możemy pilotować w 3 sołectwach."
+  },
+  {
+   "user": "demo.szkola",
+   "joined_days_ago": 20,
+   "phone": "+48 500 200 202",
+   "roles": [
+    "szkola"
+   ],
+   "interests": [
+    "jakosc-zycia",
+    "ict"
+   ],
+   "tags": [
+    "Edukacja i szkoły"
+   ],
+   "description": "Technikum w Rzeszowie, pracownia elektroniczna. Chętnie przetestujemy rozwiązania edukacyjne i pomiarowe z uczniami."
+  },
+  {
+   "user": "demo.firma",
+   "joined_days_ago": 28,
+   "phone": "+48 500 200 203",
+   "roles": [
+    "przedsiebiorstwo"
+   ],
+   "interests": [
+    "lotnictwo",
+    "motoryzacja"
+   ],
+   "tags": [
+    "Lotnictwo i kosmos"
+   ],
+   "description": "Firma z Doliny Lotniczej. Szukamy rozwiązań z uczelni do wdrożenia w kontroli jakości i produkcji kompozytów."
+  },
+  {
+   "user": "demo.fundusz",
+   "joined_days_ago": 14,
+   "phone": "+48 500 200 204",
+   "roles": [
+    "inwestor"
+   ],
+   "interests": [
+    "ict",
+    "kosmos"
+   ],
+   "tags": [
+    "Lotnictwo i kosmos"
+   ],
+   "description": "Fundusz zalążkowy. Inwestujemy w projekty na etapie prototypu, szczególnie w dane satelitarne i oprogramowanie."
+  },
+  {
+   "user": "demo.uczelnia",
+   "joined_days_ago": 40,
+   "phone": "+48 500 200 205",
+   "roles": [
+    "uczelnia",
+    "ekspert"
+   ],
+   "interests": [
+    "lotnictwo",
+    "ict"
+   ],
+   "tags": [
+    "Lotnictwo i kosmos"
+   ],
+   "description": "Centrum transferu technologii. Pomagamy ocenić potencjał komercjalizacji i ochronę własności intelektualnej."
+  },
+  {
+   "user": "demo.marek",
+   "joined_days_ago": 9,
+   "phone": "+48 500 200 206",
+   "roles": [
+    "organizacja-pozarzadowa"
+   ],
+   "interests": [
+    "jakosc-zycia"
+   ],
+   "tags": [
+    "Zdrowie i opieka"
+   ],
+   "description": "Fundacja wspierająca szkoły wiejskie. Możemy zorganizować pilotaże w kilku szkołach w powiecie jarosławskim."
+  }
+ ],
+ "questions": {
+  "Nowe metody nauczania": [
+   "Nasi nauczyciele opracowali nową metodę nauki matematyki. Jak ją opisać?",
+   "Czy są w bazie innowacje edukacyjne ze szkół z Podkarpacia?"
+  ],
+  "Szkolne projekty technologiczne": [
+   "Uczniowie zbudowali czujnik jakości powietrza. Jak go zgłosić?",
+   "Szukam szkolnych projektów z robotyki do przeniesienia."
+  ],
+  "E-usługi": [
+   "Czy ktoś już stworzył system zapisów do żłobków dla gminy?",
+   "Jakie e-usługi wdrożyły inne gminy?"
+  ],
+  "Współpraca międzygminna": [
+   "Szukamy partnera do wspólnego projektu transgranicznego.",
+   "Jak przenieść rozwiązanie z innej gminy do naszej?"
+  ],
+  "Adaptacja do zmian klimatu": [
+   "Jakie rozwiązania pomagają gminom ograniczać skutki ulew?",
+   "Czy są projekty retencji wody w Bieszczadach?"
+  ],
+  "Energia i odpady": [
+   "Szukam rozwiązań do oszczędzania energii w szkołach.",
+   "Jak gminy ograniczają ilość odpadów?"
+  ],
+  "Telemedycyna": [
+   "Czy uczelnie z regionu rozwijają rozwiązania telemedyczne?"
+  ],
+  "Profilaktyka": [
+   "Szukam programów profilaktyki dla małych gmin."
+  ],
+  "Elektromobilność": [
+   "Jakie projekty elektromobilności realizują gminy przygraniczne?"
+  ],
+  "Transport publiczny": [
+   "Jak inne gminy organizują transport na żądanie?"
+  ],
+  "Drony": [
+   "Mamy procedurę inspekcji dronem. Jaka może być ścieżka komercjalizacji?",
+   "Szukam rozwiązań z dronami dla straży pożarnej."
+  ],
+  "Dane satelitarne": [
+   "Czy uczelnie z Podkarpacia pracują z danymi satelitarnymi?"
+  ],
+  "Zarządzanie kryzysowe": [
+   "Jakie rozwiązania wspierają zarządzanie kryzysowe w powiecie?"
+  ],
+  "Ratownictwo": [
+   "Szukam projektów współpracy straży pożarnych z Podkarpacia."
+  ]
+ },
+ "trends": {
+  "_comment": "Weight multiplier of each tag in the older 30 days (before) and the last 30 days (recent), so /stats/trends shows rising and falling topics.",
+  "Edukacja i szkoły": [
+   1.0,
+   1.8
+  ],
+  "Lotnictwo i kosmos": [
+   0.6,
+   1.4
+  ],
+  "Bezpieczeństwo i ratownictwo": [
+   1.2,
+   0.6
+  ],
+  "Mobilność i transport": [
+   1.0,
+   0.7
+  ]
+ }
+}
