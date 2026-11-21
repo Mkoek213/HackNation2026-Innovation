@@ -7,6 +7,9 @@ Deviations from the original proposal are listed under each table. Endpoints: [A
 
 Scope: LLM conversations with tags/subtags, projects with PDFs, links and participation, ideas, pilot partners and their applications, and simple statistics for the admin. The vector database for RAG is an **external service**; this database stores only application data and the references the vector service returns.
 
+Discovery fields and the private source baseline for refresh merges live in the Qdrant card
+payload. Legacy cards default to candidates with an empty assessment. No SQL migration is required.
+
 ## Conventions
 
 - PostgreSQL + SQLAlchemy 2 async, one `CRUDRepo` per table.

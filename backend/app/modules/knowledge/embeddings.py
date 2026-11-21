@@ -8,24 +8,28 @@ job). Qdrant applies IDF server-side (Modifier.IDF), so no corpus statistics are
 Creating the client does no network I/O, so the API starts fast; tests can swap the embedder.
 """
 import hashlib
+import logging
 import re
+import time
 from collections import Counter
 from typing import Protocol
 
 from google import genai
-from google.genai import types
+import httpx
+from google.genai import errors, types
 from qdrant_client import models
 
 # Gemini batchEmbedContents accepts at most 100 inputs per request.
 _BATCH = 100
+logger = logging.getLogger(__name__)
 
 
 class Embedder(Protocol):
     dense_dim: int
 
-    async def embed_passages(self, texts: list[str]) -> tuple[list[list[float]], list[models.SparseVector]]: ...
+    async def embed_passages(self, texts: list[str]) -> tuple[list[list[float] | None], list[models.SparseVector]]: ...
 
-    async def embed_query(self, text: str) -> tuple[list[float], models.SparseVector]: ...
+    async def embed_query(self, text: str) -> tuple[list[float] | None, models.SparseVector]: ...
 
     async def aclose(self) -> None: ...
 
@@ -65,10 +69,11 @@ class Bm25:
 
 
 class GeminiEmbedder:
-    def __init__(self, api_key: str, model: str, dimensions: int, timeout_seconds: int = 60):
+    def __init__(self, api_key: str | None, model: str, dimensions: int, timeout_seconds: int = 60):
         self.model = model
         self.dense_dim = dimensions
         self.bm25 = Bm25()
+        self._retry_dense_at = 0.0
         self._client = genai.Client(
             api_key=api_key, vertexai=False,
             http_options=types.HttpOptions(
@@ -77,28 +82,36 @@ class GeminiEmbedder:
                 # Ingesting long reports sends many batches; ride out short 429/5xx bursts.
                 retry_options=types.HttpRetryOptions(attempts=5, initial_delay=1.0, max_delay=20.0),
             ),
-        )
+        ) if api_key else None
 
-    async def _dense(self, texts: list[str]) -> list[list[float]]:
+    async def _dense(self, texts: list[str]) -> list[list[float] | None]:
+        if self._client is None or time.monotonic() < self._retry_dense_at:
+            return [None] * len(texts)
         out: list[list[float]] = []
         for i in range(0, len(texts), _BATCH):
             # One Content per text: a plain string list would be embedded as a single input.
-            response = await self._client.aio.models.embed_content(
-                model=self.model,
-                contents=[types.Content(parts=[types.Part(text=t)]) for t in texts[i:i + _BATCH]],
-                config=types.EmbedContentConfig(output_dimensionality=self.dense_dim),
-            )
+            try:
+                response = await self._client.aio.models.embed_content(
+                    model=self.model,
+                    contents=[types.Content(parts=[types.Part(text=t)]) for t in texts[i:i + _BATCH]],
+                    config=types.EmbedContentConfig(output_dimensionality=self.dense_dim),
+                )
+            except (errors.APIError, httpx.HTTPError) as exc:
+                self._retry_dense_at = time.monotonic() + 60
+                logger.warning("Dense embeddings unavailable; using BM25 (%s)", type(exc).__name__)
+                return [None] * len(texts)
             out.extend(e.values for e in response.embeddings)
         return out
 
-    async def embed_passages(self, texts: list[str]) -> tuple[list[list[float]], list[models.SparseVector]]:
+    async def embed_passages(self, texts: list[str]) -> tuple[list[list[float] | None], list[models.SparseVector]]:
         dense = await self._dense([f"title: none | text: {t}" for t in texts])
         return dense, [self.bm25.passage(t) for t in texts]
 
-    async def embed_query(self, text: str) -> tuple[list[float], models.SparseVector]:
+    async def embed_query(self, text: str) -> tuple[list[float] | None, models.SparseVector]:
         dense = await self._dense([f"task: search result | query: {text}"])
         return dense[0], self.bm25.query(text)
 
     async def aclose(self) -> None:
-        await self._client.aio.aclose()
-        self._client.close()
+        if self._client:
+            await self._client.aio.aclose()
+            self._client.close()

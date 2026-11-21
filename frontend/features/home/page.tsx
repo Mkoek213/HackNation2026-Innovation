@@ -4,26 +4,26 @@ import Link from "next/link";
 import type { ComponentType } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, FlaskConical, Handshake, Lightbulb, MessagesSquare, Search } from "@/components/ui/icons";
-import { getInnovations, useLoad } from "@/features/knowledge";
+import { getCatalog, useLoad } from "@/features/knowledge";
 
 type IconType = ComponentType<{ size?: number; "aria-hidden"?: boolean }>;
 
 const entries: { href: string; icon: IconType; title: string; text: string; action: string }[] = [
-  { href: "/rozmowa?nowa=1", icon: MessagesSquare, title: "Zgłoś innowację", text: "Opisz rozwiązanie ze swojej szkoły, uczelni lub urzędu. Asystent pomoże je uporządkować i sprawdzi podobne innowacje.", action: "Rozpocznij rozmowę" },
-  { href: "/knowledge/innovations", icon: Lightbulb, title: "Baza innowacji", text: "Patenty, projekty i rozwiązania z instytucji publicznych, opisane według jednego schematu i ze wskazaniem źródła.", action: "Przeglądaj innowacje" },
-  { href: "/tester", icon: FlaskConical, title: "Zostań partnerem pilotażu", text: "Szukasz rozwiązania do wdrożenia, przetestowania lub sfinansowania? Zgłoś gotowość do pilotażu.", action: "Zgłoś się" },
+  { href: "/rozmowa?nowa=1", icon: MessagesSquare, title: "Znajdź rozwiązanie", text: "Opisz potrzebę szkoły, uczelni, firmy lub urzędu. Asystent pomoże wyszukać i porównać rozwiązania.", action: "Opisz potrzebę" },
+  { href: "/knowledge/innovations", icon: Lightbulb, title: "Baza innowacji", text: "Sprawdź etap wdrożenia, dowody i możliwości zastosowania polskich rozwiązań.", action: "Przeglądaj innowacje" },
+  { href: "/tester", icon: FlaskConical, title: "Zostań partnerem pilotażu", text: "Jeśli Twoja instytucja może przetestować rozwiązanie w praktyce, dołącz do bazy partnerów.", action: "Zgłoś się" },
 ];
 
 const steps: { icon: IconType; title: string; text: string }[] = [
-  { icon: MessagesSquare, title: "Opisz innowację", text: "Napisz lub podyktuj, na czym polega rozwiązanie, gdzie powstało i na jakim jest etapie." },
-  { icon: Search, title: "Sprawdź podobne rozwiązania", text: "Asystent porówna je z bazą, aby ograniczyć dublowanie prac, i wskaże brakujące informacje." },
-  { icon: Handshake, title: "Połącz się z partnerami", text: "Zapisz zgłoszenie, pobierz podsumowanie w PDF i skontaktuj się z PCI, aby zaplanować rozwój lub wdrożenie." },
+  { icon: MessagesSquare, title: "Opisz potrzebę", text: "Napisz lub podyktuj, jaki problem chcesz rozwiązać i w jakiej instytucji." },
+  { icon: Search, title: "Sprawdź dowody", text: "Porównaj etap wdrożenia, wiarygodność źródeł i możliwość zastosowania w innym miejscu." },
+  { icon: Handshake, title: "Zaplanuj wdrożenie", text: "Sprawdź warunki wdrożenia lub zgłoś gotowość do pilotażu wybranego rozwiązania." },
 ];
 
 const examples = [
-  "Nasi uczniowie zbudowali czujnik jakości powietrza. Jak go zgłosić?",
-  "Czy ktoś już stworzył system zapisów do żłobków dla gminy?",
-  "Szukam rozwiązań z uczelni dla branży lotniczej.",
+  "Jak szkoła może wdrożyć cyfrowe metody nauczania?",
+  "Jak gmina może udostępnić płatności online?",
+  "Jak zautomatyzować transport wewnątrz magazynu?",
 ];
 
 /** Polish plural form: 1 innowacja, 2–4 innowacje, 5+ innowacji (12–14 take the last form). */
@@ -34,19 +34,19 @@ function plural(count: number, one: string, few: string, many: string) {
 }
 
 export function HomePage() {
-  const innovations = useLoad(getInnovations, "innovations");
+  const innovations = useLoad(() => getCatalog("limit=1"), "confirmed-innovations");
   return <main id="main" tabIndex={-1} className="home">
     <section className="home-hero" aria-labelledby="home-title">
       <div className="home-hero-text">
         <p className="home-eyebrow">Radar innowacji · Podkarpackie Centrum Innowacji</p>
-        <h1 id="home-title">Odnajdź ukryte innowacje i daj im szansę na wdrożenie</h1>
-        <p className="home-lead">Wartościowe pomysły powstają w szkołach, na uczelniach i w samorządach, ale często zostają tam, gdzie powstały. Radar pomaga je opisać, porównać z podobnymi rozwiązaniami i połączyć z tymi, którzy mogą je rozwinąć, wdrożyć lub sfinansować.</p>
+        <h1 id="home-title">Znajdź polskie innowacje gotowe do zastosowania</h1>
+        <p className="home-lead">Radar odkrywa rozwiązania z publicznych źródeł. Porównaj dowody, sprawdź, gdzie już działają, i zaplanuj następny krok w swojej instytucji.</p>
         <div className="home-actions">
-          <Button size="lg" nativeButton={false} render={<Link href="/rozmowa?nowa=1" />}>Rozpocznij rozmowę<ArrowRight aria-hidden="true" /></Button>
-          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/knowledge/innovations" />}>Przeglądaj innowacje</Button>
+          <Button size="lg" nativeButton={false} render={<Link href="/knowledge/innovations" />}>Znajdź rozwiązanie<ArrowRight aria-hidden="true" /></Button>
+          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/rozmowa?nowa=1" />}>Zapytaj asystenta</Button>
         </div>
         {innovations && <dl className="home-figures">
-          {innovations && <div><dt>{plural(innovations.length, "innowacja", "innowacje", "innowacji")} w bazie</dt><dd>{innovations.length}</dd></div>}
+          {innovations && <div><dt>{plural(innovations.total, "innowacja", "innowacje", "innowacji")} w bazie</dt><dd>{innovations.total}</dd></div>}
         </dl>}
       </div>
       <aside className="home-examples" aria-labelledby="examples-title">

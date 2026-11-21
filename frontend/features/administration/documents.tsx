@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Tabs } from "@base-ui/react/tabs";
 import { api, ApiError } from "@/features/workspace";
+import { innovationAreas, type Assessment, type AssessmentNote, type Discovery } from "@/features/knowledge";
 import { Button } from "@/components/ui/button";
 import { FileText } from "@/components/ui/icons";
 import { Input } from "@/components/ui/input";
@@ -16,7 +17,7 @@ type Taxonomy = { sectors: Record<string, string>; innovation_types: Record<stri
 type Profile = {
   innovation_type: string | null; institution_type: string | null; institution: string | null; maturity: string | null;
   source_name: string | null; authors: Author[]; imported_at: string | null;
-};
+} & Discovery;
 type StoredDocument = { id: string; filename: string; download_url: string };
 type Innovation = {
   id: string; title: string; primary_category: string; categories: string[];
@@ -36,7 +37,11 @@ type Saved = { title: string; id: string; ingest: IngestResult | null };
 type Mode = "create" | "edit";
 
 const emptyCard: Card = { problem: "", solution: "", novelty: "", target_users: "", evidence: "" };
-const emptyProfile: Profile = { innovation_type: null, institution_type: null, institution: null, maturity: null, source_name: null, authors: [], imported_at: null };
+const emptyAssessment: Assessment = { implementation: null, novelty: null, transfer: null, credibility: null, trl: null, trl_basis: null, next_step: "" };
+const emptyProfile: Profile = {
+  innovation_type: null, institution_type: null, institution: null, maturity: null, source_name: null, authors: [], imported_at: null,
+  area: null, region: null, checked_at: null, verification: "kandydat", assessment: emptyAssessment,
+};
 const emptyForm: CardForm = { title: "", primary: "", extra: [], sourceUrl: "", card: emptyCard, profile: emptyProfile };
 const cardFields: { key: keyof Card; label: string }[] = [
   { key: "problem", label: "Jaki problem rozwiązuje?" },
@@ -67,16 +72,24 @@ function formOf(innovation: Innovation): CardForm {
     profile: {
       innovation_type: innovation.innovation_type, institution_type: innovation.institution_type, institution: innovation.institution,
       maturity: innovation.maturity, source_name: innovation.source_name, authors: innovation.authors ?? [], imported_at: innovation.imported_at,
+      area: innovation.area, region: innovation.region, checked_at: innovation.checked_at,
+      verification: innovation.verification, assessment: innovation.assessment,
     },
   };
 }
 
 function metaOf(form: CardForm, videoUrl: string | null) {
+  const assessment = { ...form.profile.assessment };
+  for (const key of ["implementation", "novelty", "transfer", "credibility", "trl_basis"] as const) {
+    const note = assessment[key];
+    assessment[key] = note?.rationale.trim() ? { ...note, rationale: note.rationale.trim() } : null;
+  }
   return {
     title: form.title.trim(), primary_category: form.primary,
     categories: [form.primary, ...form.extra.filter(category => category !== form.primary)],
     source_url: form.sourceUrl.trim() || null, video_url: videoUrl, card: form.card,
     ...form.profile, institution: form.profile.institution?.trim() || null, source_name: form.profile.source_name?.trim() || null,
+    region: form.profile.region?.trim() || null, assessment,
   };
 }
 
@@ -138,6 +151,7 @@ function CardFields({ form, onChange, taxonomy, disabled, reading = false }: {
         {Object.entries(taxonomy[axis]).map(([slug, text]) => <option key={slug} value={slug}>{text}</option>)}
       </select>
     </label>)}
+    <AssessmentFields profile={form.profile} onChange={setProfile} disabled={disabled} />
     <label className="field-block">Instytucja, w której powstała
       <Input maxLength={300} value={form.profile.institution ?? ""} onChange={e => setProfile({ institution: e.target.value })} disabled={disabled} placeholder="np. Politechnika Rzeszowska" />
     </label>
@@ -152,6 +166,70 @@ function CardFields({ form, onChange, taxonomy, disabled, reading = false }: {
         onChange={e => { const value = e.target.value; onChange(old => ({ ...old, card: { ...old.card, [field.key]: value } })); }} />
     </label>)}
   </>;
+}
+
+function AssessmentFields({ profile, onChange, disabled }: {
+  profile: Profile; onChange: (patch: Partial<Profile>) => void; disabled: boolean;
+}) {
+  const { assessment } = profile;
+  const setAssessment = (patch: Partial<Assessment>) => onChange({ assessment: { ...assessment, ...patch } });
+  const criteria = [
+    ["implementation", "Etap i dowód zastosowania"], ["novelty", "Nowość"],
+    ["transfer", "Możliwość transferu"], ["credibility", "Wiarygodność dowodów"],
+  ] as const;
+  const rows = assessment.trl === null ? criteria : [...criteria, ["trl_basis", "Podstawa oceny TRL"] as const];
+  return <details>
+    <summary>Weryfikacja i ocena potencjału</summary>
+    <fieldset className={styles.uploadForm} disabled={disabled}>
+      <legend className="sr-only">Ocena potencjału</legend>
+      <label className="field-block">Obszar zastosowania
+        <select className="select" value={profile.area ?? ""} onChange={e => {
+          const area = (e.target.value || null) as Discovery["area"];
+          onChange({ area, ...(area !== "technologia" ? { assessment: { ...assessment, trl: null, trl_basis: null } } : {}) });
+        }}>
+          <option value="">Nie określono</option>
+          {Object.entries(innovationAreas).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+        </select>
+      </label>
+      <label className="field-block">Województwo
+        <Input maxLength={60} value={profile.region ?? ""} onChange={e => onChange({ region: e.target.value || null })} />
+      </label>
+      <label className="field-block">Status weryfikacji
+        <select className="select" value={profile.verification} onChange={e => onChange({ verification: e.target.value as Discovery["verification"] })}>
+          <option value="kandydat">Kandydat do weryfikacji</option>
+          <option value="potwierdzona">Potwierdzone użycie</option>
+        </select>
+        <span className="field-help">Potwierdzenie wymaga etapu pilotażu lub wdrożenia oraz uzasadnienia ze źródłem rzeczywistego użycia.</span>
+      </label>
+      {profile.area === "technologia" && <label className="field-block">TRL (opcjonalnie)
+        <Input type="number" min={1} max={9} value={assessment.trl ?? ""} onChange={e => {
+          const trl = e.target.value ? Number(e.target.value) : null;
+          setAssessment({ trl, ...(trl === null ? { trl_basis: null } : {}) });
+        }} />
+      </label>}
+      {rows.map(([key, label]) => {
+        const note = assessment[key] ?? { basis: "szacunek", rationale: "", source_url: null };
+        const setNote = (patch: Partial<AssessmentNote>) => setAssessment({ [key]: { ...note, ...patch } });
+        return <fieldset key={key} className={styles.uploadForm}>
+          <legend>{label}</legend>
+          <label className="field-block">Podstawa oceny
+            <select className="select" value={note.basis} onChange={e => setNote({ basis: e.target.value as AssessmentNote["basis"] })}>
+              <option value="szacunek">Szacunek</option><option value="potwierdzone">Potwierdzone</option>
+            </select>
+          </label>
+          <label className="field-block">Uzasadnienie
+            <Textarea rows={2} maxLength={1200} value={note.rationale} onChange={e => setNote({ rationale: e.target.value })} />
+          </label>
+          <label className="field-block">URL źródła oceny
+            <Input type="url" maxLength={2000} value={note.source_url ?? ""} onChange={e => setNote({ source_url: e.target.value || null })} />
+          </label>
+        </fieldset>;
+      })}
+      <label className="field-block">Proponowany następny krok
+        <Textarea rows={2} maxLength={1200} value={assessment.next_step} onChange={e => setAssessment({ next_step: e.target.value })} />
+      </label>
+    </fieldset>
+  </details>;
 }
 
 function CreateInnovation({ taxonomy, innovations, onSaved, onEdit }: {

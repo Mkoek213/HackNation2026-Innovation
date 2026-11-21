@@ -265,6 +265,16 @@ with its own `X-Admin-Token` write protection; see its [README](app/modules/know
 `GET /api/v1/knowledge/taxonomy` returns Polish labels of all classification axes (sectors, innovation types,
 institution types, maturity); `GET /api/v1/knowledge/categories` returns the sectors only.
 
+`GET /api/v1/knowledge/catalog` returns `{items, total, regions}` and accepts `q`, `category`,
+`area`, `region`, `maturity`, `offset` and `limit`. It defaults to confirmed records. Pass
+`include_candidates=true` to include candidates. The existing unpaginated list still serves
+administration. Cards expose `area`, `region`, `verification`, `checked_at` and `assessment`.
+Confirmed use requires a supported stage and an implementation criterion with an HTTP(S) source.
+TRL requires the technology area and its own justification.
+
+Admin-only `PUT /api/v1/knowledge/innovations/{id}/refresh` accepts card metadata as JSON
+and returns `{status: "created" | "updated" | "unchanged"}`. It preserves attachments and editorial changes.
+
 
 ## Pilot partner pool (`/volunteers`)
 

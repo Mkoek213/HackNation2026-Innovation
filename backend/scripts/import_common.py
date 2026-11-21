@@ -48,6 +48,22 @@ INSTITUTION_KEYWORDS: list[tuple[InstitutionType, tuple[str, ...]]] = [
                                           "medical care", "centre")),
 ]
 
+REGIONS = ("Dolnośląskie", "Kujawsko-pomorskie", "Lubelskie", "Lubuskie", "Łódzkie", "Małopolskie",
+           "Mazowieckie", "Opolskie", "Podkarpackie", "Podlaskie", "Pomorskie", "Śląskie",
+           "Świętokrzyskie", "Warmińsko-mazurskie", "Wielkopolskie", "Zachodniopomorskie")
+
+
+def region_name(value: str | None) -> str | None:
+    return next((name for name in REGIONS if plain(name) == plain(value)), None) if value else None
+
+
+def application_area(kind: InnovationType, institution: InstitutionType):
+    if kind == InnovationType.EDUCATIONAL:
+        return "edukacja"
+    if institution == InstitutionType.LOCAL_GOVERNMENT:
+        return "administracja"
+    return "technologia" if kind == InnovationType.TECHNOLOGICAL else None
+
 
 def plain(text: str) -> str:
     text = unicodedata.normalize("NFKD", (text or "").replace("ł", "l").replace("Ł", "L"))

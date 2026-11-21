@@ -53,6 +53,5 @@ PCI operates the product for many public institutions. Creators report innovatio
 
 ## Not implemented
 
-- Potential assessment against explicit criteria and recommended development paths with justification.
 - Patent sources (UPRP blocked; EPO OPS needs a key).
 - Renaming the internal `tester` identifiers to `pilot`.

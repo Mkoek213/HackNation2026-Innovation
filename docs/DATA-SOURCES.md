@@ -1,7 +1,7 @@
 # Investigation: access to the PCI brief data sources
 
-Date: 2026-11-21.
-Question: which data sources suggested by the brief can feed the Radar knowledge base legally and repeatably, filtered to województwo podkarpackie?
+Date: 2026-11-21. The original investigation used Podkarpackie. Refresh now accepts
+all Polish voivodeships by default and supports `--region` for pilots.
 
 ## Findings
 
@@ -29,8 +29,24 @@ The RAD-on institutions endpoint ignores the `voivodeship` parameter, so the imp
 ## Limitations
 
 - No patents in the base yet; adding EPO OPS (free key) is the most valuable next source.
-- School innovations are not present in any public registry; they enter Radar only through chat submissions.
+- The examined registries have limited school and local administration coverage. The public deployment-report adapter currently verifies three selected cases.
 - RAD-on abstracts describe research projects, not proven innovations; maturity is left unset for them.
+
+## Deployment evidence
+
+| Area | Case and official source | Evidence scope |
+| --- | --- | --- |
+| Administration | [ePłatności](https://www.gov.pl/web/cyfryzacja/ponad-milion-platnosci-bez-kolejek-cyfrowe-oplaty-urzedowe-staja-sie-standardem) | The Ministry documents the first transaction in Bydgoszcz and national use. |
+| Technology | [EZD RP](https://www.gov.pl/web/ezd-rp/770-zrealizowanych-wdrozen-produkcyjnych-ezd-rp) | The EZD RP portal records production use in the regional office in Białystok. |
+| Education | [Lekcja:Enter](https://lekcjaenter.pl/aktualnosci/zapraszamy-do-obejrzenia-filmu-podsumowujacego-nasz-projekt) | The programme operator confirms participation. It provides no causal estimate of learning gains. |
+
+Reviewers register the public report and the evidence phrases to check in
+`backend/scripts/import_deployments.py`. The adapter rechecks them on refresh. Missing
+phrases on a readable page send the record for review. A failed fetch retains the last
+successful version. This is a bounded adapter for selected reports. A completed Interreg
+project and a RAD-on project abstract enter the broader candidate pool. Exact term ranking
+continues when Gemini embeddings are unavailable. Paged catalog lookup uses text and
+structured filters on the available records.
 
 ## Next steps
 

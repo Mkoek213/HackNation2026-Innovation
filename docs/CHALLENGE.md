@@ -1,7 +1,22 @@
 # Challenge: "Radar innowacji" (Podkarpackie Centrum Innowacji)
 
-Source: "PCI - Pełna treść zadania konkursowego" (HackNation 2026).
-The brief is in Polish; this file summarises it in English and keeps the evaluation-relevant Polish wording.
+Sources: [full challenge brief](../materials/PCI%20-%20Pe%C5%82na%20tre%C5%9B%C4%87%20zadania%20konkursowego.pdf)
+and [Radar Innowacji FAQ](../materials/Radar%20Innowacji%20FAQ.pdf) (HackNation 2026).
+Use the FAQ to define the discovery product and the full brief for submission, evaluation and deployment.
+
+## Requirement traceability
+
+| Source | Requirement | Evidence and acceptance |
+| --- | --- | --- |
+| FAQ §§1–4, 8.1–3 | Automatically find and organise existing Polish solutions in technology, education and administration | Nationwide registry imports gather candidates. The deployment-report adapter verifies public evidence for ePłatności, EZD RP and Lekcja:Enter. |
+| FAQ §5, 8.4, 8.6 | Document deployment, novelty, readiness, applicability and credibility | Card links to proof of use and labels the basis of each assessment. Check one confirmed record, a candidate and optional technology TRL. |
+| FAQ §§3, 8.5 | Search, filter and compare for different audiences | Filter by need, area, region, stage and sector. Compare the same criteria in the assistant and open its sources. |
+| FAQ §§4, 8.7 | Recurring source updates | The daily host job refreshes source records. Check repeat execution, editorial changes and source failures. |
+| FAQ §§6–7 | Discovery with optional usage analytics | Public entry points lead to discovery. Existing admin analytics measure usage. |
+| Full brief §§3, 6.4–5 | Explain a transfer or deployment path and how to measure it | Specify an adopter, first condition, next action and metric. |
+| Full brief §§5, 9 | Sources, assumptions, security, integration and scaling | See [data sources](DATA-SOURCES.md), [API](../backend/API.md) and [operations](DEVELOPMENT.md). |
+| FAQ §8.8–9, full brief §6 | Validate examples and measure usefulness | Compare two timed discovery tasks against source browsing. Count pilots and confirmed deployments during a PCI rollout. |
+| Full brief §4 | Submission and demonstration | Polish title and description, PDF presentation up to 10 slides, public video up to 3 minutes. |
 
 ## Organisation
 
@@ -59,6 +74,27 @@ Judges check whether the solution really supports finding and assessing hidden i
 5. Present the justification of the recommendation, with expected effectiveness measures.
 
 Evaluate on at least two example use cases.
+
+### Local validation record
+
+On 2026-11-21, the two worked cases were municipal payments (Bydgoszcz, ePłatności)
+and internal document workflow (Białystok, EZD RP). The running catalog returned the
+matching cards, opened evidence, and compared their deployment stages, applicability
+and suggested next steps. The technical interaction took 0.95 s and 0.79 s from entering
+the prepared terms to opening the evidence card. These are single local runs. A timed
+comparison against an independent manual search and evaluation with target users are pending.
+The education filter and keyboard dialog were also verified at 390 px using Lekcja:Enter.
+
+The local catalog contained 3 confirmed cards, 172 Interreg candidates and 20 RAD-on
+candidates from Podlaskie. The scheduled check refreshed the 3 deployment sources
+with no duplicates. A manual API review confirmed that a refresh can promote a candidate
+and preserve an edited title and attached PDF. A deliberately unavailable source left
+the catalog unchanged. The comparison worked with the provider unavailable. The Gemini
+key was rejected during local verification, so a live generated assistant answer was
+outside the verified flow.
+
+Submission files: [description](../submission/opis.md), [eight-slide PDF](../submission/radar-innowacji.pdf)
+and [local demonstration](../submission/radar-demo.mp4).
 
 ## Suggested data sources
 

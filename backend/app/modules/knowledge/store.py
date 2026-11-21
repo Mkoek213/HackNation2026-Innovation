@@ -31,7 +31,7 @@ def point_id(*parts: str) -> str:
 @dataclass
 class PointData:
     id: str
-    dense: list[float]
+    dense: list[float] | None
     sparse: models.SparseVector
     payload: dict[str, Any]
 
@@ -67,7 +67,7 @@ class QdrantStore:
                     f"{self.dense_dim}. Changing EMBEDDING_MODEL or EMBEDDING_DIMENSIONS requires a new "
                     "QDRANT_COLLECTION (scripts/reindex_knowledge.py copies the knowledge base into it)."
                 )
-        for field in ("kind", "innovation_id", "categories", "doc_type", "role"):
+        for field in ("kind", "innovation_id", "categories", "doc_type", "role", "verification"):
             await self.client.create_payload_index(
                 self.collection, field, field_schema=models.PayloadSchemaType.KEYWORD,
             )
@@ -87,7 +87,8 @@ class QdrantStore:
             await self.client.upsert(
                 self.collection,
                 points=[
-                    models.PointStruct(id=p.id, vector={DENSE: p.dense, SPARSE: p.sparse}, payload=p.payload)
+                    models.PointStruct(id=p.id, vector={SPARSE: p.sparse, **({DENSE: p.dense} if p.dense is not None else {})},
+                                       payload=p.payload)
                     for p in points[i:i + batch]
                 ],
                 wait=True,
@@ -109,6 +110,10 @@ class QdrantStore:
             points=models.Filter(must=[_match("kind", "chunk"), _match("innovation_id", innovation_id)]),
             wait=True,
         )
+
+    async def set_card_fields(self, innovation_id: str, fields: dict[str, Any]) -> None:
+        await self.client.set_payload(self.collection, payload=fields,
+                                      points=[point_id(innovation_id, "card")], wait=True)
 
     async def delete_innovation(self, innovation_id: str) -> None:
         await self.client.delete(self.collection, points_selector=self._by_innovation(innovation_id), wait=True)
@@ -147,10 +152,13 @@ class QdrantStore:
                 break
         return out
 
-    async def list_innovations(self, category: Category | None = None) -> list[InnovationSummary]:
+    async def list_innovations(self, category: Category | None = None, *,
+                               confirmed_only: bool = False) -> list[InnovationSummary]:
         must = [_match("kind", "card")]
         if category is not None:
             must.append(_match("categories", category.value))
+        if confirmed_only:
+            must.append(_match("verification", "potwierdzona"))
         out: list[InnovationSummary] = []
         offset = None
         while True:
@@ -160,11 +168,11 @@ class QdrantStore:
             out.extend(card_payload_to_summary(r.payload) for r in records)
             if offset is None:
                 break
-        return sorted(out, key=lambda s: s.title.lower())
+        return sorted(out, key=lambda s: (s.title.casefold(), s.id))
 
     async def search_chunks(
             self,
-            dense: list[float],
+            dense: list[float] | None,
             sparse: models.SparseVector,
             *,
             limit: int,
@@ -172,22 +180,31 @@ class QdrantStore:
             categories: list[Category] | None = None,
             role: DocumentRole | None = None,
             innovation_ids: list[str] | None = None,
+            confirmed_only: bool = False,
     ) -> list[models.ScoredPoint]:
         """Flat hybrid retrieval over chunks (dense + BM25, RRF). Grouping by innovation is done
         by the caller: Qdrant's grouped fusion scores each group separately, which makes the
         group scores useless for ranking innovations against each other.
         `role` restricts to summary or full materials; chunks indexed before roles existed count as full."""
-        flt = self._filter("chunk", categories)
+        flt = self._filter("chunk", categories, confirmed_only)
         if role == "summary":
             flt.must.append(_match("role", "summary"))
         elif role == "full":
             flt.must_not = [_match("role", "summary")]
         if innovation_ids is not None:
             flt.must.append(models.FieldCondition(key="innovation_id", match=models.MatchAny(any=innovation_ids)))
+        if dense is None and not sparse.indices:
+            return []
+        ranking = (
+            {"prefetch": self._prefetch(dense, sparse, prefetch, flt),
+             "query": models.FusionQuery(fusion=models.Fusion.RRF)}
+            if dense is not None and sparse.indices
+            else {"query": dense if dense is not None else sparse, "using": DENSE if dense is not None else SPARSE}
+        )
         result = await self.client.query_points(
             self.collection,
-            prefetch=self._prefetch(dense, sparse, prefetch, flt),
-            query=models.FusionQuery(fusion=models.Fusion.RRF),
+            **ranking,
+            query_filter=flt,
             limit=limit,
             with_payload=True,
         )
@@ -195,18 +212,21 @@ class QdrantStore:
 
     async def search_cards(
             self,
-            dense: list[float],
+            vector: list[float] | models.SparseVector | None,
             *,
             limit: int,
             categories: list[Category] | None = None,
+            confirmed_only: bool = False,
     ) -> list[tuple[str, float]]:
-        """Card retrieval, dense only: cards are short curated texts where BM25 is noisy;
-        exact names are still matched by BM25 over chunks (their text carries the title)."""
+        """Retrieve short curated cards by dense similarity or exact terms."""
+        if vector is None or (isinstance(vector, models.SparseVector) and not vector.indices):
+            return []
+        using = SPARSE if isinstance(vector, models.SparseVector) else DENSE
         result = await self.client.query_points(
             self.collection,
-            query=dense,
-            using=DENSE,
-            query_filter=self._filter("card", categories),
+            query=vector,
+            using=using,
+            query_filter=self._filter("card", categories, confirmed_only),
             limit=limit,
             with_payload=["innovation_id"],
         )
@@ -220,8 +240,10 @@ class QdrantStore:
         ]
 
     @staticmethod
-    def _filter(kind: str, categories: list[Category] | None) -> models.Filter:
+    def _filter(kind: str, categories: list[Category] | None, confirmed_only: bool = False) -> models.Filter:
         must: list[models.Condition] = [_match("kind", kind)]
+        if confirmed_only:
+            must.append(_match("verification", "potwierdzona"))
         if categories:
             must.append(models.FieldCondition(
                 key="categories", match=models.MatchAny(any=[c.value for c in categories]),

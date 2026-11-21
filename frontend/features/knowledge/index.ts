@@ -1,3 +1,4 @@
 export { InnovationsPage } from "./pages";
-export { getInnovations } from "./api";
+export { getCatalog, getInnovations, innovationAreas } from "./api";
+export type { Assessment, AssessmentNote, Discovery } from "./api";
 export { useLoad } from "./use-load";

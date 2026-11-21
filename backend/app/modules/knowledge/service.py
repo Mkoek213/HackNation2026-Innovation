@@ -19,8 +19,10 @@ from .errors import InnovationNotFound, KnowledgeUnavailable
 from .extract import SUPPORTED_SUFFIXES, dedupe_formats, expand_archives, extract
 from .schemas import (
     CategoriesUpdate,
+    CatalogPage,
     Evidence,
     IngestResult,
+    InnovationArea,
     InnovationMeta,
     InnovationSummary,
     InnovationUpdate,
@@ -30,14 +32,14 @@ from .schemas import (
 from .settings import KnowledgeSettings, load_knowledge_settings
 from .store import PointData, QdrantStore, make_client, meta_to_card_payload, point_id
 from .taxonomy import (CATEGORY_LABELS, INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS,
-                       Category)
+                       Category, Maturity)
 
 logger = logging.getLogger(__name__)
 
 _RRF_K = 60
 # Stage-1 ranking weights. Card and summary are short, curated and equally sized for every innovation;
 # full materials only add recall for terms that appear nowhere else, so long reports cannot dominate.
-_RANKING_WEIGHTS = {"card": 1.0, "summary": 1.0, "full": 0.5}
+_RANKING_WEIGHTS = {"card": 1.0, "card_terms": 0.7, "summary": 1.0, "full": 0.5}
 
 
 async def document_tag_options():
@@ -100,8 +102,6 @@ class KnowledgeService:
         if not settings.qdrant_url:
             raise KnowledgeUnavailable("Knowledge base is not configured (set QDRANT_URL).")
         if embedder is None:
-            if not settings.gemini_api_key:
-                raise KnowledgeUnavailable("Knowledge base is not configured (set GEMINI_API_KEY).")
             embedder = GeminiEmbedder(settings.gemini_api_key, settings.embedding_model, settings.embedding_dimensions)
         client = make_client(settings.qdrant_url, settings.qdrant_api_key)
         store = QdrantStore(client, settings.qdrant_collection, embedder.dense_dim)
@@ -129,7 +129,7 @@ class KnowledgeService:
             return await self._ingest(meta, files, workdir, summary)
 
     async def _ingest(self, meta: InnovationMeta, files: list[Path], workdir: Path,
-                      summary: Path | None = None) -> IngestResult:
+                      summary: Path | None = None, import_baseline: dict | None = None) -> IngestResult:
         if summary is not None and summary.suffix.lower() not in SUPPORTED_SUFFIXES:
             raise ValueError("Summary must be a PDF or DOCX file.")
         expanded = await to_thread.run_sync(
@@ -151,6 +151,8 @@ class KnowledgeService:
             (documents.append(doc) if doc else skipped.append(path.name))
 
         previous = await self.store.get_innovation(meta.id)
+        if previous:
+            meta = self._with_discovery_fields(previous, meta)
         for path, stored_doc in stored_by_path.items():
             def digest():
                 with path.open("rb") as stream:
@@ -185,6 +187,7 @@ class KnowledgeService:
             "title": meta.title,
             "categories": [c.value for c in meta.categories],
             "primary_category": meta.primary_category.value,
+            "verification": meta.verification,
         }
         for doc in documents:
             for i, chunk in enumerate(chunk_blocks(doc.blocks)):
@@ -209,6 +212,9 @@ class KnowledgeService:
 
         file_names = [d.path.name for d in documents]
         payloads.insert(0, meta_to_card_payload(meta, files=file_names, chunk_count=len(payloads)))
+        payloads[0]["import_baseline"] = import_baseline if import_baseline is not None else (
+            previous.import_baseline if previous else {}
+        )
         dense, sparse = await self.embedder.embed_passages(texts)
         points = [PointData(id=i, dense=d, sparse=s, payload=p) for i, d, s, p in zip(ids, dense, sparse, payloads)]
         stored = list(stored_by_path.values())
@@ -240,29 +246,80 @@ class KnowledgeService:
         re-embedded only when the title changes, because their embedded header carries it."""
         async with self._write_lock:
             previous = await self.get(innovation_id)
-            meta = InnovationMeta(id=innovation_id, **update.model_dump())
-            payload = meta_to_card_payload(meta, files=previous.files, chunk_count=previous.chunk_count)
-            payload["documents"] = [{**d.model_dump(), "object_key": d.object_key} for d in previous.documents]
-            fields = {"title": meta.title, "categories": [c.value for c in meta.categories],
-                      "primary_category": meta.primary_category.value}
-            chunks = await self.store.chunks(innovation_id) if meta.title != previous.title else []
-            texts = [card_text(meta)] + [
+            meta = self._with_discovery_fields(previous, update)
+            return await self._update(previous, meta, previous.import_baseline)
+
+    @staticmethod
+    def _with_discovery_fields(previous: InnovationSummary, update: InnovationUpdate) -> InnovationMeta:
+        fields = {"area", "region", "verification", "assessment", "checked_at"} - update.model_fields_set
+        data = {**update.model_dump(), **previous.model_dump(include=fields)}
+        data["id"] = previous.id
+        return InnovationMeta.model_validate(data)
+
+    async def _update(self, previous: InnovationSummary, meta: InnovationMeta, baseline: dict) -> InnovationSummary:
+        payload = meta_to_card_payload(meta, files=previous.files, chunk_count=previous.chunk_count)
+        payload["documents"] = [{**d.model_dump(), "object_key": d.object_key} for d in previous.documents]
+        payload["import_baseline"] = baseline
+        fields = {"title": meta.title, "categories": [c.value for c in meta.categories],
+                  "primary_category": meta.primary_category.value, "verification": meta.verification}
+        text = card_text(meta)
+        if text == card_text(previous):
+            await self.store.set_card_fields(meta.id, payload)
+            if meta.verification != previous.verification:
+                await self.store.set_chunk_fields(meta.id, fields)
+        else:
+            chunks = await self.store.chunks(meta.id) if meta.title != previous.title else []
+            texts = [text] + [
                 chunk_text(meta.title, p.get("section"), p["doc_type"], p["text"]) for _, p in chunks
             ]
             dense, sparse = await self.embedder.embed_passages(texts)
             payloads = [payload] + [{**p, **fields} for _, p in chunks]
-            ids = [point_id(innovation_id, "card")] + [i for i, _ in chunks]
+            ids = [point_id(meta.id, "card")] + [i for i, _ in chunks]
             await self.store.upsert([PointData(id=i, dense=d, sparse=s, payload=p)
                                      for i, d, s, p in zip(ids, dense, sparse, payloads)])
-            if not chunks:
-                await self.store.set_chunk_fields(innovation_id, fields)
-            logger.info("Updated card of %s (%d chunks re-embedded)", innovation_id, len(chunks))
-            return await self.get(innovation_id)
+            if not chunks and previous.chunk_count:
+                await self.store.set_chunk_fields(meta.id, fields)
+        return await self.get(meta.id)
+
+    async def refresh(self, meta: InnovationMeta, workdir: Path) -> str:
+        """Three-way merge: refresh fields still matching the previous import."""
+        incoming = meta.model_dump(mode="json", exclude={"id", "checked_at", "imported_at"})
+        async with self._write_lock:
+            previous = await self.store.get_innovation(meta.id)
+            if previous is None:
+                await self._ingest(meta, [], workdir, import_baseline=incoming)
+                return "created"
+            current = previous.model_dump(mode="json", include=set(incoming))
+            baseline = previous.import_baseline
+            merged = {}
+            for key, value in incoming.items():
+                if key in {"card", "assessment"}:
+                    old = baseline.get(key, {})
+                    merged[key] = {
+                        field: new if current[key][field] == old.get(field, None if key == "assessment" and field != "next_step" else "")
+                        else current[key][field]
+                        for field, new in value.items()
+                    }
+                else:
+                    merged[key] = value if current[key] == baseline.get(key) else current[key]
+            # Keep editorial verification as a unit when someone changed its evidence or stage.
+            review = ("verification", "maturity", "area", "assessment")
+            if (baseline and any(current[key] != baseline.get(key) for key in review)
+                    or not baseline and previous.verification == "potwierdzona"):
+                merged.update({key: current[key] for key in review})
+            elif not baseline and previous.verification == "kandydat":
+                merged["verification"] = current["verification"]
+            updated = InnovationMeta(id=meta.id, **merged, imported_at=previous.imported_at, checked_at=meta.checked_at)
+            changed = current != updated.model_dump(mode="json", include=set(incoming))
+            if changed or baseline != incoming or updated.checked_at != previous.checked_at:
+                await self._update(previous, updated, incoming)
+            return "updated" if changed else "unchanged"
 
     async def update_categories(self, innovation_id: str, update: CategoriesUpdate) -> InnovationSummary:
-        await self.get(innovation_id)
-        await self.store.set_categories(innovation_id, update.categories, update.primary_category)
-        return await self.get(innovation_id)
+        async with self._write_lock:
+            await self.get(innovation_id)
+            await self.store.set_categories(innovation_id, update.categories, update.primary_category)
+            return await self.get(innovation_id)
 
     async def _cleanup(self, documents: list[StoredDocument]) -> None:
         if not documents:
@@ -289,12 +346,29 @@ class KnowledgeService:
     async def list_innovations(self, category: Category | None = None) -> list[InnovationSummary]:
         return await self.store.list_innovations(category)
 
+    async def catalog(self, *, query: str, category: Category | None, area: InnovationArea | None,
+                      region: str | None, maturity: Maturity | None, include_candidates: bool,
+                      offset: int, limit: int) -> CatalogPage:
+        # shortcut: substring search scans matching cards; add indexed text search when the validated catalog grows.
+        items = await self.store.list_innovations(category, confirmed_only=not include_candidates)
+        regions = sorted({item.region for item in items if item.region})
+        terms = query.casefold().split()
+        matches = []
+        for item in items:
+            if (area and item.area != area) or (region and item.region != region) or (maturity and item.maturity != maturity):
+                continue
+            text = " ".join([item.title, item.institution or "", *item.card.model_dump().values()]).casefold()
+            if all(term in text for term in terms):
+                matches.append(item)
+        return CatalogPage(items=matches[offset:offset + limit], total=len(matches), regions=regions)
+
     async def retrieve(
             self,
             query: str,
             *,
             categories: list[Category] | None = None,
             pool: int = 10,
+            confirmed_only: bool = False,
     ) -> list[RetrievedInnovation]:
         """Two-stage retrieval.
 
@@ -305,13 +379,17 @@ class KnowledgeService:
         """
         dense, sparse = await self.embedder.embed_query(query)
         depth = self.settings.retrieval_prefetch
-        cards, summary_chunks, full_chunks = await asyncio.gather(
-            self.store.search_cards(dense, limit=depth, categories=categories),
-            self.store.search_chunks(dense, sparse, limit=depth, prefetch=depth, categories=categories, role="summary"),
-            self.store.search_chunks(dense, sparse, limit=depth, prefetch=depth, categories=categories, role="full"),
+        cards, card_terms, summary_chunks, full_chunks = await asyncio.gather(
+            self.store.search_cards(dense, limit=depth, categories=categories, confirmed_only=confirmed_only),
+            self.store.search_cards(sparse, limit=depth, categories=categories, confirmed_only=confirmed_only),
+            self.store.search_chunks(dense, sparse, limit=depth, prefetch=depth, categories=categories,
+                                     role="summary", confirmed_only=confirmed_only),
+            self.store.search_chunks(dense, sparse, limit=depth, prefetch=depth, categories=categories,
+                                     role="full", confirmed_only=confirmed_only),
         )
         rankings = {
             "card": [i for i, _ in cards],
+            "card_terms": [i for i, _ in card_terms],
             "summary": _first_per_innovation(summary_chunks),
             "full": _first_per_innovation(full_chunks),
         }
@@ -321,7 +399,7 @@ class KnowledgeService:
                 fused[innovation_id] = fused.get(innovation_id, 0.0) + _RANKING_WEIGHTS[name] / (_RRF_K + rank + 1)
         order = sorted(fused, key=fused.get, reverse=True)[:pool]
         metas = await self.store.get_innovations(order)
-        order = [i for i in order if i in metas]
+        order = [i for i in order if i in metas and (not confirmed_only or metas[i].verification == "potwierdzona")]
 
         evidence = await asyncio.gather(*(self._evidence(i, dense, sparse) for i in order))
         return [

@@ -23,9 +23,11 @@ from .draft import NoReadableText, propose_from_files
 from .errors import InnovationNotFound, KnowledgeUnavailable
 from .schemas import (
     INNOVATION_ID_PATTERN,
+    CatalogPage,
     CategoriesUpdate,
     Deleted,
     IngestResult,
+    InnovationArea,
     InnovationDraft,
     InnovationMeta,
     InnovationSummary,
@@ -34,7 +36,7 @@ from .schemas import (
 from .service import KnowledgeService, get_knowledge_service
 from .settings import load_knowledge_settings
 from .taxonomy import (CATEGORY_LABELS, INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS,
-                       Category)
+                       Category, Maturity)
 
 ADMIN_TOKEN_HEADER = "X-Admin-Token"
 
@@ -131,6 +133,25 @@ async def _save_uploads(files: list[UploadFile], directory: Path) -> list[Path]:
 @router.get("/innovations",response_model=list[InnovationSummary], summary="Lista innowacji")
 async def list_innovations(service: Service, category: Category | None = Query(default=None)):
     return await service.list_innovations(category)
+
+
+@router.get("/catalog", response_model=CatalogPage, summary="Wyszukaj innowacje")
+async def catalog(service: Service, q: str = Query(default="", max_length=200), category: Category | None = None,
+                  area: InnovationArea | None = None, region: str | None = Query(default=None, max_length=60),
+                  maturity: Maturity | None = None, include_candidates: bool = False,
+                  offset: int = Query(default=0, ge=0), limit: int = Query(default=24, ge=1, le=100)):
+    return await service.catalog(query=q, category=category, area=area, region=region, maturity=maturity,
+                                 include_candidates=include_candidates, offset=offset, limit=limit)
+
+
+@router.put("/innovations/{innovation_id}/refresh", summary="Odśwież rekord źródłowy", **_admin)
+async def refresh_innovation(service: Service, innovation_id: InnovationId, innovation: InnovationUpdate):
+    with tempfile.TemporaryDirectory(prefix="knowledge-refresh-") as tmp, _not_found():
+        try:
+            result = await service.refresh(InnovationMeta(id=innovation_id, **innovation.model_dump()), Path(tmp))
+        except ValidationError as exc:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Invalid merged assessment") from exc
+        return {"status": result}
 
 
 @router.post("/innovations/draft", response_model=InnovationDraft, summary="Uzupełnij kartę z dokumentów", **_admin)

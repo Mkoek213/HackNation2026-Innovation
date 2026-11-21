@@ -87,6 +87,8 @@ class RetrievalTools:
                     if not m.suitable:
                         continue
                     meta, score, sources = self.candidates[m.innovation_id]
+                    if meta.verification != "potwierdzona":
+                        return {"status": "unsupported_fit", "message": "Kandydat bez potwierdzenia działania nie może zostać rekomendowany."}
                     actual = getattr(meta.card, m.evidence_field)
                     matches.append(InnovationMatch(id=meta.id, title=meta.title, source_url=meta.source_url,
                         video_url=meta.video_url, retrieval_score=score, fit_reason="Podstawa propozycji (fragment dokumentacji): " + actual[:1200] + ("…" if len(actual) > 1200 else ""),
@@ -102,7 +104,7 @@ class RetrievalTools:
             async with asyncio.timeout(self.timeout):
                 service = await self.factory()
                 if name == "search_innovations":
-                    hits = await service.retrieve(args.query, categories=args.categories, pool=5)
+                    hits = await service.retrieve(args.query, categories=args.categories, pool=5, confirmed_only=True)
                     self.search_status = "ok" if hits else "empty"
                     self.searched = self.searched or bool(hits)
                     return {"status": "ok" if hits else "empty", "candidates": [

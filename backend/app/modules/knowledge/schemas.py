@@ -1,7 +1,7 @@
 import datetime as dt
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 from app.schemas.tagging import AssignedLabel, Classification
 from .taxonomy import Category, InnovationType, InstitutionType, Maturity
@@ -21,6 +21,30 @@ DocType = Literal[
 DocumentRole = Literal["summary", "full"]
 
 INNOVATION_ID_PATTERN = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
+InnovationArea = Literal["technologia", "edukacja", "administracja"]
+Verification = Literal["kandydat", "potwierdzona"]
+
+
+class AssessmentNote(BaseModel):
+    basis: Literal["potwierdzone", "szacunek"]
+    rationale: str = Field(min_length=1, max_length=1200)
+    source_url: HttpUrl | None = None
+
+    @model_validator(mode="after")
+    def _confirmed_has_source(self):
+        if self.basis == "potwierdzone" and self.source_url is None:
+            raise ValueError("Confirmed assessments require a source URL")
+        return self
+
+
+class InnovationAssessment(BaseModel):
+    implementation: AssessmentNote | None = None
+    novelty: AssessmentNote | None = None
+    transfer: AssessmentNote | None = None
+    credibility: AssessmentNote | None = None
+    trl: int | None = Field(default=None, ge=1, le=9)
+    trl_basis: AssessmentNote | None = None
+    next_step: str = Field(default="", max_length=1200)
 
 
 class InnovationCard(BaseModel):
@@ -91,6 +115,11 @@ class InnovationUpdate(BaseModel):
                                     description="Registry or database the record was taken from")
     source_url: str | None = Field(default=None, max_length=2000, examples=["https://ewyszukiwarka.pue.uprp.gov.pl/..."])
     imported_at: dt.date | None = Field(default=None, description="When the record was taken from source_name")
+    checked_at: dt.date | None = None
+    region: str | None = Field(default=None, max_length=60)
+    area: InnovationArea | None = None
+    verification: Verification = "kandydat"
+    assessment: InnovationAssessment = Field(default_factory=InnovationAssessment)
     video_url: str | None = Field(default=None, max_length=2000, examples=["https://www.youtube.com/watch?v=..."])
     card: InnovationCard = Field(default_factory=InnovationCard)
 
@@ -101,6 +130,14 @@ class InnovationUpdate(BaseModel):
         self.categories = list(dict.fromkeys(self.categories))  # dedupe, keep order
         if self.primary_category not in self.categories:
             self.categories.insert(0, self.primary_category)
+        if self.verification == "potwierdzona" and (
+            self.maturity not in {Maturity.PILOT, Maturity.DEPLOYED, Maturity.COMMERCIALISED}
+            or not self.assessment.implementation
+            or self.assessment.implementation.basis != "potwierdzone"
+        ):
+            raise ValueError("A confirmed innovation requires documented real-world use")
+        if self.assessment.trl is not None and (self.area != "technologia" or self.assessment.trl_basis is None):
+            raise ValueError("TRL requires the technology area and an assessment basis")
         return self
 
 
@@ -126,6 +163,13 @@ class InnovationSummary(InnovationMeta):
     documents: list[StoredDocument] = Field(default_factory=list)
     chunk_count: int = Field(default=0, examples=[42])
     files: list[str] = Field(default_factory=list, examples=[["opis-patentowy.pdf"]])
+    import_baseline: dict = Field(default_factory=dict, exclude=True)
+
+
+class CatalogPage(BaseModel):
+    items: list[InnovationSummary]
+    total: int
+    regions: list[str]
 
 
 class CategoriesUpdate(BaseModel):

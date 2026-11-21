@@ -64,8 +64,8 @@ PostgreSQL initialises credentials only when its data volume is first created; c
 
 ```bash
 cd backend
-uv run python scripts/import_interreg.py > data/seed/interreg.json   # Interreg 2021-2027, lead partner in Podkarpackie
-uv run python scripts/import_radon.py > data/seed/radon.json         # RAD-on projects of Podkarpacie universities
+uv run python scripts/import_interreg.py --region Podkarpackie > data/seed/interreg.json
+uv run python scripts/import_radon.py --region Podkarpackie --limit 200 > data/seed/radon.json
 cd ..
 set -a && . ./.env && set +a
 uv --project backend run python backend/scripts/upload_innovations.py --api "http://localhost:${BACKEND_PORT}" --dry-run
@@ -75,6 +75,27 @@ docker compose exec backend python scripts/seed_demo.py               # demo use
 
 `upload_innovations.py` reads every `backend/data/seed/*.json` and uses the same endpoint as the admin "Dokumenty" view, so cards land in Qdrant (`QDRANT_COLLECTION`) and files in S3.
 Sources, filters and limitations are recorded in [the data source investigation](DATA-SOURCES.md).
+
+### Daily source refresh
+
+From the root, run `bash backend/scripts/refresh_innovations.sh --dry-run` to inspect source
+counts, or omit `--dry-run` to publish. Limit a run to one feed using `--source deployments`,
+`--source interreg` or `--source radon`. The wrapper uses the backend virtual environment,
+the root `.env` and a local lock. The backend must be running. Output includes counts and
+per-source or per-record errors. A failed download leaves the last successful cards in place.
+
+Create `backend/.cache` before adding the following entry to the host's user crontab
+(local time). Replace the absolute path with the checkout path:
+
+```cron
+15 4 * * * /bin/bash /absolute/path/to/repo/backend/scripts/refresh_innovations.sh >> /absolute/path/to/repo/backend/.cache/innovation-refresh.log 2>&1
+```
+
+Check the refresh log and the card's last-checked date after each scheduled run. Imported
+fields still matching the prior source version are eligible for refresh. The editor's
+assessment and attachments persist. During an embedding outage, new and edited cards
+remain searchable by exact terms. Restore the Gemini key and reindex into a separate Qdrant
+collection with `scripts/reindex_knowledge.py` to rebuild dense vectors for those records.
 
 ## Validation
 
