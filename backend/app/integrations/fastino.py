@@ -110,7 +110,7 @@ class TokenUsage(BaseModel):
 
 class DecisionResult(BaseModel):
     model_config = ConfigDict(extra="allow", strict=True)
-    model: Literal["glide"]
+    model: str  # versioned names such as "glide_ro27"; informational only
     answers: dict[str, DecisionAnswer]
     usage: TokenUsage
 

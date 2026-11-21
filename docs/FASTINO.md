@@ -115,10 +115,13 @@ training jobs, or fine-tuned GLiDE IDs.
 
 | Field | Meaning |
 | --- | --- |
-| `model` | Validated response engine name `glide` |
+| `model` | Provider-reported engine name, including versioned names such as `glide_ro27`; informational only |
 | `answers` | Named typed Noul, Choice, or Score answers |
 | `usage.input_tokens` | Provider-reported input tokens across internal passes |
 | `usage.output_tokens` | Provider-reported output tokens |
+
+Live compatibility check (2026-11-21): the client accepted a `glide_ro27` response for
+a synthetic Polish education question. This checks the wire contract, not topic-label quality.
 
 All answers have `type` and `confidence` in `[0, 1]`. Noul additionally has `noul`.
 Choice has `choice` and `probabilities` keyed by option name. Score has `score`,
@@ -132,7 +135,7 @@ that the business action is correct. A confident Noul can favor false. Callers
 must inspect the result as well as confidence and validate their own thresholds.
 The client preserves probabilities without renormalizing them.
 
-The client checks response types, required fields, numeric ranges, model name,
+The client checks response types, required fields, numeric ranges,
 question names, supplied option/level membership, Score legend, probability sums
 (tolerance 0.001), and that the selected option is a most probable outcome. Additive
 provider fields are preserved. `token_usage` appears in some documentation examples
@@ -150,7 +153,7 @@ raise `ValueError`. Integration failures raise `FastinoError`:
 | `timeout` | HTTP timeout exhausted the attempt budget |
 | `transport` | Connection/transport failure exhausted the attempt budget |
 | `http` | Unsuccessful provider status; inspect `status_code` |
-| `response` | Invalid JSON, schema, model, or question/result correspondence |
+| `response` | Invalid JSON, schema, or question/result correspondence |
 
 Retryable HTTP statuses are `425`, `429`, and `503`. Transport failures also share
 the bounded retry budget. `Retry-After` accepts seconds or an HTTP date; otherwise
