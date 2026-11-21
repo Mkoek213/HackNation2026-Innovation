@@ -1,10 +1,10 @@
 # Radar innowacji
 
-HackNation 2026 project for the Podkarpackie Centrum Innowacji (PCI) challenge: find innovations in public institutions, describe them with evidence, search for similar solutions and connect creators with partners who can deploy, pilot or fund them.
+HackNation 2026 project for the Podkarpackie Centrum Innowacji (PCI) challenge: discover existing Polish innovations in technology, education and administration, assess them against the five criteria of the challenge FAQ, compare them and recommend recipients and a deployment path.
 
-The app includes a Polish chat with the opt-in "Kreator zgłoszenia", Moje sprawy, an innovation knowledge base, contact and administrator views. It runs a Next.js frontend and one FastAPI backend with PostgreSQL, Gemini, Qdrant and S3-compatible storage. Interreg and RAD-on importers supply public records from Podkarpacie.
+The app includes a searchable catalog of about 1400 cards from all of Poland with filters, comparison and per-criterion assessment, a Polish search-advisor chat with the opt-in "Zgłoś kandydata" report, Moje sprawy, contact and administrator views. It runs a Next.js frontend and one FastAPI backend with PostgreSQL, Gemini, Qdrant and S3-compatible storage. Importers for public deployment reports, the European Funds 2014-2020 project list, CORDIS, Interreg and RAD-on supply the records.
 
-Potential scoring against explicit criteria and justified development-path recommendations remain unimplemented.
+Credibility is scored by fixed rules; the other criteria, recipients, path and measures are Gemini estimates labelled as such and need a valid `GEMINI_API_KEY`.
 
 ## Run locally
 

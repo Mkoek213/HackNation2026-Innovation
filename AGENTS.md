@@ -1,6 +1,6 @@
 # Radar innowacji
 
-HackNation 2026 project for Podkarpackie Centrum Innowacji (PCI): discover public-institution innovations, describe them with evidence, find similar solutions and recommend recipients and a deployment path. The brief is in [docs/CHALLENGE.md](docs/CHALLENGE.md).
+HackNation 2026 project for Podkarpackie Centrum Innowacji (PCI): discover existing Polish innovations in technology, education and administration, assess them against the FAQ criteria with sources, compare them and recommend recipients and a deployment path. It is not a platform for new ideas or funding. The brief is in [docs/CHALLENGE.md](docs/CHALLENGE.md).
 
 ## Working here
 
@@ -21,7 +21,7 @@ HackNation 2026 project for Podkarpackie Centrum Innowacji (PCI): discover publi
 
 ## Context when needed
 
-- Architecture, data flow and unimplemented features: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- Architecture, data flow and known limitations: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - Data imports, regional filters and source limitations: [docs/DATA-SOURCES.md](docs/DATA-SOURCES.md). Keep provenance; store creators only from public sources or with consent.
 - Chat and PDF retrieval: [docs/RAG-WORKFLOW.md](docs/RAG-WORKFLOW.md). Fastino integration: [docs/FASTINO.md](docs/FASTINO.md). Vendor claims are not project validation.
 - Three local skills cover repeatable operations: `run-app`, `import-data`, `deploy-radar`. They live in `.agents/skills/`; `.claude/skills` points to the same files.

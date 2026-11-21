@@ -121,7 +121,7 @@ pnpm lint
 pnpm build
 ```
 
-Then run the stack and check the flows in a browser at desktop and 390px widths: home, chat with the submission creator, Moje sprawy, the innovation base and its dialog, pilot sign-up and application, admin views, contact.
+Then run the stack and check the flows in a browser at desktop and 390px widths: home, chat with the candidate report, Moje sprawy, the innovation base with filters, dialog and comparison, admin review of a reported candidate, admin views, contact.
 Check keyboard focus, the skip link and headings; these checks do not establish WCAG certification.
 
 ## Local document storage

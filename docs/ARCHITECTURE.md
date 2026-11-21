@@ -9,7 +9,7 @@
 | Persistence | PostgreSQL in Compose, schema by Alembic (single initial revision `0001`); SQLite with `create_all` for quick local runs |
 | Identity | Argon2 passwords, JWT in an HttpOnly cookie with CSRF, roles `admin`/`user`; anonymous `visitor_id` cookie |
 | Knowledge base | `backend/app/modules/knowledge/`: PDF/DOCX/ZIP ingestion, Gemini embeddings plus BM25 in Qdrant, documents in S3-compatible storage, `/api/v1/knowledge` |
-| Chat | `backend/app/chat/`: Gemini tool-calling agent with retrieval, live source reading, case facts, documents, matters and the submission creator; answers pass a quotation-checked review step |
+| Chat | `backend/app/chat/`: Gemini tool-calling agent with retrieval, live source reading, case facts, documents, matters and the opt-in candidate report (`creator.py`); answers pass a quotation-checked review step |
 | Classification | Fastino GLiDE for sectors of uploaded documents and conversation topics (`backend/app/integrations/fastino.py`, `backend/app/services/tagging.py`) |
 | Deployment | Docker Compose locally, including Qdrant with its own persistent volume; Google Cloud Run via `deploy/gcp/deploy.ps1` (not provisioned yet) |
 
@@ -37,7 +37,8 @@
 1. Importers fetch public data, classify it with keyword rules and write seed JSON.
 2. `upload_innovations.py` sends each record to `PUT /api/v1/knowledge/innovations/{id}`; cards and document chunks are embedded into Qdrant.
 3. The chat searches Qdrant, validates candidates (`select_innovations`) and reviews its answer against retrieved passages before replying.
-4. Submissions become matters (`application_draft`) with a generated "similar solutions" section; users can download a summary PDF for PCI.
+4. `assess_innovations.py` calls `POST /api/v1/knowledge/innovations/{id}/assess` for each card: rule-based credibility plus Gemini estimates of the other criteria, recipients, path and measures (`knowledge/assess.py`).
+5. A candidate reported in the chat is stored as `zgloszone`, hidden from the catalog and chat retrieval until staff change its status in Dokumenty.
 
 ## Run and validate
 
@@ -47,8 +48,11 @@ Frontend: `pnpm exec next typegen`, `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm
 
 ## Product boundaries
 
-PCI operates the product for many public institutions. Institutions, companies and investors look for existing solutions to deploy. Administrators manage the knowledge base. Innovation classification covers sector, innovation type, source institution type and maturity. Preserve institution, public authors, source URL and import date when editing imported cards.
+PCI operates the product for many public institutions. Institutions, companies and investors look for existing solutions to deploy; Radar is not a platform for new ideas, a social network or a funding tool. Administrators manage the knowledge base and review reported candidates. Classification covers area, sector, innovation type, source institution type and deployment level. Preserve institution, public authors, source URL and import date when editing imported cards.
 
-## Not implemented
+## Known limitations
+
+- Without a valid `GEMINI_API_KEY` only credibility is scored; dense embeddings fall back to BM25.
+- Keyword rules assign area and sector at import; candidates from registries all score 3/5 credibility.
 
 - Patent sources (UPRP blocked; EPO OPS needs a key).

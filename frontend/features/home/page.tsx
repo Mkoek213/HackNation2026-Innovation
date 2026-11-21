@@ -1,28 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import type { ComponentType } from "react";
+import { useRouter } from "next/navigation";
+import { useState, type ComponentType } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Handshake, Lightbulb, MessagesSquare, Search } from "@/components/ui/icons";
-import { getCatalog, useLoad } from "@/features/knowledge";
+import { ArrowRight, Building, Handshake, Lightbulb, MessagesSquare, Search } from "@/components/ui/icons";
+import { getCatalog, getTaxonomy, innovationAreas, useLoad } from "@/features/knowledge";
 
 type IconType = ComponentType<{ size?: number; "aria-hidden"?: boolean }>;
 
-const entries: { href: string; icon: IconType; title: string; text: string; action: string }[] = [
-  { href: "/rozmowa?nowa=1", icon: MessagesSquare, title: "Znajdź rozwiązanie", text: "Opisz potrzebę szkoły, uczelni, firmy lub urzędu. Asystent pomoże wyszukać i porównać rozwiązania.", action: "Opisz potrzebę" },
-  { href: "/knowledge/innovations", icon: Lightbulb, title: "Baza innowacji", text: "Sprawdź etap wdrożenia, dowody i możliwości zastosowania polskich rozwiązań.", action: "Przeglądaj innowacje" },
+const areas: { id: keyof typeof innovationAreas; icon: IconType; text: string }[] = [
+  { id: "technologia", icon: Lightbulb, text: "Nowe technologie, produkty i rozwiązania techniczne z uczelni, instytutów i firm." },
+  { id: "edukacja", icon: MessagesSquare, text: "Metody nauczania, narzędzia edukacyjne i programy rozwoju szkół oraz uczelni." },
+  { id: "administracja", icon: Building, text: "Rozwiązania usprawniające pracę urzędów, samorządów i instytucji publicznych." },
 ];
 
 const steps: { icon: IconType; title: string; text: string }[] = [
-  { icon: MessagesSquare, title: "Opisz potrzebę", text: "Napisz lub podyktuj, jaki problem chcesz rozwiązać i w jakiej instytucji." },
-  { icon: Search, title: "Sprawdź dowody", text: "Porównaj etap wdrożenia, wiarygodność źródeł i możliwość zastosowania w innym miejscu." },
-  { icon: Handshake, title: "Zaplanuj wdrożenie", text: "Sprawdź potencjalnych odbiorców, warunki wdrożenia i proponowaną ścieżkę." },
+  { icon: Search, title: "Znajdź rozwiązanie", text: "Wyszukaj według potrzeby, obszaru, województwa i poziomu wdrożenia albo opisz potrzebę asystentowi." },
+  { icon: Lightbulb, title: "Porównaj według kryteriów", text: "Sprawdź poziom wdrożenia, innowacyjność, potencjał zastosowania i wiarygodność wraz ze źródłem." },
+  { icon: Handshake, title: "Zaplanuj wdrożenie", text: "Zobacz potencjalnych odbiorców, proponowaną ścieżkę, pierwszy krok i mierniki efektu." },
 ];
 
 const examples = [
-  "Jak szkoła może wdrożyć cyfrowe metody nauczania?",
   "Jak gmina może udostępnić płatności online?",
-  "Jak zautomatyzować transport wewnątrz magazynu?",
+  "Jakie rozwiązania pomagają szkołom uczyć programowania?",
+  "Co sprawdziło się w elektronicznym obiegu dokumentów w urzędzie?",
 ];
 
 /** Polish plural form: 1 innowacja, 2–4 innowacje, 5+ innowacji (12–14 take the last form). */
@@ -32,20 +34,39 @@ function plural(count: number, one: string, few: string, many: string) {
   return units >= 2 && units <= 4 && (tens < 12 || tens > 14) ? few : many;
 }
 
+const count = (params: string) => getCatalog(`limit=1&${params}`).then(page => page.total);
+const catalog = (params: Record<string, string>) => `/knowledge/innovations?${new URLSearchParams(params)}`;
+
 export function HomePage() {
-  const innovations = useLoad(() => getCatalog("limit=1"), "confirmed-innovations");
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const taxonomy = useLoad(getTaxonomy, "taxonomy");
+  const totals = useLoad(() => Promise.all([
+    count(""), count("confirmed_only=true"), count("region=Podkarpackie"),
+    ...areas.map(area => count(`area=${area.id}`)),
+  ]), "home-totals");
+  const [all = 0, confirmed = 0, podkarpackie, ...byArea] = totals || [];
   return <main id="main" tabIndex={-1} className="home">
     <section className="home-hero" aria-labelledby="home-title">
       <div className="home-hero-text">
         <p className="home-eyebrow">Radar innowacji · Podkarpackie Centrum Innowacji</p>
-        <h1 id="home-title">Znajdź polskie innowacje gotowe do zastosowania</h1>
-        <p className="home-lead">Radar odkrywa rozwiązania z publicznych źródeł. Porównaj dowody, sprawdź, gdzie już działają, i zaplanuj następny krok w swojej instytucji.</p>
+        <h1 id="home-title">Znajdź polskie innowacje, które już działają</h1>
+        <p className="home-lead">Radar zbiera rozwiązania z publicznych rejestrów i raportów wdrożeń z całej Polski, ocenia je według jawnych kryteriów i podpowiada, jak przenieść je do Twojej instytucji.</p>
+        <form className="home-search" role="search" onSubmit={event => { event.preventDefault(); router.push(catalog(query.trim() ? { q: query.trim() } : {})); }}>
+          <label className="search-field grow">
+            <Search aria-hidden="true" size={18} />
+            <span className="sr-only">Czego potrzebujesz?</span>
+            <input type="search" maxLength={200} placeholder="Np. e-usługi w gminie, robotyka w szkole" value={query} onChange={e => setQuery(e.target.value)} />
+          </label>
+          <Button type="submit" size="lg">Szukaj<ArrowRight aria-hidden="true" /></Button>
+        </form>
         <div className="home-actions">
-          <Button size="lg" nativeButton={false} render={<Link href="/knowledge/innovations" />}>Znajdź rozwiązanie<ArrowRight aria-hidden="true" /></Button>
-          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/rozmowa?nowa=1" />}>Zapytaj asystenta</Button>
+          <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/rozmowa?nowa=1" />}>Opisz potrzebę asystentowi</Button>
         </div>
-        {innovations && <dl className="home-figures">
-          {innovations && <div><dt>{plural(innovations.total, "innowacja", "innowacje", "innowacji")} w bazie</dt><dd>{innovations.total}</dd></div>}
+        {totals && <dl className="home-figures">
+          <div><dt>{plural(all, "innowacja", "innowacje", "innowacji")} w bazie</dt><dd>{all}</dd></div>
+          <div><dt>{plural(confirmed, "potwierdzone wdrożenie", "potwierdzone wdrożenia", "potwierdzonych wdrożeń")}</dt><dd>{confirmed}</dd></div>
+          <div><dt>województw</dt><dd>16</dd></div>
         </dl>}
       </div>
       <aside className="home-examples" aria-labelledby="examples-title">
@@ -55,17 +76,31 @@ export function HomePage() {
       </aside>
     </section>
 
-    <section className="home-section" aria-labelledby="entries-title">
-      <h2 id="entries-title">Od czego zacząć</h2>
-      <ul className="home-entries">{entries.map(({ href, icon: Icon, title, text, action }) => <li key={href}>
-        <Link className="home-entry" href={href}>
+    <section className="home-section" aria-labelledby="areas-title">
+      <h2 id="areas-title">Trzy obszary innowacji</h2>
+      <ul className="home-entries">{areas.map(({ id, icon: Icon, text }, index) => <li key={id}>
+        <Link className="home-entry" href={catalog({ area: id })}>
           <span className="entry-icon"><Icon aria-hidden={true} size={22} /></span>
-          <span className="home-entry-title">{title}</span>
+          <span className="home-entry-title">{innovationAreas[id]}</span>
           <span className="home-entry-text">{text}</span>
-          <span className="entry-more">{action}<ArrowRight aria-hidden="true" size={16} /></span>
+          <span className="entry-more">{byArea[index] !== undefined ? `Zobacz ${byArea[index]} ${plural(byArea[index], "rozwiązanie", "rozwiązania", "rozwiązań")}` : "Zobacz rozwiązania"}<ArrowRight aria-hidden="true" size={16} /></span>
         </Link>
       </li>)}</ul>
     </section>
+
+    <section className="home-section home-region" aria-labelledby="region-title">
+      <h2 id="region-title">Innowacje z Podkarpacia</h2>
+      <p>Radar obejmuje całą Polskę, a PCI prowadzi go dla województwa podkarpackiego: od regionalnej e-administracji po program robotyki w szkołach podstawowych.</p>
+      <Link className="home-examples-link" href={catalog({ region: "Podkarpackie" })}>
+        {podkarpackie !== undefined ? `Zobacz ${podkarpackie} ${plural(podkarpackie, "rozwiązanie", "rozwiązania", "rozwiązań")} z Podkarpacia` : "Zobacz rozwiązania z Podkarpacia"}<ArrowRight aria-hidden="true" size={16} />
+      </Link>
+    </section>
+
+    {taxonomy && <section className="home-section" aria-labelledby="criteria-title">
+      <h2 id="criteria-title">Jak oceniamy</h2>
+      <p className="home-section-lead">Każda karta ma ocenę 1-5 w każdym kryterium. Przy ocenie widać, czy to fakt potwierdzony źródłem, czy szacunek do sprawdzenia.</p>
+      <dl className="home-criteria">{Object.values(taxonomy.criteria).map(([name, meaning]) => <div key={name}><dt>{name}</dt><dd>{meaning}</dd></div>)}</dl>
+    </section>}
 
     <section className="home-section" aria-labelledby="steps-title">
       <h2 id="steps-title">Jak to działa</h2>
@@ -77,6 +112,5 @@ export function HomePage() {
         </div>
       </li>)}</ol>
     </section>
-
   </main>;
 }

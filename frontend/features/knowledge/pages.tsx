@@ -16,10 +16,13 @@ function Status({ data, what }: { data: unknown; what: string }) {
 const pageSize = 24;
 const defaults = { q: "", category: "", area: "", region: "", maturity: "", min_credibility: "", confirmed_only: "" };
 
-export function InnovationsPage() {
+/** `preset` comes from the URL (?area=…, ?region=…, ?q=…), e.g. links on the home page. */
+export function InnovationsPage({ preset = {} }: { preset?: Record<string, string | string[] | undefined> }) {
   const taxonomy = useLoad(getTaxonomy, "taxonomy");
-  const [query, setQuery] = useState("");
-  const [filters, setFilters] = useState(defaults);
+  const initial = Object.fromEntries(Object.keys(defaults).flatMap(name =>
+    typeof preset[name] === "string" ? [[name, (preset[name] as string).slice(0, 200)]] : [])) as Partial<typeof defaults>;
+  const [query, setQuery] = useState(initial.q ?? "");
+  const [filters, setFilters] = useState({ ...defaults, ...initial });
   const [offset, setOffset] = useState(0);
   const [selected, setSelected] = useState<Innovation[]>([]);
   const [compare, setCompare] = useState(false);

@@ -9,9 +9,9 @@ import { api, notifySession, session, sessionEvent, type User } from "@/features
 
 type Tab = { href: string; label: string; match?: (pathname: string) => boolean };
 const tabs: Tab[] = [
+  { href: "/knowledge/innovations", label: "Baza innowacji" },
   { href: "/rozmowa", label: "Rozmowa" },
   { href: "/matters", label: "Moje sprawy" },
-  { href: "/knowledge/innovations", label: "Baza innowacji" },
 ];
 // Reachable without signing in or starting a chat; always the last tab.
 const contactTab: Tab = { href: "/contact", label: "Kontakt" };
