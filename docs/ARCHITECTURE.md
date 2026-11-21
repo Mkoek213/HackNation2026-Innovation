@@ -24,7 +24,7 @@
 | `backend/app/main.py`, `config.py`, `lifespan.py` | App composition, settings from the root `.env`, startup |
 | `backend/app/models/`, `schemas/`, `repos/`, `routes/` | One model, schema module, repo and router per resource |
 | `backend/app/routes/operator.py` | PCI staff contacts and the Markdown to PDF helper |
-| `backend/app/modules/knowledge/taxonomy.py` | Sectors, innovation types, institution types and maturity stages with Polish labels |
+| `backend/app/modules/knowledge/taxonomy.py` | Sectors, innovation types, institution types and deployment levels (the five FAQ stages) with Polish labels |
 | `backend/app/chat/sources.py` | Live reading of approved public pages (Interreg, NCBR successes, pcinn.org) |
 | `backend/scripts/import_*.py` | Source importers writing `backend/data/seed/<source>.json` |
 | `backend/scripts/upload_innovations.py` | Uploads every seed file through the knowledge API (S3 and Qdrant) |

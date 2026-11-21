@@ -76,21 +76,28 @@ INSTITUTION_TYPE_LABELS: dict[InstitutionType, str] = {
 
 
 class Maturity(StrEnum):
-    IDEA = "pomysl"
+    """Deployment level from the PCI FAQ (section 5)."""
+    CONCEPT = "koncepcja"
     PROTOTYPE = "prototyp"
+    TESTING = "testy"
     PILOT = "pilotaz"
-    DEPLOYED = "wdrozenie"
-    COMMERCIALISED = "komercjalizacja"
+    IN_USE = "stosowane"
+
+    @classmethod
+    def _missing_(cls, value):
+        # Cards stored before the FAQ alignment; commercialisation is now a path, not a stage.
+        return {"pomysl": cls.CONCEPT, "wdrozenie": cls.IN_USE, "komercjalizacja": cls.IN_USE}.get(value)
 
 
 MATURITY_LABELS: dict[Maturity, str] = {
-    Maturity.IDEA: "Pomysł",
+    Maturity.CONCEPT: "Koncepcja",
     Maturity.PROTOTYPE: "Prototyp",
-    Maturity.PILOT: "Pilotaż / testy",
-    Maturity.DEPLOYED: "Wdrożona lokalnie",
-    Maturity.COMMERCIALISED: "Skomercjalizowana",
+    Maturity.TESTING: "Testy",
+    Maturity.PILOT: "Wdrożenie pilotażowe",
+    Maturity.IN_USE: "Stosowane w praktyce",
 }
 
 assert INNOVATION_TYPE_LABELS.keys() == set(InnovationType)
 assert INSTITUTION_TYPE_LABELS.keys() == set(InstitutionType)
 assert MATURITY_LABELS.keys() == set(Maturity)
+assert Maturity("wdrozenie") is Maturity.IN_USE

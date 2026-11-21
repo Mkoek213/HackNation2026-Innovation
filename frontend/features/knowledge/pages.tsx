@@ -64,7 +64,7 @@ export function InnovationsPage() {
         {([
           ["area", "Obszar", Object.entries(innovationAreas)],
           ["region", "Województwo", regions.map(region => [region, region])],
-          ["maturity", "Etap", Object.entries(taxonomy.maturity)],
+          ["maturity", "Poziom wdrożenia", Object.entries(taxonomy.maturity)],
           ["category", "Sektor", Object.entries(taxonomy.sectors)],
         ] as const).map(([name, label, options]) =>
           <label key={name} className="field-block">{label}

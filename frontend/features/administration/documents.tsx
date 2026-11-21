@@ -53,7 +53,7 @@ const cardFields: { key: keyof Card; label: string }[] = [
 const profileAxes: { key: "innovation_type" | "institution_type" | "maturity"; axis: Exclude<keyof Taxonomy, "sectors">; label: string }[] = [
   { key: "innovation_type", axis: "innovation_types", label: "Rodzaj innowacji" },
   { key: "institution_type", axis: "institution_types", label: "Typ instytucji źródłowej" },
-  { key: "maturity", axis: "maturity", label: "Etap rozwoju" },
+  { key: "maturity", axis: "maturity", label: "Poziom wdrożenia" },
 ];
 const fileTypes = ".pdf,.docx,.zip,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/zip";
 const documentUrl = /^\/api\/v1\/knowledge\/innovations\/[a-z0-9-]+\/documents\/[a-f0-9]{32}$/;

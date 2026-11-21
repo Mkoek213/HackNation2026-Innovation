@@ -57,7 +57,7 @@ def card_text(meta: InnovationMeta) -> str:
         f"Rodzaj innowacji: {INNOVATION_TYPE_LABELS[meta.innovation_type]}" if meta.innovation_type else "",
         f"Źródło: {INSTITUTION_TYPE_LABELS[meta.institution_type]}" if meta.institution_type else "",
         f"Instytucja: {meta.institution}" if meta.institution else "",
-        f"Etap: {MATURITY_LABELS[meta.maturity]}" if meta.maturity else "",
+        f"Poziom wdrożenia: {MATURITY_LABELS[meta.maturity]}" if meta.maturity else "",
         f"Problem: {c.problem}" if c.problem else "",
         f"Na czym polega: {c.solution}" if c.solution else "",
         f"Nowość: {c.novelty}" if c.novelty else "",

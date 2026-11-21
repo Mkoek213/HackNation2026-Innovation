@@ -121,7 +121,7 @@ function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innov
     ["Województwo", innovation.region ?? ""],
     ["Rodzaj innowacji", innovation.innovation_type ? taxonomy.innovation_types[innovation.innovation_type] ?? innovation.innovation_type : ""],
     ["Instytucja", institution],
-    ["Etap rozwoju", innovation.maturity ? taxonomy.maturity[innovation.maturity] ?? innovation.maturity : ""],
+    ["Poziom wdrożenia", innovation.maturity ? taxonomy.maturity[innovation.maturity] ?? innovation.maturity : ""],
     ["Twórcy", innovation.authors.map(a => a.affiliation ? `${a.name} (${a.affiliation})` : a.name).join(", ")],
   ];
   return <Dialog open onClose={onClose} title={innovation.title} className="innovation-modal">

@@ -17,7 +17,7 @@ FIELDS = {
     "target_users": ("Odbiorcy i użytkownicy", "kto korzysta lub mógłby skorzystać i kto mógłby ją wdrożyć"),
     "solution": ("Sposób działania", "jak rozwiązanie działa w praktyce"),
     "novelty": ("Nowość", "czym różni się od znanych rozwiązań, według użytkownika"),
-    "development_stage": ("Etap rozwoju", "pomysł, prototyp, pilotaż, wdrożenie lub komercjalizacja"),
+    "development_stage": ("Etap rozwoju", "koncepcja, prototyp, testy, wdrożenie pilotażowe lub stosowane w praktyce"),
     "evidence": ("Dowody działania", "testy, wyniki, liczba użytkowników, opinie podane przez użytkownika"),
     "creators": ("Twórcy i zespół", "kto stworzył rozwiązanie; tylko za zgodą rozmówcy"),
     "ip_status": ("Ochrona i prawa", "patent, zgłoszenie, licencja, prawa autorskie lub prawa instytucji"),

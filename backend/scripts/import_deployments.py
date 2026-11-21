@@ -104,7 +104,7 @@ def records() -> tuple[list[InnovationMeta], int]:
                     innovation_type=report.kind, institution_type=report.institution_kind, institution=report.institution,
                     region=report.region, area=report.area,
                     verification="potwierdzona" if confirmed else "kandydat",
-                    maturity=Maturity.DEPLOYED if confirmed else None, assessment=assessment,
+                    maturity=Maturity.IN_USE if confirmed else None, assessment=assessment,
                     source_name=report.publisher, source_url=report.url, imported_at=today, checked_at=today,
                     card=InnovationCard(solution=report.solution, evidence=report.implementation if confirmed else ""),
                 ))

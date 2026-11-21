@@ -131,7 +131,7 @@ class InnovationUpdate(BaseModel):
         if self.primary_category not in self.categories:
             self.categories.insert(0, self.primary_category)
         if self.verification == "potwierdzona" and (
-            self.maturity not in {Maturity.PILOT, Maturity.DEPLOYED, Maturity.COMMERCIALISED}
+            self.maturity not in {Maturity.PILOT, Maturity.IN_USE}
             or not self.assessment.implementation
             or self.assessment.implementation.basis != "potwierdzone"
         ):
