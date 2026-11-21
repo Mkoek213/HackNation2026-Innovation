@@ -334,6 +334,10 @@ class KnowledgeService:
             merged = {field: value if current[field] in (defaults[field], old.get(field, defaults[field])) else current[field]
                       for field, value in new.items()}
             merged.update(criteria_version=new["criteria_version"], assessed_at=new["assessed_at"])
+            # A kept editorial or source note without a score takes the automatic score; its text and basis stay.
+            for field in ("implementation", "novelty", "transfer", "credibility"):
+                if merged[field] and merged[field].get("score") is None and (new.get(field) or {}).get("score"):
+                    merged[field] = {**merged[field], "score": new[field]["score"]}
             data = previous.model_dump(include=set(InnovationMeta.model_fields))
             data["assessment"] = merged
             old_maturity = previous.assessment_baseline.get("maturity")
