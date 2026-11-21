@@ -115,7 +115,7 @@ export function ContactPage() {
         }}>{errors[field]}</a></li>)}</ul>
       </div>}
       <p ref={failureRef} tabIndex={-1} role="alert" className="form-error">{failure}</p>
-      <form onSubmit={submit} noValidate className="tester-form" aria-describedby="contact-required">
+      <form onSubmit={submit} noValidate className="contact-form" aria-describedby="contact-required">
         <p id="contact-required" className="field-help contact-required">Wszystkie pola są wymagane.</p>
         <div className="field-block">
           <label htmlFor={fieldId("name")}>Imię i nazwisko</label>

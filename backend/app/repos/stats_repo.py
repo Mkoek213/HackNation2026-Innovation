@@ -31,15 +31,13 @@ from app.models import (
     Project,
     ProjectMatch,
     ProjectParticipant,
-    ProjectReview,
     Subtag,
     Tag,
-    TestSignup,
     User,
     UserRole,
     Visit,
 )
-from app.repos.project_repo import ParticipantsLevel, average_rating
+from app.repos.project_repo import ParticipantsLevel
 from app.schemas.geojson import Feature, point
 from app.schemas.stats import (
     InnovationRank,
@@ -573,7 +571,7 @@ class StatsRepo:
     async def project(self, project_id: int, period: Period) -> ProjectStats:
         """
         One project (drafts too): recommendations in the period with a per-day series, plus
-        all-time participants, test sign-ups, reviews and average rating.
+        all-time participants.
         :raises NotFoundError: missing project.
         """
         project = await self.db.get(Project, project_id)
@@ -599,10 +597,6 @@ class StatsRepo:
             select(func.coalesce(func.sum(ProjectParticipant.participants_count), 0))
             .where(ProjectParticipant.project_id == project_id)
         )
-        signups = await self.db.scalar(select(func.count(TestSignup.id)).where(TestSignup.project_id == project_id))
-        reviews = await self.db.scalar(
-            select(func.count(ProjectReview.id)).where(ProjectReview.project_id == project_id)
-        )
 
         return ProjectStats(
             period=period,
@@ -613,9 +607,6 @@ class StatsRepo:
             unique_searchers=totals[1],
             opened=totals[2],
             participants_total=participants,
-            test_signups=signups,
-            reviews=reviews,
-            rating_avg=await average_rating(self.db, project_id),
             series=[
                 ProjectDay(
                     date=d,

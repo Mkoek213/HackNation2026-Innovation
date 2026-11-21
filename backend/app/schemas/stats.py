@@ -213,9 +213,6 @@ class ProjectDay(ProjectSearchCounts):
 class ProjectStats(ProjectRank):
     period: Period
     participants_total: int = Field(ge=0, examples=[120], description="All participants (not per period).")
-    test_signups: int = Field(ge=0, examples=[4], description="All test sign-ups (not per period).")
-    reviews: int = Field(ge=0, examples=[3], description="All reviews (not per period).")
-    rating_avg: float | None = Field(examples=[4.33], description="Average review rating; null without reviews.")
     series: list[ProjectDay]
 
 

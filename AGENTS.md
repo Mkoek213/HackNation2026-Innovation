@@ -1,6 +1,6 @@
 # Radar innowacji
 
-HackNation 2026 project for Podkarpackie Centrum Innowacji (PCI): discover public-institution innovations, describe them with evidence, find similar solutions and connect creators with pilot partners. The brief is in [docs/CHALLENGE.md](docs/CHALLENGE.md).
+HackNation 2026 project for Podkarpackie Centrum Innowacji (PCI): discover public-institution innovations, describe them with evidence, find similar solutions and recommend recipients and a deployment path. The brief is in [docs/CHALLENGE.md](docs/CHALLENGE.md).
 
 ## Working here
 

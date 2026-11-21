@@ -1,5 +1,4 @@
 import { api } from "@/features/workspace";
-import type { TesterApplicationAdmin } from "@/features/tester";
 
 export type Period = { from: string; to: string };
 type Counts = { conversations: number; unique_people: number; no_answer: number };
@@ -47,13 +46,3 @@ export async function loadStats(period: Period): Promise<Stats> {
   ]);
   return { site, workspace, tags, trends, timeline, innovations };
 }
-
-export type ApplicationList = { total: number; items: TesterApplicationAdmin[] };
-export type InnovationOption = { id: string; title: string; primary_category: string; categories: string[] };
-export type TagOption = { id: string; label: string };
-export type TesterOptions = { roles: TagOption[]; interests: TagOption[] };
-export type PoolTester = {
-  user_id: number; email: string; phone: string; description: string; roles: string[]; interests: string[];
-  tags: { id: number; name: string }[];
-};
-export const applicationsPageSize = 20;

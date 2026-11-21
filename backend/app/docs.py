@@ -8,7 +8,6 @@ class Tags:
     Ideas = "Ideas"
     Matters = "Matters"
     Operator = "Operator"
-    Tester = "Tester"
     Conversations = "Conversations"
     Statistics = "Statistics"
 
@@ -49,11 +48,6 @@ tags_metadata = [
         "name": Tags.Projects,
         "description": "Innovation projects with PDFs, links, participants by location "
                        "and map points. Reading published projects is public; managing them requires the admin role.",
-    },
-    {
-        "name": Tags.Tester,
-        "description": "Test sign-ups and reviews (rating 1-5 with feedback) of published projects. "
-                       "Reading reviews is public; signing up and reviewing require login.",
     },
     {
         "name": Tags.Conversations,

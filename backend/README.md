@@ -3,7 +3,7 @@
 FastAPI backend `app.main:app`: SQLAlchemy 2 async persistence with Alembic migrations, JWT login (cookie or Bearer)
 with `admin`/`user` roles and self-registration, and the Radar API: locations and GeoJSON for OpenStreetMap maps,
 admin-defined tags/subtags, projects with PDFs and participants, persisted conversations with automatic tagging and
-project matches (public chat, saved history after login), ideas, pilot partners and their applications, visit tracking and admin
+project matches (public chat, saved history after login), ideas, visit tracking and admin
 statistics. The legacy `POST /chat` stays for the current frontend. The implemented endpoints and tables are in
 [API.md](API.md) and [DATABASE.md](DATABASE.md).
 
@@ -61,7 +61,7 @@ The data is © OpenStreetMap contributors under the ODbL; a map showing it must 
 `scripts/seed_demo.py` fills an empty database with synthetic demo data from `data/demo/demo.json`: the Podkarpackie
 locations, 7 topics with subtopics, 12 demo users, 6 published projects (real records of the
 [Interreg 2021-2027 project list](https://interreg.gov.pl/lista-projektow/), each with a generated PDF card and invented
-participant counts), ideas, pilot partner profiles, sign-ups, reviews, and a 60-day history of conversations and visits
+participant counts), ideas, and a 60-day history of conversations and visits
 for the statistics. Run it after the migrations; it is idempotent:
 
 ```bash
@@ -73,13 +73,6 @@ Demo users (`demo.anna`, `demo.ngo`, ...) log in with `DEMO_USER_PASSWORD` (defa
 comes from `ADMIN_USERNAME`/`ADMIN_PASSWORD`. Rows are matched by natural keys, so a second run adds nothing and keeps
 admin edits. The history is generated once, relative to the day of the first run. Without S3 configured, the PDFs
 are skipped; run the script again once storage is available.
-
-Tester applications (T17) use the T16 pool and up to three existing knowledge-base innovations per demo tester,
-prioritizing their interest categories. New applications have mixed `pending`, `approved` and `rejected` statuses;
-decided rows reference an existing admin. All messages explicitly identify demo data. Existing applications,
-including admin decisions, are preserved. This step requires an existing admin and a reachable, non-empty Qdrant
-catalog (`QDRANT_*`); otherwise it prints a skip reason. Configure the missing prerequisite and rerun the same
-seed command. The seeder does not create knowledge innovations or send notifications.
 
 ## Compose stack
 

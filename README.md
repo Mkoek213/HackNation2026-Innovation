@@ -2,9 +2,9 @@
 
 HackNation 2026 project for the Podkarpackie Centrum Innowacji (PCI) challenge: find innovations in public institutions, describe them with evidence, search for similar solutions and connect creators with partners who can deploy, pilot or fund them.
 
-The app includes a Polish chat with the opt-in "Kreator zgłoszenia", Moje sprawy, an innovation knowledge base, pilot partner sign-up, contact and administrator views. It runs a Next.js frontend and one FastAPI backend with PostgreSQL, Gemini, Qdrant and S3-compatible storage. Interreg and RAD-on importers supply public records from Podkarpacie.
+The app includes a Polish chat with the opt-in "Kreator zgłoszenia", Moje sprawy, an innovation knowledge base, contact and administrator views. It runs a Next.js frontend and one FastAPI backend with PostgreSQL, Gemini, Qdrant and S3-compatible storage. Interreg and RAD-on importers supply public records from Podkarpacie.
 
-Potential scoring against explicit criteria and justified development-path recommendations remain unimplemented. Internal `tester`/`volunteer` names still refer to pilot partners.
+Potential scoring against explicit criteria and justified development-path recommendations remain unimplemented.
 
 ## Run locally
 

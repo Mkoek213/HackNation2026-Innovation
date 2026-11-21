@@ -14,7 +14,6 @@ from . import (
     projects,
     stats,
     tags,
-    tester,
     users,
     visits,
 )
@@ -33,7 +32,6 @@ router.include_router(locations.router)
 router.include_router(projects.router)
 router.include_router(projects.matches_router)
 router.include_router(conversations.router)
-router.include_router(tester.router)
 router.include_router(ideas.router)
 router.include_router(matters.router)
 router.include_router(operator.router)

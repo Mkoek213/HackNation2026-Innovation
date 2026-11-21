@@ -5,7 +5,7 @@ Every table below exists in PostgreSQL and in SQLite for quick local runs (`crea
 The squashed revision was verified against the previous migration chain: identical schema apart from column order.
 Deviations from the original proposal are listed under each table. Endpoints: [API.md](API.md).
 
-Scope: LLM conversations with tags/subtags, projects with PDFs, links and participation, ideas, pilot partners and their applications, and simple statistics for the admin. The vector database for RAG is an **external service**; this database stores only application data and the references the vector service returns.
+Scope: LLM conversations with tags/subtags, projects with PDFs, links and participation, ideas, and simple statistics for the admin. The vector database for RAG is an **external service**; this database stores only application data and the references the vector service returns.
 
 Discovery fields and the private source baseline for refresh merges live in the Qdrant card
 payload. Legacy cards default to candidates with an empty assessment. No SQL migration is required.
@@ -15,7 +15,7 @@ payload. Legacy cards default to candidates with an empty assessment. No SQL mig
 - PostgreSQL + SQLAlchemy 2 async, one `CRUDRepo` per table.
 - `id bigint` primary keys (`BigIntPK`: a bigserial sequence on PostgreSQL rather than `GENERATED AS IDENTITY`,
   INTEGER on SQLite), `created_at timestamptz default now()` on every table except `users`, `updated_at` where rows
-  are edited in place (`projects`, `project_reviews`).
+  are edited in place (`projects`).
 - Enums are `varchar` + `CHECK` (`native_enum=False`, like `users.role`).
 - JSON columns are `JSON` on SQLite and `jsonb` on PostgreSQL. `UNIQUE ... NULLS NOT DISTINCT` exists on PostgreSQL;
   the repositories enforce the same rule for SQLite.
@@ -37,8 +37,6 @@ erDiagram
     projects ||--o{ project_matches : "shown in chat"
     conversations ||--o{ project_matches : ""
     users ||--o{ ideas : submits
-    projects ||--o{ test_signups : ""
-    projects ||--o{ project_reviews : ""
     locations ||--o{ locations : "parent"
 ```
 
@@ -249,32 +247,6 @@ per project per conversation, so repeated recommendations do not inflate the cou
 Implemented with `created_at`, `CHECK`s on `stage` and `status`, indexes on `author_id`, `tag_id`, `status`;
 `author_id` `ON DELETE CASCADE`, `tag_id`/`location_id` `ON DELETE SET NULL`.
 
-## Tester
-
-`test_signups` – willingness to test a project:
-
-| Column | Type | Notes |
-|---|---|---|
-| id | bigint PK | |
-| project_id | FK projects | |
-| user_id | FK users | `UNIQUE (project_id, user_id)` |
-| location_id | FK locations null | |
-| message | text null | |
-
-`project_reviews` – rating, feedback and improvement suggestions:
-
-| Column | Type | Notes |
-|---|---|---|
-| id | bigint PK | |
-| project_id | FK projects | |
-| user_id | FK users | `UNIQUE (project_id, user_id)` |
-| rating | smallint `CHECK 1..5` | |
-| comment | text null | feedback / proposed improvements |
-
-Both tables are implemented with `created_at` (and `updated_at` on reviews, which are replaced in place), an index on
-`user_id`, `project_id`/`user_id` `ON DELETE CASCADE` and `test_signups.location_id` `ON DELETE SET NULL`. The project
-average (`rating_avg`) is computed, not stored.
-
 ## visits (site usage)
 
 One row per page view sent by the frontend.
@@ -302,13 +274,12 @@ One row per page view sent by the frontend.
 | Innovations shown in the live chat | `innovation_matches` ⨝ `conversations`: distinct owner per `innovation_id`; `opened` for source-dialog opens |
 | Live chat turns and outcomes | `chat_operations` ⨝ `conversations` (`workspace`): status and `result.outcome` per day |
 | Project participants and their origin | `project_participants` |
-| Testers / rating | `test_signups`, `project_reviews` |
 
 A conversation counts once per tag, no matter how many follow-up messages it has. Days are UTC calendar days, for
 period bounds and per-day series alike (a portable `date(...)` / `CAST(... AT TIME ZONE 'UTC' AS DATE)` construct in
 `app/repos/stats_repo.py`); SQLite and PostgreSQL return identical results on the demo seed. Tag statistics count
 conversations by `conversations.created_at`, project statistics count `project_matches.created_at`;
-`registered_users`, participants, sign-ups, reviews and `rating_avg` are all-time. Indexes on `created_at` and the FK columns are enough at this scale. Precomputed daily tables can be added later if these queries get slow.
+`registered_users`, participants are all-time. Indexes on `created_at` and the FK columns are enough at this scale. Precomputed daily tables can be added later if these queries get slow.
 
 ## Implemented workspace extension
 
@@ -357,7 +328,7 @@ latest result, so the tag `no_answer` statistic covers the live chat.
 
 ### Demo data
 
-`scripts/seed_demo.py` fills topics, demo accounts, ideas, pilot partner profiles and a deterministic
+`scripts/seed_demo.py` fills topics, demo accounts, ideas and a deterministic
 synthetic activity history from `data/demo/demo.json`, so the admin Analityka view has data.
 Project texts in that file are real Interreg records; everything else is invented.
 
@@ -374,35 +345,6 @@ separate needs. See [Fastino contract](../docs/FASTINO.md#topic-tagging).
 The schema has nullable `conversations.tagged_at`: the `last_activity_at` value the stored topic tags cover.
 A workspace conversation is due for tagging while `tagged_at` is null or older than `last_activity_at`.
 
-
-## Pilot partner pool (internally: volunteer/tester pool)
-
-The schema has `volunteer_profiles`, keyed by `user_id` (one per account,
-cascading on account deletion), with required contact email/phone/description,
-content-free classifier evidence (JSONB on PostgreSQL, JSON on SQLite), contact
-acknowledgement timestamp and creation/update timestamps. Profiles do not reference
-projects. Contact email is independent of account email.
-
-`volunteer_tags` has composite key `(user_id, tag_id)` and an index on `tag_id`.
-Both foreign keys cascade on deletion; deleting a profile removes its assignments.
-The tags use the existing top-level taxonomy. Withdrawal deletes the entire profile,
-including classifier evidence and acknowledgement, without deleting the account.
-Existing project-specific `test_signups` and `project_reviews` are unchanged.
-
-The schema has explicit, self-selected tester tags to `volunteer_profiles`:
-`roles` and `interests` (JSONB on PostgreSQL, JSON on SQLite, `NOT NULL`, default `[]`).
-`roles` holds `TesterRole` partner-type slugs ("Kim jesteś", `app/modules/tester_tags.py`);
-`interests` holds innovation sector `Category` slugs ("W jakich sektorach możesz pilotować?"), so
-partner interests match innovation sectors directly. The automatic `volunteer_tags` stay; `description` may now be empty, and then
-no automatic tagging runs.
-
-The schema has `tester_applications`: `id`, `user_id` (FK
-`volunteer_profiles.user_id`, cascade, indexed), `innovation_id` (knowledge innovation
-slug, `String(120)`, indexed, no FK because innovations live in Qdrant), `status`
-(`pending|approved|rejected`), `source` (`tester|admin`), optional `message`,
-`decided_by` (FK `users.id`, `SET NULL`), `decided_at`, `created_at`, `updated_at`, and a
-unique `(user_id, innovation_id)`. Withdrawing a tester profile deletes its applications;
-deleting an innovation leaves orphan rows that show the slug.
 
 ## Progressive chat case card
 

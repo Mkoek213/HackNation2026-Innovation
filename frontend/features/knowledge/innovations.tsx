@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Building, ExternalLink, FileText, Play } from "@/components/ui/icons";
-import { ApplyAsTester } from "@/features/tester";
 import { innovationAreas, type Assessment, type Innovation, type Taxonomy } from "./api";
 import { AREAS, areaOf } from "./category-areas";
 
@@ -158,9 +157,6 @@ function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innov
       {innovation.imported_at && <>, dane pobrane {date.format(new Date(innovation.imported_at))}</>}
       {innovation.checked_at && <>, sprawdzono {date.format(new Date(innovation.checked_at))}</>}
     </p>}
-    {innovation.verification === "potwierdzona" && <>
-      <p><Link href={`/rozmowa?pytanie=${encodeURIComponent(`Porównaj „${innovation.title}” (${innovation.id}) z innym rozwiązaniem dla podobnej potrzeby. Podaj źródła, warunki wdrożenia i następny krok.`)}`}>Porównaj w rozmowie</Link></p>
-      <ApplyAsTester innovationId={innovation.id} innovationTitle={innovation.title} />
-    </>}
+    {innovation.verification === "potwierdzona" && <p><Link href={`/rozmowa?pytanie=${encodeURIComponent(`Porównaj „${innovation.title}” (${innovation.id}) z innym rozwiązaniem dla podobnej potrzeby. Podaj źródła, warunki wdrożenia i następny krok.`)}`}>Porównaj w rozmowie</Link></p>}
   </Dialog>;
 }

@@ -238,7 +238,7 @@ async def get_project_stats_one(
 ):
     """
     One project: recommendations in the period (`times_shown`, `unique_searchers`, `opened`) with a
-    per-day series, plus all-time `participants_total`, `test_signups`, `reviews` and `rating_avg`. Admin only. \\
+    per-day series, plus all-time `participants_total`. Admin only. \\
     Raises 404 Not Found when the project does not exist.
     """
     return await StatsRepo(db).project(project_id, period)

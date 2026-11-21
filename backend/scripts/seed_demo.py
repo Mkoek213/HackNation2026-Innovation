@@ -10,16 +10,13 @@ Defaults to data/demo/demo.json. In order, it:
 
 - upserts the Podkarpackie locations (data/locations_podkarpackie.geojson);
 - creates the missing tags, subtags, demo users, published projects with their
-  participants and a generated PDF card, ideas, tester sign-ups and reviews, and the
-  tester pool (volunteer profiles with roles, interests and topic tags);
+  participants and a generated PDF card, and ideas;
 - once, generates a deterministic 60-day history of anonymous and registered
   conversations (tags, project matches, messages of saved ones) and site visits.
 
 Rows are matched by natural keys (tag name, username, project title, ...), so existing
 rows, including admin edits, are left alone. The PDF upload needs the S3 storage
 (`S3_*` settings, present in Compose); without it the documents are skipped.
-Tester applications require the T16 volunteer pool, an existing admin and a reachable,
-non-empty knowledge catalog; unavailable prerequisites are reported and can be retried.
 Demo users log in with DEMO_USER_PASSWORD (default below); all data is synthetic.
 """
 import asyncio
@@ -37,9 +34,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import httpx  # noqa: E402
 import pymupdf  # noqa: E402
-from qdrant_client.http.exceptions import ResponseHandlingException, UnexpectedResponse  # noqa: E402
 from sqlalchemy import exists, or_, select  # noqa: E402
 from sqlalchemy.ext.asyncio import AsyncSession  # noqa: E402
 
@@ -47,8 +42,6 @@ from app.config import settings  # noqa: E402
 from app.database.database import sessionmanager  # noqa: E402
 from app.exceptions import DependencyUnavailable  # noqa: E402
 from app.models import (  # noqa: E402
-    ApplicationSource,
-    ApplicationStatus,
     Conversation,
     ConversationOutcome,
     ConversationTag,
@@ -64,14 +57,10 @@ from app.models import (  # noqa: E402
     Subtag,
     Tag,
     TagSource,
-    TesterApplication,
     User,
     UserRole,
     Visit,
 )
-from app.models.volunteer import VolunteerProfile, VolunteerTag  # noqa: E402
-from app.modules.knowledge import Category, KnowledgeUnavailable, get_knowledge_service  # noqa: E402
-from app.modules.tester_tags import TesterRole  # noqa: E402
 from app.repos.idea_repo import IdeaRepo  # noqa: E402
 from app.repos.location_repo import LocationRepo  # noqa: E402
 from app.repos.project_repo import (  # noqa: E402
@@ -82,15 +71,12 @@ from app.repos.project_repo import (  # noqa: E402
 )
 from app.repos.stats_repo import VisitRepo  # noqa: E402
 from app.repos.tag_repo import SubtagRepo, TagRepo  # noqa: E402
-from app.repos.tester_repo import ReviewRepo, TestSignupRepo  # noqa: E402
 from app.repos.user_repo import UserRepo  # noqa: E402
 from app.schemas.idea import IdeaCreate  # noqa: E402
 from app.schemas.location import LocationImport  # noqa: E402
 from app.schemas.project import ParticipantInput, ProjectCreate  # noqa: E402
 from app.schemas.stats import VisitCreate  # noqa: E402
 from app.schemas.tag import SubtagCreate, TagCreate  # noqa: E402
-from app.schemas.tagging import Classification, LabelDecision  # noqa: E402
-from app.schemas.tester import ReviewInput, TestSignupCreate  # noqa: E402
 from app.schemas.user import UserCreate  # noqa: E402
 from app.services.files import FileStorage, get_file_storage  # noqa: E402
 from app.utils.crud_repo import CRUDRepo  # noqa: E402
@@ -109,10 +95,10 @@ DEMO_NAMESPACE = uuid.UUID("5b0c3c1e-6d2a-4c55-9a51-0d3e6f1c2026")
 VISITOR_TERYT = ["1863011"] * 5 + [
     "1861011", "1862011", "1864011", "1817011", "1805011", "1811011", "1803011", "1804011",
 ]
-PAGES = ["/", "/rozmowa", "/knowledge/innovations", "/tester", "/matters", "/contact"]
+PAGES = ["/", "/rozmowa", "/knowledge/innovations", "/matters", "/contact"]
 DOCUMENT_NOTE = (
     "Opis pochodzi z oficjalnej listy projektów Interreg 2021-2027 (interreg.gov.pl). "
-    "Lokalizacja na mapie, liczby uczestników, recenzje i statystyki są danymi demonstracyjnymi."
+    "Lokalizacja na mapie, liczby uczestników i statystyki są danymi demonstracyjnymi."
 )
 
 
@@ -184,9 +170,6 @@ class DemoSeeder:
         await self.seed_users()
         await self.seed_projects()
         await self.seed_ideas()
-        await self.seed_tester_activity()
-        await self.seed_tester_pool()
-        await self.seed_tester_applications()
         await self.seed_history()
 
     async def seed_locations(self) -> None:
@@ -284,108 +267,6 @@ class DemoSeeder:
             if item["status"] != IdeaStatus.submitted:
                 await repo.update({"status": IdeaStatus(item["status"])}, id=idea.id)
             self.created["ideas"] += 1
-
-    async def seed_tester_activity(self) -> None:
-        signups, reviews = TestSignupRepo(self.db), ReviewRepo(self.db)
-        for item in self.data["signups"]:
-            user, project = self.users[item["user"]], self.projects[item["project"]]
-            if await signups.get_mine(project.id, user, quiet=True) is None:
-                await signups.sign_up(project.id, user, TestSignupCreate(
-                    location_id=self.location_id(item["teryt_code"]), message=item["message"],
-                ))
-                self.created["test sign-ups"] += 1
-        for item in self.data["reviews"]:
-            user, project = self.users[item["user"]], self.projects[item["project"]]
-            if await find(reviews, project_id=project.id, user_id=user.id) is None:
-                await reviews.put_mine(project.id, user, ReviewInput(rating=item["rating"], comment=item["comment"]))
-                self.created["reviews"] += 1
-
-    async def seed_tester_pool(self) -> None:
-        """
-        Volunteer profiles, added as ORM objects: VolunteerRepo.put_mine would call the
-        tagging model and stamp the current time. The topic tags come from the data file
-        and are recorded as a completed demo classification; join dates are backdated.
-        """
-        now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
-        for item in self.data["testers"]:
-            user = self.users[item["user"]]
-            if await self._has(VolunteerProfile.user_id == user.id):
-                continue
-            joined_at = now - dt.timedelta(days=item["joined_days_ago"])
-            tags = [self.tags[name] for name in item["tags"]]
-            classification = Classification(
-                status="completed", model="demo-seed", classified_at=joined_at, decisions=[
-                    LabelDecision(tag_id=t.id, name=t.name, probability=0.9, confidence=0.9, selected=True) for t in tags
-                ],
-            )
-            self.db.add(VolunteerProfile(
-                user_id=user.id,
-                email=user.email,
-                phone=item["phone"],
-                description=item["description"],
-                roles=[str(TesterRole(r)) for r in item["roles"]],
-                interests=[str(Category(i)) for i in item["interests"]],
-                classification=classification.model_dump(mode="json"),
-                consented_at=joined_at,
-                created_at=joined_at,
-                updated_at=joined_at,
-            ))
-            # The profile must exist before its tags (foreign key).
-            await self.db.flush()
-            self.db.add_all([VolunteerTag(user_id=user.id, tag_id=t.id) for t in tags])
-            self.created["testers"] += 1
-        await self.db.commit()
-
-    async def seed_tester_applications(self) -> None:
-        """Apply seeded pool testers to existing knowledge innovations, preserving decisions."""
-        profiles = list(await self.db.scalars(
-            select(VolunteerProfile).where(VolunteerProfile.user_id.in_([u.id for u in self.users.values()]))
-        ))
-        if not profiles:
-            print("Skipped tester applications: seed the volunteer pool first (T16), then rerun.")
-            return
-        admin_id = await self.db.scalar(select(User.id).where(User.role == UserRole.admin).order_by(User.id).limit(1))
-        if admin_id is None:
-            print("Skipped tester applications: start the backend with a bootstrap admin, then rerun.")
-            return
-        # Release the read transaction before contacting the knowledge service.
-        await self.db.commit()
-        try:
-            service = await get_knowledge_service()
-            innovations = sorted(await service.list_innovations(), key=lambda item: item.id)
-        except (KnowledgeUnavailable, httpx.HTTPError, ResponseHandlingException, UnexpectedResponse):
-            print("Skipped tester applications: knowledge base unavailable. Configure QDRANT_* and rerun.")
-            return
-        if not innovations:
-            print("Skipped tester applications: upload knowledge innovations first, then rerun.")
-            return
-        existing = set((await self.db.execute(
-            select(TesterApplication.user_id, TesterApplication.innovation_id)
-            .where(TesterApplication.user_id.in_([p.user_id for p in profiles]))
-        )).tuples().all())
-        usernames = {user.id: user.username for user in self.users.values()}
-        statuses = list(ApplicationStatus)
-        now = dt.datetime.now(dt.UTC)
-        for index, profile in enumerate(sorted(profiles, key=lambda p: usernames[p.user_id])):
-            matching = [item for item in innovations if set(item.categories) & set(profile.interests)]
-            # Demonstration applications are not evidence of an assessed match.
-            candidates = matching or innovations
-            for offset, innovation in enumerate(candidates[:3]):
-                if (profile.user_id, innovation.id) in existing:
-                    continue
-                status = statuses[(index + offset) % len(statuses)]
-                created_at = now - dt.timedelta(days=7 + index, hours=offset)
-                self.db.add(TesterApplication(
-                    user_id=profile.user_id, innovation_id=innovation.id,
-                    status=status, source=ApplicationSource.tester,
-                    message="Zgłoszenie demonstracyjne: chętnie sprawdzę rozwiązanie i przekażę uwagi z testowania.",
-                    created_at=created_at,
-                    decided_by=admin_id if status != ApplicationStatus.pending else None,
-                    decided_at=created_at + dt.timedelta(days=2) if status != ApplicationStatus.pending else None,
-                ))
-                existing.add((profile.user_id, innovation.id))
-                self.created["tester applications"] += 1
-        await self.db.commit()
 
     async def _has(self, *conditions) -> bool:
         return bool(await self.db.scalar(select(exists().where(*conditions))))

@@ -1,6 +1,6 @@
 # Radar innowacji frontend
 
-Polish web app of Radar innowacji using Next.js App Router, React, TypeScript and Tailwind CSS: home page, chat with the submission creator, Moje sprawy, the innovation base, pilot partner sign-up, contact and admin views.
+Polish web app of Radar innowacji using Next.js App Router, React, TypeScript and Tailwind CSS: home page, chat with the submission creator, Moje sprawy, the innovation base, contact and admin views.
 
 ## Development
 

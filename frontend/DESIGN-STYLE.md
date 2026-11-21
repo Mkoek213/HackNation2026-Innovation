@@ -8,16 +8,14 @@ User-confirmed guidelines take precedence over library defaults and implementati
 ### Scope
 
 - The product does only what it must: the chat (reporting and finding innovations) is the focal point.
-- Routes: `/` (public home page: what Radar innowacji is, with entry points to the chat, the innovation base and pilot
-  sign-up), `/rozmowa` (Rozmowa, the chat), `/matters` (Moje sprawy), `/knowledge/innovations` (Baza innowacji;
-  `/knowledge` redirects there), `/tester` (pilot partner sign-up), `/contact` (Kontakt), and the admin-only
-  `/administration/testers` (Baza partnerów), `/administration/applications` (Zgłoszenia pilotaży: applications per
-  innovation), `/administration/analytics` and `/administration/documents`; `/administration` redirects to the partner pool.
+- Routes: `/` (public home page: what Radar innowacji is, with entry points to the chat and the innovation base), `/rozmowa` (Rozmowa, the chat), `/matters` (Moje sprawy), `/knowledge/innovations` (Baza innowacji;
+  `/knowledge` redirects there), `/contact` (Kontakt), and the admin-only
+  `/administration/analytics` and `/administration/documents`; `/administration` redirects to Dokumenty.
 - The tab menu is shown before sign-in too. Kontakt is a standalone form (name, e-mail, message, consent) reachable
   without signing in or starting a chat, and it is the last tab for everyone.
 - Innovation cards show the sector, institution and maturity; the detail dialog adds a facts row (innovation type,
   institution, maturity, creators) and the source with its import date.
-- Admins get four separate header tabs: "Baza partnerów", "Zgłoszenia pilotaży", "Analityka" and "Dokumenty".
+- Admins get two extra header tabs: "Analityka" and "Dokumenty".
   Analytics uses headed panels, metric tiles and data tables. Topic trends are small multiples of inline SVG
   line charts (no chart library) on one shared scale: slate for the previous period, navy with a light fill
   for the selected one, an `aria-label` summary and per-point `<title>` tooltips, with the same data in a
@@ -32,8 +30,7 @@ User-confirmed guidelines take precedence over library defaults and implementati
 ### Layout
 
 - Slim navy top bar on every page: radar mark and "Radar innowacji · PCI" on the left, tabs (Rozmowa, Moje sprawy,
-  Baza innowacji, Pilotaże, Kontakt; admins see Baza partnerów, Zgłoszenia pilotaży, Analityka and Dokumenty
-  instead of Pilotaże, before Kontakt), username and logout on the right. The active tab has an amber underline.
+  Baza innowacji, Kontakt; admins also see Analityka and Dokumenty before Kontakt), username and logout on the right. The active tab has an amber underline.
 - When the tabs do not fit beside the brand and the account controls even after the 1440px tightening (admin tabs,
   enlarged font), they move to a second 48px row under the 64px top row instead of being clipped; `--header-h`
   follows the actual header height.

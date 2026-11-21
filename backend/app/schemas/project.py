@@ -54,13 +54,10 @@ class ProjectDocumentModel(BaseModel):
 
 
 class ProjectDetail(ProjectModel):
-    """A project with its description, PDFs, participants total and average rating."""
+    """A project with its description, PDFs, and participants total."""
     description: str = Field(examples=["## Opis\nPełny opis projektu."])
     documents: list[ProjectDocumentModel] = Field(default_factory=list)
     participants_total: int = Field(ge=0, examples=[120])
-    rating_avg: float | None = Field(
-        default=None, ge=1, le=5, examples=[4.5], description="Average review rating, 2 decimals; null without reviews.",
-    )
 
 
 class ProjectCreate(BaseModel):

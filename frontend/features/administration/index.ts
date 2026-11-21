@@ -1,1 +1,1 @@
-export { AnalyticsPage, ApplicationsPage, DocumentsPage, TesterPoolPage } from "./page";
+export { AnalyticsPage, DocumentsPage } from "./page";

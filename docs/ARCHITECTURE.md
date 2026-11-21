@@ -17,15 +17,14 @@
 
 | Path | Responsibility |
 | --- | --- |
-| `frontend/app/` | Thin routes: `/` home, `/rozmowa` chat, `/matters` Moje sprawy, `/knowledge/innovations` innovation base, `/tester` pilot sign-up, `/contact`, `/administration/*` admin views |
-| `frontend/features/<id>/` | Feature UI behind a public `index.ts`: `home`, `workspace` (chat), `matters`, `knowledge`, `tester` (pilot partners), `administration`, `contact` |
+| `frontend/app/` | Thin routes: `/` home, `/rozmowa` chat, `/matters` Moje sprawy, `/knowledge/innovations` innovation base, `/contact`, `/administration/*` admin views |
+| `frontend/features/<id>/` | Feature UI behind a public `index.ts`: `home`, `workspace` (chat), `matters`, `knowledge`, `administration`, `contact` |
 | `frontend/app/api/backend/[...path]/route.ts` | Allowlisted same-origin proxy to FastAPI (cookies and CSRF) |
 | `frontend/components/` | Site header, accessibility bar, shared UI primitives and icons |
 | `backend/app/main.py`, `config.py`, `lifespan.py` | App composition, settings from the root `.env`, startup |
 | `backend/app/models/`, `schemas/`, `repos/`, `routes/` | One model, schema module, repo and router per resource |
 | `backend/app/routes/operator.py` | PCI staff contacts and the Markdown to PDF helper |
 | `backend/app/modules/knowledge/taxonomy.py` | Sectors, innovation types, institution types and maturity stages with Polish labels |
-| `backend/app/modules/tester_tags.py` | Pilot partner types and sector interests (the pool is stored as "volunteers"/"testers" internally) |
 | `backend/app/chat/sources.py` | Live reading of approved public pages (Interreg, NCBR successes, pcinn.org) |
 | `backend/scripts/import_*.py` | Source importers writing `backend/data/seed/<source>.json` |
 | `backend/scripts/upload_innovations.py` | Uploads every seed file through the knowledge API (S3 and Qdrant) |
@@ -39,7 +38,6 @@
 2. `upload_innovations.py` sends each record to `PUT /api/v1/knowledge/innovations/{id}`; cards and document chunks are embedded into Qdrant.
 3. The chat searches Qdrant, validates candidates (`select_innovations`) and reviews its answer against retrieved passages before replying.
 4. Submissions become matters (`application_draft`) with a generated "similar solutions" section; users can download a summary PDF for PCI.
-5. Pilot partners join the pool and apply to innovations; admins approve, reject or assign them.
 
 ## Run and validate
 
@@ -49,9 +47,8 @@ Frontend: `pnpm exec next typegen`, `pnpm exec tsc --noEmit`, `pnpm lint`, `pnpm
 
 ## Product boundaries
 
-PCI operates the product for many public institutions. Creators report innovations; institutions, companies, investors and experts look for solutions to deploy, pilot or fund. Administrators manage the knowledge base and partner pool. Innovation classification covers sector, innovation type, source institution type and maturity. Preserve institution, public authors, source URL and import date when editing imported cards.
+PCI operates the product for many public institutions. Institutions, companies and investors look for existing solutions to deploy. Administrators manage the knowledge base. Innovation classification covers sector, innovation type, source institution type and maturity. Preserve institution, public authors, source URL and import date when editing imported cards.
 
 ## Not implemented
 
 - Patent sources (UPRP blocked; EPO OPS needs a key).
-- Renaming the internal `tester` identifiers to `pilot`.

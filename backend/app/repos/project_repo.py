@@ -13,7 +13,6 @@ from app.models import (
     Project,
     ProjectDocument,
     ProjectParticipant,
-    ProjectReview,
     ProjectStatus,
     Subtag,
 )
@@ -55,12 +54,6 @@ async def delete_stored_files(storage: FileStorage, keys: Sequence[str]) -> None
             await storage.delete(key)
         except DependencyUnavailable:
             logger.warning("Could not delete stored file %s; it is left orphaned.", key)
-
-
-async def average_rating(db: AsyncSession, project_id: int) -> float | None:
-    """The project's average review rating rounded to 2 decimals; None without reviews."""
-    avg = await db.scalar(select(func.avg(ProjectReview.rating)).where(ProjectReview.project_id == project_id))
-    return None if avg is None else round(float(avg), 2)
 
 
 class FileTooLargeError(DomainError):
@@ -160,7 +153,6 @@ class ProjectRepo(CRUDRepo[Project, ProjectModel]):
             description=project.description,
             documents=[ProjectDocumentModel.model_validate(d) for d in documents],
             participants_total=total,
-            rating_avg=await average_rating(self.db, project.id),
         )
 
     async def _validate(self, data: dict[str, Any]) -> None:

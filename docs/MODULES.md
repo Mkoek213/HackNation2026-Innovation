@@ -11,9 +11,6 @@ The backend is one FastAPI application, `app.main`, organized by resource rather
 | Rozmowa | [route](../frontend/app/rozmowa/page.tsx) / [feature](../frontend/features/workspace/index.ts) |
 | Moje sprawy | [route](../frontend/app/matters/page.tsx) / [feature](../frontend/features/matters/index.ts) |
 | Baza innowacji (`/knowledge` redirects here) | [route](../frontend/app/knowledge/innovations/page.tsx) / [feature](../frontend/features/knowledge/index.ts) |
-| Pilotaże (pilot partner sign-up) | [route](../frontend/app/tester/page.tsx) / [feature](../frontend/features/tester/index.ts) |
-| Baza partnerów (admins only) | [route](../frontend/app/administration/testers/page.tsx) / [feature](../frontend/features/administration/index.ts) (composes [tester](../frontend/features/tester/index.ts)) |
-| Zgłoszenia pilotaży (admins only) | [route](../frontend/app/administration/applications/page.tsx) / [feature](../frontend/features/administration/index.ts) |
 | Analityka (admins only) | [route](../frontend/app/administration/analytics/page.tsx) / [feature](../frontend/features/administration/index.ts) |
 | Dokumenty (admins only) | [route](../frontend/app/administration/documents/page.tsx) / [feature](../frontend/features/administration/index.ts) |
 | Kontakt (everyone, also signed out) | [route](../frontend/app/contact/page.tsx) / [feature](../frontend/features/contact/index.ts) |
@@ -66,23 +63,12 @@ Trends and statistics about Radar usage are administrator-only.
 See [development setup](DEVELOPMENT.md) for startup and browser checks.
 
 
-## Pilot partner pool (internally: volunteer pool)
-
-The tester feature (pilot partners) exports `VolunteerPage` through its public entry point.
-`/tester` renders the own-profile form; `/administration/testers` composes the same feature
-in administrator mode. API authorization remains server-side. The workspace public
-entry point exports its existing cookie/CSRF API client for these authenticated
-flows. The BFF allowlists `/volunteers`, `/volunteers/mine` and `/volunteers/tags`
-and forwards PUT. Other modules retain their existing scope.
-
 ## Administration analytics
 
 `frontend/features/administration/` owns the admin routes, each its own header tab shown only to admins:
-`/administration/testers` (Baza partnerów), `/administration/applications` (Zgłoszenia pilotaży, pilot
-applications per innovation), `/administration/analytics` (Analityka) and
+`/administration/analytics` (Analityka) and
 `/administration/documents` (Dokumenty: a "Nowa innowacja" tab that uploads documents, autofills the card and creates the innovation, and an "Edytuj istniejącą" tab that edits a card through `PATCH /api/v1/knowledge/innovations/{id}` or replaces its documents through `PUT`). `/administration` redirects to
-the partner pool. Non-admins get the pilot feature's own login or forbidden message and no admin
-request is made.
+Dokumenty. Non-admins get a login or forbidden message and no admin request is made.
 Analityka reads `GET /stats/site`, `/stats/workspace`, `/stats/tags`, `/stats/trends`,
 `/stats/tags/timeline` and the first page of `/stats/innovations` for one inclusive UTC period
 (default: last 30 days). "Tematy w czasie" draws one inline SVG line chart per topic from the

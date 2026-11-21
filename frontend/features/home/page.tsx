@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { ComponentType } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, FlaskConical, Handshake, Lightbulb, MessagesSquare, Search } from "@/components/ui/icons";
+import { ArrowRight, Handshake, Lightbulb, MessagesSquare, Search } from "@/components/ui/icons";
 import { getCatalog, useLoad } from "@/features/knowledge";
 
 type IconType = ComponentType<{ size?: number; "aria-hidden"?: boolean }>;
@@ -11,13 +11,12 @@ type IconType = ComponentType<{ size?: number; "aria-hidden"?: boolean }>;
 const entries: { href: string; icon: IconType; title: string; text: string; action: string }[] = [
   { href: "/rozmowa?nowa=1", icon: MessagesSquare, title: "Znajdź rozwiązanie", text: "Opisz potrzebę szkoły, uczelni, firmy lub urzędu. Asystent pomoże wyszukać i porównać rozwiązania.", action: "Opisz potrzebę" },
   { href: "/knowledge/innovations", icon: Lightbulb, title: "Baza innowacji", text: "Sprawdź etap wdrożenia, dowody i możliwości zastosowania polskich rozwiązań.", action: "Przeglądaj innowacje" },
-  { href: "/tester", icon: FlaskConical, title: "Zostań partnerem pilotażu", text: "Jeśli Twoja instytucja może przetestować rozwiązanie w praktyce, dołącz do bazy partnerów.", action: "Zgłoś się" },
 ];
 
 const steps: { icon: IconType; title: string; text: string }[] = [
   { icon: MessagesSquare, title: "Opisz potrzebę", text: "Napisz lub podyktuj, jaki problem chcesz rozwiązać i w jakiej instytucji." },
   { icon: Search, title: "Sprawdź dowody", text: "Porównaj etap wdrożenia, wiarygodność źródeł i możliwość zastosowania w innym miejscu." },
-  { icon: Handshake, title: "Zaplanuj wdrożenie", text: "Sprawdź warunki wdrożenia lub zgłoś gotowość do pilotażu wybranego rozwiązania." },
+  { icon: Handshake, title: "Zaplanuj wdrożenie", text: "Sprawdź potencjalnych odbiorców, warunki wdrożenia i proponowaną ścieżkę." },
 ];
 
 const examples = [

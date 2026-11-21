@@ -26,7 +26,7 @@ These follow the existing code (`app/routes/users.py`, `CRUDRepo`).
 | Access | Meaning |
 |---|---|
 | public | No login (decision D4). Endpoints that track a visitor (`VisitorDep`) set the anonymous `visitor_id` cookie if missing. |
-| user | Logged in (`CurrentUserDep`): saved conversations, ideas, pilot sign-ups and reviews |
+| user | Logged in (`CurrentUserDep`): saved conversations and ideas |
 | owner | Owns the resource (by `user_id` or, for anonymous conversations, the `visitor_id` cookie), or admin |
 | admin | `CurrentAdminDep`; a regular user gets 403, an anonymous caller 401 |
 
@@ -40,7 +40,7 @@ These follow the existing code (`app/routes/users.py`, `CRUDRepo`).
 | GET | `/users/me` | user | |
 | PATCH | `/users/me` | user | Own username, e-mail or password; non-admins cannot change `role` |
 | GET, POST | `/users` | admin | Paginated list (20 by default); create |
-| GET, PATCH, DELETE | `/users/{user_id}` | admin | Deleting a user deletes their conversations, ideas, sign-ups and reviews |
+| GET, PATCH, DELETE | `/users/{user_id}` | admin | Deleting a user deletes their conversations and ideas |
 
 ## Operator (PCI) staff and PDF helper
 
@@ -127,7 +127,7 @@ The interfaces and the `AI_BACKEND` setting are documented in [app/services/READ
 | Method | Path | Access | Description |
 |---|---|---|---|
 | GET | `/projects` | public | Published, newest first, `?tag_id=&subtag_id=&location_id=&q=`; `location_id` includes the units inside it; the admin also sees drafts and can filter `?status=` |
-| GET | `/projects/{project_id}` | public | `ProjectDetail`: description, links, `documents[]` with `url`, `participants_total`, `rating_avg` (2 decimals, null without reviews) |
+| GET | `/projects/{project_id}` | public | `ProjectDetail`: description, links, `documents[]` with `url`, `participants_total` |
 | POST | `/projects` | admin | Create (always `draft`) → `ProjectDetail` |
 | PATCH | `/projects/{project_id}` | admin | Edit; `{"status": "published"}` publishes and indexes it in the vector store, `draft` unindexes it |
 | DELETE | `/projects/{project_id}` | admin | Also deletes the stored PDFs; 409 once the project was shown in the chat (unpublish instead) |
@@ -152,21 +152,6 @@ given together (422), `website_url`/`video_url` are http(s) URLs. Files live in 
 | PATCH | `/ideas/{idea_id}` | owner | The author edits the content while `submitted` (otherwise 409) and cannot set `status` (403); the admin edits anything and sets `status` (`published` / `rejected`) |
 | DELETE | `/ideas/{idea_id}` | owner | In any status |
 
-## Tester
-
-Sign-ups and reviews are allowed only for published projects (a draft is 404 for users, 409 for the admin).
-
-| Method | Path | Access | Description |
-|---|---|---|---|
-| POST | `/projects/{project_id}/test-signups` | user | `{location_id?, message?}` → 201; 409 if already signed up; unknown location → 404 |
-| GET | `/projects/{project_id}/test-signups/mine` | user | *(added)* Own sign-up, 404 when not signed up |
-| DELETE | `/projects/{project_id}/test-signups/mine` | user | Withdraw (any project status) |
-| GET | `/projects/{project_id}/test-signups` | admin | Paginated, newest first, with `username` and `email` for contact |
-| GET | `/projects/{project_id}/reviews` | public | `{total, items: [{id, project_id, user_id, username, rating, comment, created_at, updated_at}], rating_avg}`, newest first, paginated; never `email` |
-| GET | `/projects/{project_id}/reviews/mine` | user | *(added)* Own review, 404 when none |
-| PUT | `/projects/{project_id}/reviews/mine` | user | `{rating: 1..5, comment?}` – 201 on create, 200 on replace; an omitted or null `comment` clears it |
-| DELETE | `/reviews/{review_id}` | admin | Moderation |
-
 ## Statistics
 
 Counting rules: a person is the logged-in user, otherwise the anonymous visitor (`coalesce('u' || user_id, 'v' ||
@@ -184,7 +169,7 @@ no matter how many follow-up messages or tag/subtag rows it has. Admins are not 
 | GET | `/stats/tags/{tag_id}` | admin | One tag: the same counts, per-day series, subtag breakdown, `top_projects` (10 most recommended in its conversations) |
 | GET | `/stats/trends` | admin | Per tag and subtag (`{tag_id, tag_name, subtag_id, subtag_name, current, previous, change, change_pct}`): distinct people now vs the previous period of the same length, `change`, `change_pct` (null when the previous count is 0), biggest absolute change first; rows without activity in both periods are left out. `?location_id=` includes the units inside it. Also returns `previous_period` and `location_id`. |
 | GET | `/stats/projects` | admin | Paginated ranking of every project (drafts too), items `{project_id, title, status, unique_searchers, times_shown, opened}`, ordered by `unique_searchers`, `times_shown`, `opened`; counted by `project_matches.created_at` |
-| GET | `/stats/projects/{project_id}` | admin | `{project_id, title, status, times_shown, unique_searchers, opened, participants_total, test_signups, reviews, rating_avg, series}`; participants, sign-ups, reviews and the average are all-time |
+| GET | `/stats/projects/{project_id}` | admin | `{project_id, title, status, times_shown, unique_searchers, opened, participants_total, series}`; participants are all-time |
 | GET | `/stats/locations` | admin | `{total, items: [{location_id, name, teryt_code, kind, conversations, unique_people, participants}], unknown}` for locations with data (`?level=county`); `?format=geojson` gives features with boundary or centroid, `period` and `unknown` as foreign members. Participants are all-time and include drafts. |
 
 ## Operations
@@ -275,65 +260,6 @@ TRL requires the technology area and its own justification.
 Admin-only `PUT /api/v1/knowledge/innovations/{id}/refresh` accepts card metadata as JSON
 and returns `{status: "created" | "updated" | "unchanged"}`. It preserves attachments and editorial changes.
 
-
-## Pilot partner pool (`/volunteers`)
-
-In the product this is the pilot partner pool ("Baza partnerów"); the API keeps the original `volunteer`/`tester` names.
-
-This pool is independent of project-specific test sign-ups and reviews.
-
-| Method | Path | Access | Behavior |
-| --- | --- | --- | --- |
-| GET | `/volunteers/mine` | Logged-in owner | Own profile or JSON null |
-| PUT | `/volunteers/mine` | Logged-in non-admin owner | Create/replace own profile; 403 for administrators |
-| DELETE | `/volunteers/mine` | Logged-in owner | Delete profile and labels; retain account (idempotent) |
-| GET | `/volunteers` | Admin only | Paginated pool, newest first; `q` searches descriptions, `tag_id` filters a topic, `role` and `interest` filter explicit tags |
-| GET | `/volunteers/tags` | Admin only | Existing top-level topic dictionary for filtering |
-| GET | `/volunteers/options` | Logged-in | Fixed explicit tag lists: `{roles, interests}`, each `[{id, label}]` with Polish labels |
-
-PUT returns 403 Forbidden (`Administrators cannot register as testers.`) when the
-caller is an administrator; admins manage the pool instead of joining it.
-PUT requires `email`, `phone`, `roles` (at least one `TesterRole` slug, "Kim jesteś"),
-`interests` (at least one innovation sector `Category` slug, "W jakich sektorach możesz pilotować?") and
-`consent: true`; `description` is optional (stripped, at most 2000 characters).
-Unknown or empty tag lists return 422; duplicates are removed. Phone accepts a leading plus, digits, spaces, parentheses and
-hyphens, with 7–15 digits. Email is validated and lowercased; it is independent
-of account email. Clients cannot set another owner, tags, eligibility or status.
-The own/list models include contact details, description, `roles`, `interests`,
-automatically assigned `tags`, tagging status and timestamps. Contact details are never exposed through a public pool.
-
-The existing Fastino classifier runs only for a non-empty description (an empty one
-records `no_text`) and receives only the description and top-level topic
-definitions. It excludes inferred personal traits. Completed results assign tags;
-changed descriptions clear obsolete tags on unavailable/uncertain classification.
-Unchanged descriptions retain earlier tags on failure. Missing provider credentials,
-uncertainty or an empty taxonomy do not block saving. No tag mutation endpoint exists.
-Administrator contact uses external email; the platform sends no invitations.
-
-## Pilot applications (`/tester-applications`)
-
-Pool partners apply to pilot or deploy a knowledge-base innovation, keyed by its slug
-(`api/v1/knowledge/innovations/{innovation_id}`), not `projects.id`. Admins
-approve or reject applications, or add a partner directly. Statuses: `pending`,
-`approved`, `rejected`; `source` is `tester` (applied) or `admin` (added by PCI).
-
-| Method | Path | Access | Behavior |
-| --- | --- | --- | --- |
-| POST | `/tester-applications` | Logged-in non-admin with a tester profile | `{innovation_id, message?}` creates a `pending` application (201) |
-| GET | `/tester-applications/mine` | Logged-in | Own applications with `innovation_title`, newest first |
-| DELETE | `/tester-applications/mine/{id}` | Logged-in owner | Withdraw (delete) an own `pending` application |
-| GET | `/tester-applications` | Admin only | Paginated, newest first; filters `status`, `innovation_id`; adds tester `user_id`, `email`, `phone`, `roles`, `interests`, `tags` |
-| PATCH | `/tester-applications/{id}` | Admin only | `{status: "approved" \| "rejected"}`; records `decided_by` and `decided_at` |
-| POST | `/tester-applications/assign` | Admin only | `{user_id, innovation_id}` creates or upgrades the application to `approved` with `source=admin` (200) |
-
-POST returns 403 for administrators, 409 Conflict without a tester profile
-(`Join the tester pool before applying to test an innovation.`) or for a duplicate
-(user, innovation) pair, 404 for an unknown innovation and 503 when the knowledge
-base is unavailable. `message` is optional (stripped, at most 2000 characters).
-Withdrawing a decided application returns 409; someone else's id returns 404.
-Assign returns 404 when the user has no tester profile or the innovation is unknown.
-Innovation titles are resolved in one knowledge-base read; when an innovation was
-deleted, `innovation_title` falls back to the slug. No notifications are sent.
 
 ## Adaptive workspace summary and contact
 

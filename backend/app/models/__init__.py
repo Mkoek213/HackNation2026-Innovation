@@ -16,9 +16,6 @@ from .conversation import (
     ProjectMatch,
     TagSource,
 )
-from .tester import TestSignup, ProjectReview
-from .volunteer import VolunteerProfile, VolunteerTag
-from .tester_application import ApplicationSource, ApplicationStatus, TesterApplication
 from .visit import Visit
 from .contact import ContactMessage
 

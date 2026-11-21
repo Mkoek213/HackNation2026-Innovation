@@ -12,13 +12,10 @@ const tabs: Tab[] = [
   { href: "/rozmowa", label: "Rozmowa" },
   { href: "/matters", label: "Moje sprawy" },
   { href: "/knowledge/innovations", label: "Baza innowacji" },
-  { href: "/tester", label: "Pilotaże" },
 ];
 // Reachable without signing in or starting a chat; always the last tab.
 const contactTab: Tab = { href: "/contact", label: "Kontakt" };
 const adminTabs: Tab[] = [
-  { href: "/administration/testers", label: "Baza partnerów" },
-  { href: "/administration/applications", label: "Zgłoszenia pilotaży" },
   { href: "/administration/analytics", label: "Analityka" },
   { href: "/administration/documents", label: "Dokumenty" },
 ];
@@ -73,8 +70,7 @@ export function SiteHeader() {
     }
   }
 
-  // Admins cannot join the pilot partner pool, so they get the admin views instead of the sign-up tab.
-  const links = [...(user?.role === "admin" ? [...tabs.filter(tab => tab.href !== "/tester"), ...adminTabs] : tabs), contactTab];
+  const links = [...tabs, ...(user?.role === "admin" ? adminTabs : []), contactTab];
   const current = (tab: Tab) => tab.match ? tab.match(pathname) : pathname === tab.href || pathname.startsWith(`${tab.href}/`);
   return <header ref={headerRef} className="site-header" data-wrapped={wrapped || undefined}>
     <a className="skip-link" href="#main">Przejdź do treści</a>
