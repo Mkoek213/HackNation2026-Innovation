@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Building, ExternalLink, FileText, Play } from "@/components/ui/icons";
-import { innovationAreas, type Assessment, type AssessmentNote, type Innovation, type Taxonomy } from "./api";
+import { recordVisit } from "@/features/workspace";
+import { getSimilar, innovationAreas, type Assessment, type AssessmentNote, type Innovation, type Taxonomy } from "./api";
 import { AREAS, areaOf } from "./category-areas";
+import { useLoad } from "./use-load";
 
 function youtubeId(url: string | null) {
   if (!url) return null;
@@ -26,6 +28,10 @@ export function InnovationGrid({ innovations, taxonomy, selected, onToggle }: {
 }) {
   const labels = taxonomy.sectors;
   const [open, setOpen] = useState<Innovation | null>(null);
+  function show(item: Innovation) {
+    setOpen(item);
+    void recordVisit(`/_radar/karta/${item.id}`); // anonymous catalog analytics, see Analityka
+  }
   const shown = AREAS.filter(area => innovations.some(item => areaOf(item.area) === area.id));
   return <>
     {shown.length > 1 && <ul className="area-legend" aria-label="Kolor paska karty oznacza obszar zastosowania">
@@ -33,7 +39,7 @@ export function InnovationGrid({ innovations, taxonomy, selected, onToggle }: {
     </ul>}
     <ul className="innovation-grid">
       {innovations.map(item => <li key={item.id}>
-        <button type="button" className="innovation-card" data-area={areaOf(item.area)} onClick={() => setOpen(item)} aria-haspopup="dialog">
+        <button type="button" className="innovation-card" data-area={areaOf(item.area)} onClick={() => show(item)} aria-haspopup="dialog">
           <span className="innovation-category">{item.area ? innovationAreas[item.area] : labels[item.primary_category] ?? item.primary_category}</span>
           <span className="innovation-title">{item.title}</span>
           <span className="innovation-solution">{item.assessment.summary || item.card.solution || item.card.problem}</span>
@@ -54,7 +60,7 @@ export function InnovationGrid({ innovations, taxonomy, selected, onToggle }: {
         </label>
       </li>)}
     </ul>
-    {open && <InnovationDialog innovation={open} taxonomy={taxonomy} onClose={() => setOpen(null)} />}
+    {open && <InnovationDialog key={open.id} innovation={open} taxonomy={taxonomy} onClose={() => setOpen(null)} onOpen={show} />}
   </>;
 }
 
@@ -138,7 +144,24 @@ export function CompareInnovations({ innovations, taxonomy, onClose }: {
   </Dialog>;
 }
 
-function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innovation; taxonomy: Taxonomy; onClose: () => void }) {
+function Similar({ innovation, taxonomy, onOpen }: { innovation: Innovation; taxonomy: Taxonomy; onOpen: (item: Innovation) => void }) {
+  const similar = useLoad(() => getSimilar(innovation.id), innovation.id);
+  if (!similar || similar.length === 0) return null;
+  return <section className="similar">
+    <h3>Podobne rozwiązania</h3>
+    <p className="source-note">Sprawdź je, zanim zaczniesz własny projekt: ktoś mógł już rozwiązać ten sam problem.</p>
+    <ul>{similar.map(item => <li key={item.id}>
+      <button type="button" onClick={() => onOpen(item)}>
+        <span className="similar-title">{item.title}</span>
+        <span className="similar-meta">{[item.institution, item.region, item.maturity && taxonomy.maturity[item.maturity]].filter(Boolean).join(" · ")}</span>
+      </button>
+    </li>)}</ul>
+  </section>;
+}
+
+function InnovationDialog({ innovation, taxonomy, onClose, onOpen }: {
+  innovation: Innovation; taxonomy: Taxonomy; onClose: () => void; onOpen: (item: Innovation) => void;
+}) {
   const labels = taxonomy.sectors;
   const video = youtubeId(innovation.video_url);
   const source = httpLink(innovation.source_url);
@@ -196,6 +219,7 @@ function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innov
       {innovation.imported_at && <>, dane pobrane {date.format(new Date(innovation.imported_at))}</>}
       {innovation.checked_at && <>, sprawdzono {date.format(new Date(innovation.checked_at))}</>}
     </p>}
+    <Similar innovation={innovation} taxonomy={taxonomy} onOpen={onOpen} />
     <p><Link href={`/rozmowa?pytanie=${encodeURIComponent(`Porównaj „${innovation.title}” (${innovation.id}) z innym rozwiązaniem dla podobnej potrzeby. Podaj źródła, warunki wdrożenia i następny krok.`)}`}>Porównaj w rozmowie</Link></p>
   </Dialog>;
 }

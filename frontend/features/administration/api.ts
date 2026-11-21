@@ -7,6 +7,7 @@ export type Outcomes = { matched: number; no_match: number; unavailable: number 
 export type SiteStats = {
   period: Period; visits: number; unique_visitors: number; conversations: number; registered_users: number;
   series: { date: string; visits: number; unique_visitors: number; conversations: number }[];
+  catalog: { kind: string; value: string; label: string; views: number; people: number }[];
 };
 export type WorkspaceStats = {
   period: Period; threads: number; unique_users: number; operations: number;

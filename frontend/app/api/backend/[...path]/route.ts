@@ -49,7 +49,7 @@ function assertTrustedOrigin(request: NextRequest): Response | null {
 async function forward(request: NextRequest, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
   const pathname = path.join("/");
-  if (pathname !== "api/v1/knowledge/catalog" && !/^(auth\/(login|register|logout|session)|users\/me|operator\/(?:staff|pdf)|contact|matters(?:\/\d+(?:\/(?:thread|pdf))?)?|visits|workspace\/conversations(?:\/\d+(?:\/(?:messages|handoff(?:\/(?:send|pdf))?|artifacts\/[a-f0-9-]{36}\/pdf)|\/innovations\/[a-z0-9-]{1,120}\/open)?)?|stats\/(?:site|workspace|innovations|trends|tags(?:\/\d+|\/timeline)?|projects(?:\/\d+)?)|api\/v1\/knowledge\/(?:innovations(?:\/[a-z0-9-]+(?:\/documents\/[a-f0-9]{32})?)?|categories|taxonomy))$/.test(pathname)) {
+  if (pathname !== "api/v1/knowledge/catalog" && !/^(auth\/(login|register|logout|session)|users\/me|operator\/(?:staff|pdf)|contact|matters(?:\/\d+(?:\/(?:thread|pdf))?)?|visits|workspace\/conversations(?:\/\d+(?:\/(?:messages|handoff(?:\/(?:send|pdf))?|artifacts\/[a-f0-9-]{36}\/pdf)|\/innovations\/[a-z0-9-]{1,120}\/open)?)?|stats\/(?:site|workspace|innovations|trends|tags(?:\/\d+|\/timeline)?|projects(?:\/\d+)?)|api\/v1\/knowledge\/(?:innovations(?:\/[a-z0-9-]+(?:\/documents\/[a-f0-9]{32}|\/similar)?)?|categories|taxonomy))$/.test(pathname)) {
     return new Response(null, { status: 404 });
   }
   // Knowledge writes: admin upload, card edit, and the unstored draft that fills the upload form.

@@ -18,6 +18,7 @@ from .embeddings import Embedder, GeminiEmbedder
 from .errors import InnovationNotFound, KnowledgeUnavailable
 from .extract import SUPPORTED_SUFFIXES, dedupe_formats, expand_archives, extract
 from .schemas import (
+    AssessmentNote,
     CategoriesUpdate,
     CatalogPage,
     Evidence,
@@ -34,7 +35,7 @@ from .schemas import (
 from .settings import KnowledgeSettings, load_knowledge_settings
 from .store import PointData, QdrantStore, make_client, meta_to_card_payload, point_id
 from .taxonomy import (CATEGORY_LABELS, INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS,
-                       Category, Maturity)
+                       Audience, Category, Maturity)
 
 logger = logging.getLogger(__name__)
 
@@ -281,6 +282,9 @@ class KnowledgeService:
             dense, sparse = await self.embedder.embed_passages(texts)
             payloads = [payload] + [{**p, **fields} for _, p in chunks]
             ids = [point_id(meta.id, "card")] + [i for i, _ in chunks]
+            if None in dense:  # embedding outage: a slightly stale meaning beats none; scripts/backfill_dense.py refreshes it
+                kept = await self.store.dense_vectors([i for i, d in zip(ids, dense) if d is None])
+                dense = [d if d is not None else kept.get(i) for i, d in zip(ids, dense)]
             await self.store.upsert([PointData(id=i, dense=d, sparse=s, payload=p)
                                      for i, d, s, p in zip(ids, dense, sparse, payloads)])
             if not chunks and previous.chunk_count:
@@ -348,6 +352,22 @@ class KnowledgeService:
             baseline = {"assessment": new, "maturity": maturity.value if maturity else None}
             return await self._update(previous, meta, previous.import_baseline, assessment_baseline=baseline)
 
+    async def apply_credibility(self, innovation_id: str, note: AssessmentNote) -> InnovationSummary:
+        """Store only the rule-based credibility (the model was unavailable); every other note stays."""
+        async with self._write_lock:
+            previous = await self.get(innovation_id)
+            current = previous.assessment.model_dump(mode="json")
+            old = dict(previous.assessment_baseline.get("assessment") or {})
+            new = note.model_dump(mode="json")
+            if current["credibility"] in (None, old.get("credibility")):  # an editorial note is kept
+                current["credibility"] = new
+            old["credibility"] = new
+            data = previous.model_dump(include=set(InnovationMeta.model_fields))
+            data["assessment"] = current
+            baseline = {**previous.assessment_baseline, "assessment": old}
+            return await self._update(previous, InnovationMeta.model_validate(data), previous.import_baseline,
+                                      assessment_baseline=baseline)
+
     async def update_categories(self, innovation_id: str, update: CategoriesUpdate) -> InnovationSummary:
         async with self._write_lock:
             await self.get(innovation_id)
@@ -382,7 +402,8 @@ class KnowledgeService:
 
     async def catalog(self, *, query: str, category: Category | None, area: InnovationArea | None,
                       region: str | None, maturity: Maturity | None, confirmed_only: bool,
-                      min_credibility: int | None, offset: int, limit: int) -> CatalogPage:
+                      min_credibility: int | None, offset: int, limit: int,
+                      audience: Audience | None = None) -> CatalogPage:
         # shortcut: substring search scans matching cards; add indexed text search when the catalog passes ~10k cards.
         items = await self.store.list_innovations(category, confirmed_only=confirmed_only)
         regions = sorted({item.region for item in items if item.region})
@@ -398,6 +419,8 @@ class KnowledgeService:
                 continue
             if min_credibility and score(item, "credibility") < min_credibility:
                 continue
+            if audience and all(r.audience != audience for r in item.assessment.recipients):
+                continue
             text = " ".join([item.title, item.institution or "", item.assessment.summary,
                              *item.card.model_dump().values()]).casefold()
             if all(term in text for term in terms):
@@ -405,7 +428,16 @@ class KnowledgeService:
         # Strongest evidence first: confirmed use, then credibility, then deployment level.
         matches.sort(key=lambda item: (item.verification != "potwierdzona", -score(item, "credibility"),
                                        -score(item, "implementation"), item.title))
-        return CatalogPage(items=matches[offset:offset + limit], total=len(matches), regions=regions)
+        refreshed = max((item.checked_at or item.imported_at for item in items if item.checked_at or item.imported_at),
+                        default=None)
+        return CatalogPage(items=matches[offset:offset + limit], total=len(matches), regions=regions,
+                           refreshed_at=refreshed)
+
+    async def similar(self, innovation_id: str, limit: int) -> list[InnovationSummary]:
+        """Nearest public cards to this card's dense vector, to spot overlapping work."""
+        ids = await self.store.similar_cards(innovation_id, limit=limit)
+        found = await self.store.get_innovations(ids)
+        return [found[i] for i in ids if i in found]
 
     async def retrieve(
             self,

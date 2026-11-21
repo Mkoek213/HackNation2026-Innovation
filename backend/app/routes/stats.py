@@ -9,7 +9,12 @@ from app.exceptions import ValidationError
 from app.repos.project_repo import ParticipantsLevel
 from app.repos.stats_repo import StatsRepo
 from app.schemas.default import NOT_FOUND
+from app.modules.knowledge.errors import KnowledgeError
+from app.modules.knowledge.schemas import InnovationSummary
+from app.modules.knowledge.service import get_knowledge_service
+from app.modules.knowledge.taxonomy import AUDIENCE_LABELS, CATEGORY_LABELS, MATURITY_LABELS
 from app.schemas.stats import (
+    CatalogUse,
     InnovationRankList,
     LocationStatsCollection,
     LocationStatsList,
@@ -82,7 +87,28 @@ async def get_site_stats(
     and the number of registered users. Admin only. \\
     A person is the logged-in user, otherwise the anonymous visitor.
     """
-    return await StatsRepo(db).site(period)
+    stats = await StatsRepo(db).site(period)
+    await label_catalog(stats.catalog)
+    return stats
+
+
+async def label_catalog(events: list[CatalogUse]) -> None:
+    """Card titles from the knowledge store and taxonomy labels for filter values."""
+    labels = {"area": {"technologia": "Technologia", "edukacja": "Edukacja", "administracja": "Administracja"},
+              "maturity": MATURITY_LABELS, "category": CATEGORY_LABELS, "audience": AUDIENCE_LABELS,
+              "min_credibility": {str(n): f"co najmniej {n}/5" for n in range(1, 6)}, "confirmed_only": {"true": "tak"}}
+    titles: dict[str, InnovationSummary] = {}
+    cards = [e.value for e in events if e.kind == "karta"]
+    if cards:
+        try:
+            titles = await (await get_knowledge_service()).store.get_innovations(cards)
+        except KnowledgeError:
+            pass  # statistics still load without the knowledge store; ids stay visible
+    for event in events:
+        if event.kind == "karta":
+            event.label = titles[event.value].title if event.value in titles else event.value
+        else:
+            event.label = str(labels.get(event.kind, {}).get(event.value, event.value))
 
 
 @router.get("/workspace",

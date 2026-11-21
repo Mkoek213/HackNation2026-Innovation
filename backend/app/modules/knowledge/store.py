@@ -10,15 +10,18 @@ chunks (evidence, exact terms). The service groups chunks by innovation and fuse
 rankings, so an innovation with many long reports does not outrank a better-fitting one
 just by having more text.
 """
+import logging
 import uuid
 from dataclasses import dataclass
 from typing import Any
 
 from qdrant_client import AsyncQdrantClient, models
+from qdrant_client.http.exceptions import UnexpectedResponse
 
 from .schemas import DocumentRole, InnovationMeta, InnovationSummary
 from .taxonomy import Category
 
+logger = logging.getLogger(__name__)
 SUBMITTED = "zgloszone"  # user submission awaiting staff review: hidden from the catalog and chat
 DENSE = "dense"
 SPARSE = "bm25"
@@ -234,6 +237,30 @@ class QdrantStore:
             with_payload=["innovation_id"],
         )
         return [(p.payload["innovation_id"], p.score) for p in result.points]
+
+    async def dense_vectors(self, ids: list[str]) -> dict[str, list[float]]:
+        if not ids:
+            return {}
+        points = await self.client.retrieve(self.collection, ids=ids, with_vectors=[DENSE], with_payload=False)
+        return {str(p.id): p.vector[DENSE] for p in points if isinstance(p.vector, dict) and p.vector.get(DENSE)}
+
+    async def set_dense(self, vectors: dict[str, list[float]]) -> None:
+        if not vectors:
+            return
+        await self.client.update_vectors(self.collection, points=[models.PointVectors(id=i, vector={DENSE: v})
+                                                                  for i, v in vectors.items()], wait=True)
+
+    async def similar_cards(self, innovation_id: str, limit: int) -> list[str]:
+        flt = self._filter("card", None)
+        flt.must_not.append(_match("innovation_id", innovation_id))
+        try:
+            # A point id as the query searches with that point's stored vector.
+            result = await self.client.query_points(self.collection, query=point_id(innovation_id, "card"), using=DENSE,
+                                                    query_filter=flt, limit=limit, with_payload=["innovation_id"])
+        except UnexpectedResponse as exc:  # card without a dense vector (embedding was unavailable)
+            logger.info("No similar cards for %s: %s", innovation_id, exc)
+            return []
+        return [p.payload["innovation_id"] for p in result.points]
 
     @staticmethod
     def _prefetch(dense, sparse, limit: int, flt: models.Filter) -> list[models.Prefetch]:

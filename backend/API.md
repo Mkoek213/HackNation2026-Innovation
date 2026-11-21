@@ -160,8 +160,8 @@ no matter how many follow-up messages or tag/subtag rows it has. Admins are not 
 
 | Method | Path | Access | Description |
 |---|---|---|---|
-| POST | `/visits` | public | `{path}` (must start with `/`; the query string and fragment are dropped) → 201 `{id, path, created_at}`; the frontend calls it on each page view |
-| GET | `/stats/site` | admin | `{visits, unique_visitors, conversations, registered_users, series[{date, visits, unique_visitors, conversations}]}`; `registered_users` is all-time |
+| POST | `/visits` | public | `{path}` (must start with `/`; the query string and fragment are dropped) → 201 `{id, path, created_at}`; the frontend calls it on each page view, and for anonymous catalog events with the path `/_radar/<kind>/<value>` (never the typed search text) |
+| GET | `/stats/site` | admin | `{visits, unique_visitors, conversations, registered_users, series[{date, visits, unique_visitors, conversations}], catalog[{kind, value, label, views, people}]}`; `registered_users` is all-time; `catalog` counts catalog events (card opens `karta`, chosen filters by name), which are kept out of page views |
 | GET | `/stats/workspace` | admin | The logged-in chat on `/`: `{threads, unique_users, operations, processing, completed, failed, outcomes{matched, no_match, unavailable}, series[{date, threads, operations, matched, no_match, unavailable}]}`. Threads count by `conversations.created_at` where `workspace` is true; questions (one per `chat_operations` row) count by `chat_operations.created_at`. Outcomes come from `chat_operations.result.outcome` (`unavailable` rows have status `failed`); the tag `no_answer` count uses `conversations.outcome`, which workspace threads now also set. |
 | GET | `/stats/innovations` | admin | Paginated ranking of knowledge-base innovations shown in the workspace chat, items `{innovation_id, title, unique_searchers, times_shown, opened}`, ordered by `unique_searchers`, `times_shown`, `opened`; counted by `innovation_matches.created_at`; `total` is the number of innovations shown at least once |
 | GET | `/stats/tags` | admin | `{total, items}` of every tag (zeros for unused) with nested subtags, each `{conversations, unique_people, no_answer}`, most searched first; counted by `conversations.created_at` |
@@ -251,8 +251,10 @@ with its own `X-Admin-Token` write protection; see its [README](app/modules/know
 institution types, deployment levels, audiences, development paths), the five assessment criteria with their meaning
 and the current `criteria_version`; `GET /api/v1/knowledge/categories` returns the sectors only.
 
-`GET /api/v1/knowledge/catalog` returns `{items, total, regions}` and accepts `q`, `category`,
-`area`, `region`, `maturity`, `confirmed_only`, `min_credibility` (1-5), `offset` and `limit`.
+`GET /api/v1/knowledge/catalog` returns `{items, total, regions, refreshed_at}` and accepts `q`, `category`,
+`area`, `audience`, `region`, `maturity`, `confirmed_only`, `min_credibility` (1-5), `offset` and `limit`.
+`audience` keeps cards whose assessment recommends that FAQ target group; `refreshed_at` is the latest source check of any public card.
+`GET /api/v1/knowledge/innovations/{id}/similar?limit=4` returns the closest public cards by the card's dense vector, to spot similar solutions and duplicated work; it is empty for a card without a dense vector.
 It returns candidates and confirmed records, strongest evidence first (confirmed, then credibility, then deployment level).
 `q` also matches the Polish assessment summary. The existing unpaginated list still serves administration. Cards expose `area`, `region`, `verification`, `checked_at` and `assessment`.
 Confirmed use requires a supported stage and an implementation criterion with an HTTP(S) source.
@@ -262,7 +264,8 @@ Admin-only `POST /api/v1/knowledge/innovations/{id}/assess` scores the card agai
 (`app/modules/knowledge/assess.py`): credibility by fixed rules, the other criteria, `summary`, `recipients`, `path`,
 `measures` and `next_step` as Gemini estimates with basis `szacunek` and a quote checked against the card text.
 A field is replaced only while it is empty or still equals the previous automatic proposal, so staff edits and
-source-confirmed notes survive. Candidates also take the estimated `maturity`. 503 when Gemini is unavailable.
+source-confirmed notes survive. Candidates also take the estimated `maturity`. When Gemini is unavailable only the
+rule-based credibility is stored, every other note stays, and the route returns 429 (quota or overload) or 503.
 `backend/scripts/assess_innovations.py` runs it for every card not yet on the current `criteria_version`.
 
 Admin-only `PUT /api/v1/knowledge/innovations/{id}/refresh` accepts card metadata as JSON

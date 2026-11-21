@@ -468,6 +468,13 @@ export function DocumentsView() {
       </Tabs.Panel>
       <Tabs.Panel value="edit" keepMounted tabIndex={-1} className={styles.modePanel}>
         <p className={styles.modeLead}>Wybierz innowację, aby poprawić jej kartę lub zastąpić dokumenty.</p>
+        {innovations.some(item => item.verification === "zgloszone") && <section className={styles.pending} aria-labelledby="pending-title">
+          <h2 id="pending-title">Zgłoszenia czekające na przegląd</h2>
+          <p className="field-help">Ukryte w bazie i w rozmowie. Sprawdź źródło, popraw kartę i zmień weryfikację na „Kandydat” albo „Potwierdzone użycie”.</p>
+          <ul>{innovations.filter(item => item.verification === "zgloszone").map(item => <li key={item.id}>
+            <Button size="sm" variant="outline" onClick={() => setSelected(item.id)} disabled={editBusy}>{item.title}</Button>
+          </li>)}</ul>
+        </section>}
         <label className={`field-block ${styles.picker}`}>Innowacja
           <select className="select" value={selected} onChange={e => setSelected(e.target.value)} disabled={editBusy}>
             <option value="" disabled>{innovations.length > 0 ? "Wybierz innowację" : "Brak innowacji w bazie wiedzy"}</option>

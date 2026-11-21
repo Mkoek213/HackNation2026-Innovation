@@ -10,6 +10,11 @@ import { TopicCharts, TrendChange } from "./topic-charts";
 
 const defaultDays = 30;
 
+const catalogFilters: Record<string, string> = {
+  area: "Obszar", audience: "Dla kogo", region: "Województwo", maturity: "Poziom wdrożenia",
+  min_credibility: "Wiarygodność", category: "Sektor", confirmed_only: "Tylko potwierdzone wdrożenia",
+};
+
 function utcDay(date: Date) { return date.toISOString().slice(0, 10); }
 function defaultPeriod(): Period {
   const today = new Date();
@@ -161,6 +166,22 @@ export function AnalyticsView() {
             item.title, formatNumber(item.unique_searchers), formatNumber(item.times_shown), formatNumber(item.opened),
           ])} />
           : <p className={styles.empty}>W tym okresie czat nie zaproponował żadnej innowacji.</p>}
+      </Block>
+
+      <Block id="catalog-title" title="Baza innowacji" lead="Anonimowe dane z wyszukiwarki: które karty ludzie otwierają i jakie filtry wybierają. Wpisywane frazy nie są zapisywane.">
+        {(() => {
+          const cards = stats.site.catalog.filter(item => item.kind === "karta").slice(0, 10);
+          const filters = stats.site.catalog.filter(item => item.kind !== "karta" && catalogFilters[item.kind]).slice(0, 15);
+          if (!cards.length && !filters.length) return <p className={styles.empty}>W tym okresie nikt nie korzystał z bazy innowacji.</p>;
+          return <>
+            {cards.length > 0 && <><h3 className={styles.subhead}>Najczęściej oglądane karty</h3>
+              <Table caption="Najczęściej oglądane karty" head={["Innowacja", "Osoby", "Otwarcia"]}
+                rows={cards.map(item => [item.label, formatNumber(item.people), formatNumber(item.views)])} /></>}
+            {filters.length > 0 && <><h3 className={styles.subhead}>Najczęściej wybierane obszary i filtry</h3>
+              <Table caption="Najczęściej wybierane obszary i filtry" head={["Filtr", "Osoby", "Wybrania"]}
+                rows={filters.map(item => [`${catalogFilters[item.kind]}: ${item.label}`, formatNumber(item.people), formatNumber(item.views)])} /></>}
+          </>;
+        })()}
       </Block>
     </div>}
   </section>;

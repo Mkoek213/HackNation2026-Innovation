@@ -12,6 +12,7 @@ agree on SQLite and PostgreSQL.
 """
 import datetime as dt
 from typing import Any
+from urllib.parse import unquote
 
 from sqlalchemy import ColumnElement, Date, String, and_, case, cast, distinct, func, literal_column, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -52,6 +53,7 @@ from app.schemas.stats import (
     ProjectRank,
     ProjectRankList,
     ProjectStats,
+    CatalogUse,
     SiteDay,
     SiteStats,
     SubtagStats,
@@ -111,6 +113,18 @@ def person_key(user_id: ColumnElement, visitor_id: ColumnElement) -> ColumnEleme
 
 CONVERSATION_PERSON = person_key(Conversation.user_id, Conversation.visitor_id)
 VISIT_PERSON = person_key(Visit.user_id, Visit.visitor_id)
+#: Catalog events reported as visits (`/_radar/<kind>/<value>`); kept out of page-view counts.
+CATALOG_EVENTS = "/_radar/"
+PAGE_VIEW = ~Visit.path.startswith(CATALOG_EVENTS)
+
+
+def parse_catalog_event(path: str) -> tuple[str, str] | None:
+    kind, _, value = unquote(path.removeprefix(CATALOG_EVENTS)).partition("/")
+    return (kind, value) if path.startswith(CATALOG_EVENTS) and kind and value else None
+
+
+assert parse_catalog_event("/_radar/region/podkarpackie%20x") == ("region", "podkarpackie x")
+assert parse_catalog_event("/_radar/karta") is None and parse_catalog_event("/baza") is None
 
 
 def in_period(column: ColumnElement, period: Period) -> ColumnElement[bool]:
@@ -169,7 +183,7 @@ class StatsRepo:
         day = utc_date(Visit.created_at)
         visit_rows = (await self.db.execute(
             select(day, func.count(Visit.id), _count_distinct(VISIT_PERSON))
-            .where(in_period(Visit.created_at, period))
+            .where(in_period(Visit.created_at, period), PAGE_VIEW)
             .group_by(day)
         )).all()
         visits_by_day = {d: (n, people) for d, n, people in visit_rows}
@@ -183,8 +197,16 @@ class StatsRepo:
 
         totals = (await self.db.execute(
             select(func.count(Visit.id), _count_distinct(VISIT_PERSON))
-            .where(in_period(Visit.created_at, period))
+            .where(in_period(Visit.created_at, period), PAGE_VIEW)
         )).one()
+        views = func.count(Visit.id)
+        catalog_rows = (await self.db.execute(
+            select(Visit.path, views, _count_distinct(VISIT_PERSON))
+            .where(in_period(Visit.created_at, period), ~PAGE_VIEW)
+            .group_by(Visit.path).order_by(views.desc(), Visit.path).limit(100)
+        )).all()
+        catalog = [CatalogUse(kind=event[0], value=event[1], views=n, people=people)
+                   for path, n, people in catalog_rows if (event := parse_catalog_event(path))]
         registered = await self.db.scalar(select(func.count(User.id)).where(User.role == UserRole.user))
 
         return SiteStats(
@@ -193,6 +215,7 @@ class StatsRepo:
             unique_visitors=totals[1],
             conversations=sum(conv_by_day.values()),
             registered_users=registered,
+            catalog=catalog,
             series=[
                 SiteDay(
                     date=d,

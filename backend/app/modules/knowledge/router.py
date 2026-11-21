@@ -28,7 +28,6 @@ from .schemas import (
     Deleted,
     IngestResult,
     InnovationArea,
-    InnovationAssessment,
     InnovationDraft,
     InnovationMeta,
     InnovationSummary,
@@ -38,7 +37,8 @@ from .assess import AssessmentUnavailable, assess, credibility
 from .service import KnowledgeService, get_knowledge_service
 from .settings import load_knowledge_settings
 from .taxonomy import (ASSESSMENT_CRITERIA, AUDIENCE_LABELS, CATEGORY_LABELS, CRITERIA_VERSION,
-                       INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS, PATH_LABELS, Category, Maturity)
+                       INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS, PATH_LABELS, Audience, Category,
+                       Maturity)
 
 ADMIN_TOKEN_HEADER = "X-Admin-Token"
 
@@ -155,11 +155,12 @@ async def list_innovations(service: Service, admin: Admin, category: Category | 
 async def catalog(service: Service, q: str = Query(default="", max_length=200), category: Category | None = None,
                   area: InnovationArea | None = None, region: str | None = Query(default=None, max_length=60),
                   maturity: Maturity | None = None, confirmed_only: bool = False,
-                  min_credibility: int | None = Query(default=None, ge=1, le=5),
+                  min_credibility: int | None = Query(default=None, ge=1, le=5), audience: Audience | None = None,
                   offset: int = Query(default=0, ge=0), limit: int = Query(default=24, ge=1, le=100)):
+    """`audience` keeps cards whose assessment recommends that target group."""
     return await service.catalog(query=q, category=category, area=area, region=region, maturity=maturity,
                                  confirmed_only=confirmed_only, min_credibility=min_credibility,
-                                 offset=offset, limit=limit)
+                                 offset=offset, limit=limit, audience=audience)
 
 
 @router.put("/innovations/{innovation_id}/refresh", summary="Odśwież rekord źródłowy", **_admin)
@@ -185,7 +186,7 @@ async def assess_innovation(service: Service, innovation_id: InnovationId):
             proposed, maturity = await assess(item)
         except AssessmentUnavailable as exc:
             # The rule-based credibility needs no model; store it and report the rest as unavailable.
-            await service.apply_assessment(innovation_id, InnovationAssessment(credibility=credibility(item)), None)
+            await service.apply_credibility(innovation_id, credibility(item))
             code = status.HTTP_429_TOO_MANY_REQUESTS if exc.rate_limited else status.HTTP_503_SERVICE_UNAVAILABLE
             raise HTTPException(code, "Automatic assessment unavailable; credibility updated") from exc
         try:
@@ -224,6 +225,14 @@ async def get_innovation(service: Service, admin: Admin, innovation_id: Innovati
     if item.verification == "zgloszone" and not admin:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Innovation not found")
     return item
+
+
+@router.get("/innovations/{innovation_id}/similar", response_model=list[InnovationSummary],
+            summary="Podobne rozwiązania")
+async def similar_innovations(service: Service, innovation_id: InnovationId,
+                              limit: int = Query(default=4, ge=1, le=12)):
+    """Closest public cards by meaning, to spot similar solutions and duplicated work."""
+    return await service.similar(innovation_id, limit)
 
 
 @router.put("/innovations/{innovation_id}", response_model=IngestResult, summary="Dodaj lub zastąp innowację",

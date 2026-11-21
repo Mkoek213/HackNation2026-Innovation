@@ -392,6 +392,23 @@ html[data-contrast="high"] .starter { border-width: 2px; }
 .recommendation ul { margin: 0 0 12px; padding-left: 20px; list-style: disc; }
 .recommendation li + li { margin-top: 4px; }
 .recommendation-label { margin: 0 0 4px; font-size: 0.875rem; font-weight: 650; }
+.catalog-intro { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.sync-status { position: relative; flex: none; }
+.sync-status summary { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--navy); font-size: 0.875rem; font-weight: 600; cursor: pointer; list-style: none; }
+.sync-status summary::-webkit-details-marker { display: none; }
+.sync-status summary:hover { background: var(--slate-soft); }
+.sync-status summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.sync-status svg { color: var(--success); }
+.sync-panel { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(340px, calc(100vw - 32px)); padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 8px 24px rgb(22 50 92 / 0.12); font-size: 0.875rem; line-height: 1.5; }
+.sync-panel p { margin: 0 0 8px; max-width: none; font-size: 0.875rem; }
+.sync-panel ul { margin: 0; padding-left: 18px; list-style: disc; color: var(--ink-soft); }
+.similar ul { display: grid; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
+.similar button { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); text-align: left; cursor: pointer; }
+.similar button:hover { background: var(--slate-soft); }
+.similar button:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.similar-title { color: var(--navy); font-weight: 600; }
+.similar-meta { color: var(--ink-soft); font-size: 0.8125rem; }
+@media (max-width: 640px) { .sync-panel { right: auto; left: 0; } }
 .assessment-method { margin: 0 0 8px; font-size: 0.875rem; }
 .assessment-method summary { color: var(--navy); font-weight: 650; cursor: pointer; }
 .assessment-method dl { display: grid; gap: 6px; margin: 8px 0; }

@@ -84,7 +84,7 @@ Sources, filters and limitations are recorded in [the data source investigation]
 
 From the root, run `bash backend/scripts/refresh_innovations.sh --dry-run` to inspect source
 counts, or omit `--dry-run` to publish. Limit a run to one feed using `--source` with
-`deployments`, `fundusze`, `cordis`, `interreg` or `radon`. Run `assess_innovations.py` afterwards to score new cards. The wrapper uses the backend virtual environment,
+`deployments`, `fundusze`, `cordis`, `interreg` or `radon`. A publishing run then calls `assess_innovations.py`, which scores cards that have no assessment on the current criteria. The wrapper uses the backend virtual environment,
 the root `.env` and a local lock. The backend must be running. Output includes counts and
 per-source or per-record errors. A failed download leaves the last successful cards in place.
 
@@ -100,6 +100,7 @@ fields still matching the prior source version are eligible for refresh. The edi
 assessment and attachments persist. During an embedding outage, new and edited cards
 remain searchable by exact terms. Restore the Gemini key and reindex into a separate Qdrant
 collection with `scripts/reindex_knowledge.py` to rebuild dense vectors for those records.
+To fill only the missing card vectors in place, run `docker compose exec backend python scripts/backfill_dense.py`; an outage keeps the previous card vector, so only new cards lose it.
 
 ## Validation
 

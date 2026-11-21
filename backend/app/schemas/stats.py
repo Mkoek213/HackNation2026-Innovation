@@ -84,6 +84,15 @@ class SiteDay(BaseModel):
     conversations: int = Field(ge=0, examples=[9])
 
 
+class CatalogUse(BaseModel):
+    """A catalog event: a card opened (`karta`) or a filter chosen (its name), with how often."""
+    kind: str = Field(examples=["karta", "area"])
+    value: str = Field(examples=["deploy-eplatnosci", "edukacja"])
+    label: str = Field(default="", examples=["ePłatności"], description="Card title or filter value label.")
+    views: int = Field(ge=0, examples=[12])
+    people: int = Field(ge=0, examples=[5])
+
+
 class SiteStats(BaseModel):
     period: Period
     visits: int = Field(ge=0, examples=[420], description="Page views.")
@@ -91,6 +100,7 @@ class SiteStats(BaseModel):
     conversations: int = Field(ge=0, examples=[85], description="Conversations started.")
     registered_users: int = Field(ge=0, examples=[12], description="All accounts with the `user` role (not per period).")
     series: list[SiteDay]
+    catalog: list[CatalogUse] = Field(default_factory=list, description="Most frequent catalog card opens and filters.")
 
 
 # ============ tags ============

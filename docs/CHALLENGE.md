@@ -10,12 +10,13 @@ Use the FAQ to define the discovery product and the full brief for submission, e
 | --- | --- | --- |
 | FAQ §§1–4, 8.1–3 | Automatically find and organise existing Polish solutions in technology, education and administration | Five importers (European Funds 2014-2020, CORDIS, Interreg, RAD-on, deployment reports) gather about 1400 cards from 16 voivodeships; 10 deployment reports are verified by evidence phrases. |
 | FAQ §5, 8.4, 8.6 | Document deployment, novelty, readiness, applicability and credibility | Each card scores the five criteria 1-5 with basis `potwierdzone` or `szacunek` and a source; credibility follows fixed rules, the rest are Gemini estimates with checked quotes; deployment levels follow the FAQ stages. |
-| FAQ §§3, 8.5 | Search, filter and compare for different audiences | Search by need; filter by area, voivodeship, deployment level, credibility and sector; compare two cards side by side or in the assistant; recipients are typed by FAQ audience. |
-| FAQ §§4, 8.7 | Recurring source updates | The daily host job refreshes source records. Check repeat execution, editorial changes and source failures. |
-| FAQ §§6–7 | Discovery with optional usage analytics | No idea submission, social or funding features; reported candidates are existing solutions hidden until staff review. Admin analytics use anonymous visit ids. |
+| FAQ §§3, 8.5 | Search, filter and compare for different audiences | Search by need; filter by area, target group ("Dla kogo", all six FAQ groups), voivodeship, deployment level, credibility and sector; compare two cards side by side or in the assistant. |
+| FAQ §§4, 8.7 | Recurring source updates | The daily job (`refresh_innovations.sh`, 04:15) refreshes source records and then assesses new cards; the catalog shows the next run and the last check. |
+| Full brief §3 | Similar solutions and less duplicated work | Each card lists the four closest cards by meaning ("Podobne rozwiązania"); the chat compares a card with alternatives. |
+| FAQ §§6–7 | Discovery with optional usage analytics | No idea submission, social or funding features; reported candidates are existing solutions hidden until staff review in Dokumenty. Admin analytics show chat topics, cards proposed in chat, cards opened in the catalog and chosen filters, all by anonymous visit ids and never with typed search text. |
 | Full brief §§3, 6.4–5 | Explain a transfer or deployment path and how to measure it | Card section "Potencjalni odbiorcy i ścieżka": path, recipients, first step and measures; the chat adds addressee, condition and metric. |
 | Full brief §§5, 9 | Sources, assumptions, security, integration and scaling | See [data sources](DATA-SOURCES.md), [API](../backend/API.md) and [operations](DEVELOPMENT.md). |
-| FAQ §8.8–9, full brief §6 | Validate examples and measure usefulness | Compare two timed discovery tasks against source browsing. Count deployments started from Radar during a PCI rollout. |
+| FAQ §8.8–9, full brief §6 | Validate examples and measure usefulness | Two timed discovery tasks against the raw sources (below). Count deployments started from Radar during a PCI rollout. |
 | Full brief §4 | Submission and demonstration | Polish title and description, PDF presentation up to 10 slides, public video up to 3 minutes. |
 
 ## Organisation
@@ -78,10 +79,24 @@ Evaluate on at least two example use cases.
 ### Local validation record
 
 On 2026-11-21 the local catalog held 1402 cards: 10 confirmed deployment reports, 500 European Funds projects, 400 CORDIS projects, 172 Interreg projects and 320 RAD-on projects, covering all 16 voivodeships.
-The catalog search, filters, comparison and card dialog were checked in a browser at desktop width and at 390 px.
-A candidate reported through the creator code path was stored as `zgloszone` and was absent from the public list, the detail route, the catalog and chat retrieval, while staff could read it.
-The Gemini key in the local `.env` was rejected (`API_KEY_INVALID`), so only the rule-based credibility was scored; model estimates, dense embeddings and live chat answers remain unverified until a valid key is set.
-A timed comparison against manual search and an evaluation with target users are pending.
+All 1402 cards were assessed with `kryteria-2026-11` by `gemini-3.5-flash-lite`.
+In the browser, at desktop width and at 390 px, the following worked: catalog search, all filters including the target group, comparison, the card dialog with similar solutions, the sync badge and the catalog analytics.
+The chat answered the two demo cases (ePłatności and EZD RP) with an addressee, a first condition and a measure.
+A candidate reported through the chat creator was stored as `zgloszone`, was absent from the public list, detail route, catalog and chat retrieval, and became public after staff changed it to `kandydat` in Dokumenty.
+The project's prepaid Gemini credits then ran out (HTTP 402), which stopped the chat, the assessment and new embeddings.
+A second assessment run during that outage cleared the notes of 581 cards and the dense vectors of 747 cards; both causes are fixed, and the data is restored by `assess_innovations.py` (without `--force`) and `backfill_dense.py` once credits are available.
+
+### Time to find an existing solution
+
+Measured on 2026-11-21 on the same machine for two tasks: a municipality looking for online payment of office fees, and a school looking for a robotics programme already used in schools.
+
+| Step | Radar | Raw sources |
+| --- | --- | --- |
+| Get the data | Already gathered and assessed | European Funds list: 62 MB XLSX, 10 s download; CORDIS: 38 MB zip, 7 s; Interreg and RAD-on separately |
+| Search | One query, 0.5 s (`płatności urzędowe`, `robotyka szkoły`) | 103 829 European Funds rows to filter; a title filter gives 32 and 16 rows, mostly company R&D |
+| First relevant result | ePłatności and RaP STEAM in the top three, with confirmed use and source | No deployment status, area or assessment; every row needs a separate check |
+
+This is a proxy: it counts data handling and steps, not a timed session with target users, which is still pending.
 
 Submission files: [description](../submission/opis.md), [eight-slide PDF](../submission/radar-innowacji.pdf)
 and [local demonstration](../submission/radar-demo.mp4).

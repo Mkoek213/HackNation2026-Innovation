@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Search } from "@/components/ui/icons";
+import { useEffect, useState } from "react";
+import { RefreshCw, Search } from "@/components/ui/icons";
+import { recordVisit } from "@/features/workspace";
 import { Button } from "@/components/ui/button";
 import { getCatalog, getTaxonomy, innovationAreas, type Innovation } from "./api";
 import { CompareInnovations, InnovationGrid } from "./innovations";
@@ -14,7 +15,37 @@ function Status({ data, what }: { data: unknown; what: string }) {
 }
 
 const pageSize = 24;
-const defaults = { q: "", category: "", area: "", region: "", maturity: "", min_credibility: "", confirmed_only: "" };
+const defaults = { q: "", category: "", area: "", audience: "", region: "", maturity: "", min_credibility: "", confirmed_only: "" };
+// Matches the daily cron in docs/DEVELOPMENT.md (local time).
+const SYNC_HOUR = 4, SYNC_MINUTE = 15;
+const SOURCES = ["Raporty wdrożeń (gov.pl i samorządy)", "Fundusze Europejskie 2014-2020", "CORDIS Horyzont Europa", "Interreg 2021-2027", "RAD-on (projekty uczelni)"];
+const longDate = new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" });
+
+function nextSync(now: Date) {
+  const next = new Date(now);
+  next.setHours(SYNC_HOUR, SYNC_MINUTE, 0, 0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  return next;
+}
+
+/** Corner badge for the scheduled source refresh; rendered only after data loads, so the clock is client-side. */
+function SyncStatus({ refreshedAt }: { refreshedAt: string | null }) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(timer);
+  }, []);
+  const minutes = Math.max(1, Math.ceil((nextSync(now).getTime() - now.getTime()) / 60000));
+  const left = minutes >= 60 ? `${Math.floor(minutes / 60)} godz. ${minutes % 60} min` : `${minutes} min`;
+  return <details className="sync-status">
+    <summary><RefreshCw aria-hidden="true" size={15} />Synchronizacja źródeł za {left}</summary>
+    <div className="sync-panel">
+      <p>Codziennie o {SYNC_HOUR}:{String(SYNC_MINUTE).padStart(2, "0")} Radar pobiera nowe i zmienione rekordy, ponownie sprawdza dowody wdrożeń i ocenia nowe karty według kryteriów.</p>
+      {refreshedAt && <p><strong>Ostatnia synchronizacja:</strong> {longDate.format(new Date(refreshedAt))}</p>}
+      <ul>{SOURCES.map(source => <li key={source}>{source}</li>)}</ul>
+    </div>
+  </details>;
+}
 
 /** `preset` comes from the URL (?area=…, ?region=…, ?q=…), e.g. links on the home page. */
 export function InnovationsPage({ preset = {} }: { preset?: Record<string, string | string[] | undefined> }) {
@@ -36,6 +67,8 @@ export function InnovationsPage({ preset = {} }: { preset?: Record<string, strin
   const regions = (regionPage ? regionPage.regions : (filters.region ? [filters.region] : [])).toSorted((a, b) => a.localeCompare(b, "pl"));
 
   function setFilter(name: keyof typeof defaults, value: string) {
+    // Anonymous usage analytics: which filters people choose (never the typed search text).
+    if (value && name !== "q") void recordVisit(`/_radar/${name}/${encodeURIComponent(value)}`);
     setFilters(current => ({
       ...current, [name]: value,
       ...(name === "confirmed_only" ? { region: "" } : {}),
@@ -49,9 +82,12 @@ export function InnovationsPage({ preset = {} }: { preset?: Record<string, strin
       : [...items.slice(0, 1), item]);
   }
   return <>
-    <header className="page-intro">
-      <h1>Baza innowacji</h1>
-      <p>Znajdź polskie rozwiązania, sprawdź dowody ich zastosowania i oceń, czy sprawdzą się w Twojej instytucji.</p>
+    <header className="page-intro catalog-intro">
+      <div>
+        <h1>Baza innowacji</h1>
+        <p>Znajdź polskie rozwiązania, sprawdź dowody ich zastosowania i oceń, czy sprawdzą się w Twojej instytucji.</p>
+      </div>
+      {regionPage && <SyncStatus refreshedAt={regionPage.refreshed_at} />}
     </header>
     {taxonomy === false && <Status data={false} what="sektorów" />}
     {taxonomy && <div className="filter-bar">
@@ -66,6 +102,7 @@ export function InnovationsPage({ preset = {} }: { preset?: Record<string, strin
       <div className="chip-row">
         {([
           ["area", "Obszar", Object.entries(innovationAreas)],
+          ["audience", "Dla kogo", Object.entries(taxonomy.audiences)],
           ["region", "Województwo", regions.map(region => [region, region])],
           ["maturity", "Poziom wdrożenia", Object.entries(taxonomy.maturity)],
           ["min_credibility", "Wiarygodność", [["3", "co najmniej 3/5"], ["4", "co najmniej 4/5"], ["5", "5/5"]]],

@@ -35,4 +35,5 @@ const knowledge = <T,>(path: string) => api<T>(`api/v1/knowledge/${path}`);
 export const getInnovations = () => knowledge<Innovation[]>("innovations");
 export const getTaxonomy = () => knowledge<Taxonomy>("taxonomy");
 export const getCatalog = (params: string) =>
-  knowledge<{ items: Innovation[]; total: number; regions: string[] }>(`catalog?${params}`);
+  knowledge<{ items: Innovation[]; total: number; regions: string[]; refreshed_at: string | null }>(`catalog?${params}`);
+export const getSimilar = (id: string) => knowledge<Innovation[]>(`innovations/${id}/similar`);

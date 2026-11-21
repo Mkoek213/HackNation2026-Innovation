@@ -107,6 +107,7 @@ class Audience(StrEnum):
     SCHOOL = "szkola"
     COMPANY = "przedsiebiorstwo"
     INVESTOR = "inwestor"
+    INNOVATOR = "innowator"
 
 
 AUDIENCE_LABELS: dict[Audience, str] = {
@@ -115,7 +116,8 @@ AUDIENCE_LABELS: dict[Audience, str] = {
     Audience.UNIVERSITY: "Uczelnia lub jednostka naukowa",
     Audience.SCHOOL: "Szkoła lub placówka edukacyjna",
     Audience.COMPANY: "Przedsiębiorstwo lub startup",
-    Audience.INVESTOR: "Inwestor",
+    Audience.INVESTOR: "Inwestor lub podmiot komercyjny",
+    Audience.INNOVATOR: "Indywidualny innowator lub wynalazca",
 }
 
 

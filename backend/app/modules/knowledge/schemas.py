@@ -184,6 +184,7 @@ class CatalogPage(BaseModel):
     items: list[InnovationSummary]
     total: int
     regions: list[str]
+    refreshed_at: dt.date | None = Field(default=None, description="Latest source check of any public card")
 
 
 class CategoriesUpdate(BaseModel):
