@@ -79,6 +79,9 @@ REVIEW = (
     "Brak dopasowania w wynikach nie oznacza, że nigdzie nie ma podobnej innowacji. Usuń takie kategoryczne deklaracje. "
     "Jeżeli szkic zgłoszenia został utworzony, krótko przedstaw wynik rzeczywistego porównania z podobnymi innowacjami. "
     "Nie podawaj liczb z pamięci ani z historycznych wypowiedzi asystenta. "
+    "assessments zawiera zapisaną ocenę Radaru dla odczytanych kart (kryteria 1-5 z podstawą, ścieżka, odbiorcy, mierniki, pierwszy krok). "
+    "Gdy prośba dotyczy wdrożenia, wyboru lub porównania rozwiązań, użyj jej: podaj ścieżkę, pierwszy krok z warunkiem startu i jeden miernik efektu. "
+    "Ocenę z basis=szacunek przedstaw jako szacunek Radaru, a z basis=potwierdzone jako potwierdzoną źródłem; kandydat (verification=kandydat) wymaga sprawdzenia. "
     "Odpowiedź ma być zwięzła, praktyczna i zgodna z bieżącą prośbą."
 )
 
@@ -103,6 +106,16 @@ PUBLIC_TOOLS = [types.Tool(function_declarations=[types.FunctionDeclaration(name
     parameters_json_schema=PublicReply.model_json_schema())])]
 
 
+def radar_assessment(meta):
+    """The card's stored Radar assessment, compact: criteria scores with basis, path, recipients and measures."""
+    a = meta.assessment
+    notes = {name: {"score": note.score, "basis": note.basis} for name in ("implementation", "novelty", "transfer", "credibility")
+             if (note := getattr(a, name))}
+    return {"verification": meta.verification, "maturity": meta.maturity and meta.maturity.value, "trl": a.trl, "criteria": notes,
+            "path": a.path and a.path.value, "path_rationale": a.path_rationale,
+            "recipients": [r.model_dump(mode="json") for r in a.recipients], "measures": a.measures, "next_step": a.next_step}
+
+
 async def review_answer(provider, draft, *, contents, guide, retrieval, artifacts, sources, max_bytes, required_question=None):
     evidence = {}
     for i, (meta, _, _) in retrieval.candidates.items():
@@ -121,7 +134,8 @@ async def review_answer(provider, draft, *, contents, guide, retrieval, artifact
               "previous_assistant_answer": previous_answer[:1500],
               "facts": guide.facts, "evidence": evidence,
               "search_status": retrieval.search_status, "selected_matches": [m.model_dump(mode="json", include={"id", "title", "fit_reason", "limitations"}) for m in retrieval.matches],
-              "saved_documents": artifacts.written, "required_question": required_question}
+              "saved_documents": artifacts.written, "required_question": required_question,
+              "assessments": {i: radar_assessment(meta) for i, (meta, _, _) in retrieval.candidates.items()}}
     # The review receives bounded real excerpts; its validation still uses the
     # complete turn-local evidence. Long PDF reads must not crowd out the request.
     packet["evidence"] = {i: {"title": source["title"], "url": source.get("url"),
@@ -227,7 +241,10 @@ def render_reply(reply, evidence, retrieval, artifacts):
     elif retrieval.search_status == "empty":
         blocks.append("Nie znalazłem w naszej bazie rozwiązania odpowiadającego tej potrzebie.")
     elif retrieval.search_status and not retrieval.matches:
-        blocks.append("Nie znalazłem w bazie rozwiązania, które do tego pasuje.")
+        described = any(fact.source_id in retrieval.candidates for fact in reply.documented_facts)
+        # Describing retrieved cards while denying any result would contradict the answer above.
+        blocks.append("To najbliższe projekty w bazie, ale żaden nie spełnia w pełni tych warunków; traktuj je jako kandydatów do sprawdzenia."
+                      if described else "Nie znalazłem w bazie rozwiązania, które do tego pasuje.")
     if reply.question:
         blocks.append(reply.question)
     return "\n\n".join(dict.fromkeys(blocks)) or "Co chcesz zmienić lub zorganizować?"
