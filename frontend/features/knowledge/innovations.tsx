@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Building, ExternalLink, FileText, Play } from "@/components/ui/icons";
-import { innovationAreas, type Assessment, type Innovation, type Taxonomy } from "./api";
+import { innovationAreas, type Assessment, type AssessmentNote, type Innovation, type Taxonomy } from "./api";
 import { AREAS, areaOf } from "./category-areas";
 
 function youtubeId(url: string | null) {
@@ -26,17 +26,17 @@ export function InnovationGrid({ innovations, taxonomy, selected, onToggle }: {
 }) {
   const labels = taxonomy.sectors;
   const [open, setOpen] = useState<Innovation | null>(null);
-  const shown = AREAS.filter(area => innovations.some(item => areaOf(item.primary_category) === area.id));
+  const shown = AREAS.filter(area => innovations.some(item => areaOf(item.area) === area.id));
   return <>
-    {shown.length > 1 && <ul className="area-legend" aria-label="Kolor paska karty oznacza obszar">
+    {shown.length > 1 && <ul className="area-legend" aria-label="Kolor paska karty oznacza obszar zastosowania">
       {shown.map(area => <li key={area.id} data-area={area.id}>{area.label}</li>)}
     </ul>}
     <ul className="innovation-grid">
       {innovations.map(item => <li key={item.id}>
-        <button type="button" className="innovation-card" data-area={areaOf(item.primary_category)} onClick={() => setOpen(item)} aria-haspopup="dialog">
-          <span className="innovation-category">{labels[item.primary_category] ?? item.primary_category}</span>
+        <button type="button" className="innovation-card" data-area={areaOf(item.area)} onClick={() => setOpen(item)} aria-haspopup="dialog">
+          <span className="innovation-category">{item.area ? innovationAreas[item.area] : labels[item.primary_category] ?? item.primary_category}</span>
           <span className="innovation-title">{item.title}</span>
-          <span className="innovation-solution">{item.card.solution || item.card.problem}</span>
+          <span className="innovation-solution">{item.assessment.summary || item.card.solution || item.card.problem}</span>
           <span className="innovation-meta">
             {item.institution && <span><Building aria-hidden="true" size={14} />{item.institution}</span>}
             {item.maturity && <span>{taxonomy.maturity[item.maturity] ?? item.maturity}</span>}
@@ -45,37 +45,74 @@ export function InnovationGrid({ innovations, taxonomy, selected, onToggle }: {
             {item.documents.length > 0 && <span><FileText aria-hidden="true" size={14} />Dokumenty: {item.documents.length}</span>}
           </span>
         </button>
-        {item.verification === "potwierdzona" && <label className="flex items-center gap-2 p-2">
+        <label className="flex items-center gap-2 p-2">
           <input type="checkbox" checked={selected.some(entry => entry.id === item.id)}
             disabled={selected.length === 2 && !selected.some(entry => entry.id === item.id)}
             aria-label={`Wybierz do porównania: ${item.title}`}
             onChange={() => onToggle(item)} />
           Wybierz do porównania
-        </label>}
+        </label>
       </li>)}
     </ul>
     {open && <InnovationDialog innovation={open} taxonomy={taxonomy} onClose={() => setOpen(null)} />}
   </>;
 }
 
-function AssessmentRows({ assessment }: { assessment: Assessment }) {
-  const criteria = [
-    ["Etap i dowód zastosowania", assessment.implementation],
-    ["Nowość", assessment.novelty],
-    ["Możliwość zastosowania w innej instytucji", assessment.transfer],
-    ["Wiarygodność dowodów", assessment.credibility],
-    ...(assessment.trl !== null ? [[`Dojrzałość technologiczna · TRL ${assessment.trl}/9`, assessment.trl_basis] as const] : []),
-  ] as const;
-  return <dl className="innovation-facts">
-    {criteria.map(([label, note]) => {
+const date = new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" });
+
+function AssessmentRows({ assessment, taxonomy }: { assessment: Assessment; taxonomy: Taxonomy }) {
+  const label = (key: keyof Taxonomy["criteria"]) => taxonomy.criteria[key]?.[0] ?? key;
+  const criteria: [string, AssessmentNote | null, string][] = [
+    [label("implementation"), assessment.implementation, ""],
+    ...(assessment.trl !== null ? [[label("trl"), assessment.trl_basis, `TRL ${assessment.trl}/9`] as [string, AssessmentNote | null, string]] : []),
+    [label("novelty"), assessment.novelty, ""],
+    [label("transfer"), assessment.transfer, ""],
+    [label("credibility"), assessment.credibility, ""],
+  ];
+  return <dl className="innovation-facts assessment-rows">
+    {criteria.map(([term, note, extra]) => {
       const evidence = httpLink(note?.source_url ?? null);
-      return <div key={label}><dt>{label}</dt><dd>
-        {note ? <><strong>{note.basis === "potwierdzone" ? "Potwierdzone" : "Szacunek"}</strong> · {note.rationale}
-          {evidence && <> · <a href={evidence} target="_blank" rel="noopener noreferrer">Źródło oceny</a></>}
-        </> : "Brak danych"}
+      const score = extra || (note?.score ? `${note.score}/5` : "");
+      return <div key={term}><dt>{term}</dt><dd>
+        {note ? <>
+          <span className="assessment-head">
+            {score && <span className="score-badge">{score}</span>}
+            <span className="basis-badge" data-basis={note.basis}>{note.basis === "potwierdzone" ? "Potwierdzone" : "Szacunek"}</span>
+          </span>
+          {note.rationale}
+          {evidence && <> <a href={evidence} target="_blank" rel="noopener noreferrer">Źródło oceny<span className="sr-only"> (otwiera się w nowej karcie)</span></a></>}
+        </> : "Brak oceny"}
       </dd></div>;
     })}
   </dl>;
+}
+
+function Recommendation({ assessment, taxonomy, level = "h3" }: { assessment: Assessment; taxonomy: Taxonomy; level?: "h3" | "h4" }) {
+  const Heading = level;
+  const { path, recipients, measures } = assessment;
+  if (!path && !recipients.length && !measures.length && !assessment.next_step) return null;
+  return <section className="recommendation">
+    <Heading>Potencjalni odbiorcy i ścieżka</Heading>
+    {path && <p><strong>{taxonomy.paths[path] ?? path}</strong>{assessment.path_rationale && <> · {assessment.path_rationale}</>}</p>}
+    {recipients.length > 0 && <ul>{recipients.map(r => <li key={r.audience}><strong>{taxonomy.audiences[r.audience] ?? r.audience}</strong> · {r.why}</li>)}</ul>}
+    {assessment.next_step && <p><strong>Pierwszy krok</strong> · {assessment.next_step}</p>}
+    {measures.length > 0 && <>
+      <p className="recommendation-label">Jak mierzyć efekt</p>
+      <ul>{measures.map(m => <li key={m}>{m}</li>)}</ul>
+    </>}
+  </section>;
+}
+
+export function AssessmentMethod({ taxonomy, assessment }: { taxonomy: Taxonomy; assessment?: Assessment }) {
+  return <details className="assessment-method">
+    <summary>Jak oceniamy</summary>
+    <p>Każde kryterium ma ocenę 1-5 i oznaczenie: <strong>Potwierdzone</strong> (fakt z podanego źródła) albo <strong>Szacunek</strong> (wniosek z opisu, wymaga sprawdzenia).
+      Wiarygodność liczą stałe reguły, pozostałe kryteria, odbiorców, ścieżkę i mierniki proponuje model AI na podstawie tekstu karty.
+      Redakcja PCI może każdą ocenę poprawić; poprawki nie są nadpisywane.</p>
+    <dl>{Object.values(taxonomy.criteria).map(([name, meaning]) => <div key={name}><dt>{name}</dt><dd>{meaning}</dd></div>)}</dl>
+    <p className="source-note">Wersja kryteriów: {taxonomy.criteria_version}
+      {assessment?.assessed_at && <>, ocena z {date.format(new Date(assessment.assessed_at))}</>}.</p>
+  </details>;
 }
 
 export function CompareInnovations({ innovations, taxonomy, onClose }: {
@@ -87,19 +124,19 @@ export function CompareInnovations({ innovations, taxonomy, onClose }: {
     <div className="grid gap-4 md:grid-cols-2">
       {innovations.map(item => <section key={item.id}>
         <h3>{item.title}</h3>
-        {item.maturity && <p>{taxonomy.maturity[item.maturity]}</p>}
-        <p>{item.card.solution}</p>
-        <AssessmentRows assessment={item.assessment} />
-        {item.assessment.next_step && <p><strong>Proponowany następny krok</strong> · {item.assessment.next_step}</p>}
+        <p className="source-note">{item.verification === "potwierdzona" ? "Potwierdzone użycie" : "Kandydat do weryfikacji"}
+          {item.maturity && <> · {taxonomy.maturity[item.maturity]}</>}</p>
+        <p>{item.assessment.summary || item.card.solution}</p>
+        <AssessmentRows assessment={item.assessment} taxonomy={taxonomy} />
+        <Recommendation assessment={item.assessment} taxonomy={taxonomy} level="h4" />
       </section>)}
     </div>
+    <AssessmentMethod taxonomy={taxonomy} />
     <Button variant="outline" nativeButton={false} render={<Link href={`/rozmowa?pytanie=${encodeURIComponent(question)}`} />}>
       Doprecyzuj w rozmowie
     </Button>
   </Dialog>;
 }
-
-const date = new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" });
 
 function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innovation; taxonomy: Taxonomy; onClose: () => void }) {
   const labels = taxonomy.sectors;
@@ -109,6 +146,7 @@ function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innov
   const assessment = innovation.assessment;
   const sections: [string, string][] = [
     ["Jaki problem rozwiązuje", card.problem],
+    ["W skrócie", assessment.summary],
     ["Na czym polega", card.solution],
     ["Co jest nowego", card.novelty],
     ["Kto może skorzystać lub wdrożyć", card.target_users],
@@ -139,9 +177,10 @@ function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innov
     {sections.filter(([, text]) => text).map(([heading, text]) => <section key={heading}><h3>{heading}</h3><p>{text}</p></section>)}
     <section>
       <h3>Ocena potencjału</h3>
-      <AssessmentRows assessment={assessment} />
+      <AssessmentRows assessment={assessment} taxonomy={taxonomy} />
+      <AssessmentMethod taxonomy={taxonomy} assessment={assessment} />
     </section>
-    {assessment.next_step && <section><h3>Proponowany następny krok</h3><p>{assessment.next_step}</p></section>}
+    <Recommendation assessment={assessment} taxonomy={taxonomy} />
     {innovation.documents.length > 0 && <section>
       <h3>Dokumenty</h3>
       <ul className="document-list">
@@ -157,6 +196,6 @@ function InnovationDialog({ innovation, taxonomy, onClose }: { innovation: Innov
       {innovation.imported_at && <>, dane pobrane {date.format(new Date(innovation.imported_at))}</>}
       {innovation.checked_at && <>, sprawdzono {date.format(new Date(innovation.checked_at))}</>}
     </p>}
-    {innovation.verification === "potwierdzona" && <p><Link href={`/rozmowa?pytanie=${encodeURIComponent(`Porównaj „${innovation.title}” (${innovation.id}) z innym rozwiązaniem dla podobnej potrzeby. Podaj źródła, warunki wdrożenia i następny krok.`)}`}>Porównaj w rozmowie</Link></p>}
+    <p><Link href={`/rozmowa?pytanie=${encodeURIComponent(`Porównaj „${innovation.title}” (${innovation.id}) z innym rozwiązaniem dla podobnej potrzeby. Podaj źródła, warunki wdrożenia i następny krok.`)}`}>Porównaj w rozmowie</Link></p>
   </Dialog>;
 }

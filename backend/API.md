@@ -248,14 +248,22 @@ an admin dashboard.
 The knowledge base module (`app/modules/knowledge`) is mounted under `/api/v1/knowledge`
 with its own `X-Admin-Token` write protection; see its [README](app/modules/knowledge/README.md).
 `GET /api/v1/knowledge/taxonomy` returns Polish labels of all classification axes (sectors, innovation types,
-institution types, maturity); `GET /api/v1/knowledge/categories` returns the sectors only.
+institution types, deployment levels, audiences, development paths), the five assessment criteria with their meaning
+and the current `criteria_version`; `GET /api/v1/knowledge/categories` returns the sectors only.
 
 `GET /api/v1/knowledge/catalog` returns `{items, total, regions}` and accepts `q`, `category`,
-`area`, `region`, `maturity`, `offset` and `limit`. It defaults to confirmed records. Pass
-`include_candidates=true` to include candidates. The existing unpaginated list still serves
-administration. Cards expose `area`, `region`, `verification`, `checked_at` and `assessment`.
+`area`, `region`, `maturity`, `confirmed_only`, `min_credibility` (1-5), `offset` and `limit`.
+It returns candidates and confirmed records, strongest evidence first (confirmed, then credibility, then deployment level).
+`q` also matches the Polish assessment summary. The existing unpaginated list still serves administration. Cards expose `area`, `region`, `verification`, `checked_at` and `assessment`.
 Confirmed use requires a supported stage and an implementation criterion with an HTTP(S) source.
 TRL requires the technology area and its own justification.
+
+Admin-only `POST /api/v1/knowledge/innovations/{id}/assess` scores the card against the five FAQ criteria
+(`app/modules/knowledge/assess.py`): credibility by fixed rules, the other criteria, `summary`, `recipients`, `path`,
+`measures` and `next_step` as Gemini estimates with basis `szacunek` and a quote checked against the card text.
+A field is replaced only while it is empty or still equals the previous automatic proposal, so staff edits and
+source-confirmed notes survive. Candidates also take the estimated `maturity`. 503 when Gemini is unavailable.
+`backend/scripts/assess_innovations.py` runs it for every card not yet on the current `criteria_version`.
 
 Admin-only `PUT /api/v1/knowledge/innovations/{id}/refresh` accepts card metadata as JSON
 and returns `{status: "created" | "updated" | "unchanged"}`. It preserves attachments and editorial changes.

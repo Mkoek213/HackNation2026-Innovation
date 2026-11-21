@@ -37,7 +37,10 @@ type Saved = { title: string; id: string; ingest: IngestResult | null };
 type Mode = "create" | "edit";
 
 const emptyCard: Card = { problem: "", solution: "", novelty: "", target_users: "", evidence: "" };
-const emptyAssessment: Assessment = { implementation: null, novelty: null, transfer: null, credibility: null, trl: null, trl_basis: null, next_step: "" };
+const emptyAssessment: Assessment = {
+  implementation: null, novelty: null, transfer: null, credibility: null, trl: null, trl_basis: null, next_step: "",
+  summary: "", recipients: [], path: null, path_rationale: "", measures: [], criteria_version: "", assessed_at: null,
+};
 const emptyProfile: Profile = {
   innovation_type: null, institution_type: null, institution: null, maturity: null, source_name: null, authors: [], imported_at: null,
   area: null, region: null, checked_at: null, verification: "kandydat", assessment: emptyAssessment,
@@ -208,7 +211,7 @@ function AssessmentFields({ profile, onChange, disabled }: {
         }} />
       </label>}
       {rows.map(([key, label]) => {
-        const note = assessment[key] ?? { basis: "szacunek", rationale: "", source_url: null };
+        const note = assessment[key] ?? { basis: "szacunek", rationale: "", source_url: null, score: null };
         const setNote = (patch: Partial<AssessmentNote>) => setAssessment({ [key]: { ...note, ...patch } });
         return <fieldset key={key} className={styles.uploadForm}>
           <legend>{label}</legend>

@@ -363,9 +363,9 @@ html[data-contrast="high"] .starter { border-width: 2px; }
   transition: border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
 }
 .innovation-card:hover { border-color: var(--navy); border-left-color: var(--area, var(--amber)); box-shadow: 0 6px 20px rgb(22 50 92 / 0.1); transform: translateY(-2px); }
-[data-area="industry"] { --area: var(--area-industry); --area-soft: var(--area-industry-soft); }
-[data-area="digital"] { --area: var(--area-digital); --area-soft: var(--area-digital-soft); }
-[data-area="life"] { --area: var(--area-life); --area-soft: var(--area-life-soft); }
+[data-area="technologia"] { --area: var(--area-industry); --area-soft: var(--area-industry-soft); }
+[data-area="administracja"] { --area: var(--area-digital); --area-soft: var(--area-digital-soft); }
+[data-area="edukacja"] { --area: var(--area-life); --area-soft: var(--area-life-soft); }
 .innovation-card[data-area] { border-left-color: var(--area); }
 .innovation-card[data-area] .innovation-category { background: var(--area-soft); }
 .area-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0 0 12px; padding: 0; list-style: none; color: var(--ink-soft); font-size: 0.8125rem; }
@@ -380,6 +380,22 @@ html[data-contrast="high"] .starter { border-width: 2px; }
 .innovation-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 20px; margin: 0 0 16px; padding: 14px 16px; border-radius: 10px; background: var(--slate-soft); }
 .innovation-facts dt { color: var(--ink-soft); font-size: 0.75rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.04em; }
 .innovation-facts dd { margin: 2px 0 0; color: var(--ink); font-size: 0.9375rem; line-height: 1.45; }
+.assessment-rows { grid-template-columns: 1fr; gap: 14px; }
+.assessment-head { display: inline-flex; flex-wrap: wrap; gap: 6px; margin-right: 8px; vertical-align: 1px; }
+.score-badge, .basis-badge { display: inline-block; padding: 1px 8px; border: 1px solid currentColor; border-radius: 999px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+.score-badge { background: var(--surface); color: var(--navy); }
+.basis-badge[data-basis="potwierdzone"] { background: #e7f3eb; color: var(--success); }
+.basis-badge[data-basis="szacunek"] { background: var(--amber-soft); color: var(--ink); }
+.recommendation { margin-top: 16px; padding: 14px 16px; border-left: 4px solid var(--amber); border-radius: 0 10px 10px 0; background: var(--slate-soft); }
+.recommendation h3, .recommendation h4 { margin-top: 0; }
+.recommendation ul { margin: 0 0 12px; padding-left: 20px; }
+.recommendation li + li { margin-top: 4px; }
+.recommendation-label { margin: 0 0 4px; font-weight: 650; }
+.assessment-method { margin: 0 0 8px; font-size: 0.875rem; }
+.assessment-method summary { color: var(--navy); font-weight: 650; cursor: pointer; }
+.assessment-method dl { display: grid; gap: 6px; margin: 8px 0; }
+.assessment-method dt { font-weight: 650; }
+.assessment-method dd { margin: 0; color: var(--ink-soft); }
 .innovation-tags span { padding: 2px 10px; border-radius: 999px; background: var(--slate-soft); color: var(--navy); font-size: 0.75rem; font-weight: 650; }
 .video-frame { position: relative; aspect-ratio: 16 / 9; margin-bottom: 8px; overflow: hidden; border-radius: 10px; background: var(--ink); }
 .video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
@@ -388,7 +404,9 @@ html[data-contrast="high"] .starter { border-width: 2px; }
 .document-list a:hover { text-decoration: underline !important; }
 
 .filter-bar { display: flex; flex-direction: column; gap: 14px; }
-.filter-bar .chip-row { margin-bottom: 0; }
+.filter-bar .chip-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 0; }
+.filter-bar .chip-row select { width: 100%; }
+@media (max-width: 480px) { .filter-bar .chip-row { grid-template-columns: 1fr 1fr; } }
 .search-field { display: flex; align-items: center; gap: 10px; max-width: 480px; min-height: 48px; padding: 0 14px; border: 1px solid var(--input); border-radius: 8px; background: var(--surface); color: var(--ink-soft); }
 .search-field:focus-within { border-color: var(--navy); box-shadow: 0 0 0 1px var(--navy); }
 .search-field input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: inherit; outline: none; }

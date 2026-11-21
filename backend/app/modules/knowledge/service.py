@@ -23,6 +23,8 @@ from .schemas import (
     Evidence,
     IngestResult,
     InnovationArea,
+    InnovationAssessment,
+    InnovationCard,
     InnovationMeta,
     InnovationSummary,
     InnovationUpdate,
@@ -63,6 +65,7 @@ def card_text(meta: InnovationMeta) -> str:
         f"Nowość: {c.novelty}" if c.novelty else "",
         f"Dla kogo: {c.target_users}" if c.target_users else "",
         f"Stan i dowody: {c.evidence}" if c.evidence else "",
+        f"Streszczenie: {meta.assessment.summary}" if meta.assessment.summary else "",
     ]
     return "\n".join(p for p in parts if p)
 
@@ -215,6 +218,7 @@ class KnowledgeService:
         payloads[0]["import_baseline"] = import_baseline if import_baseline is not None else (
             previous.import_baseline if previous else {}
         )
+        payloads[0]["assessment_baseline"] = previous.assessment_baseline if previous else {}
         dense, sparse = await self.embedder.embed_passages(texts)
         points = [PointData(id=i, dense=d, sparse=s, payload=p) for i, d, s, p in zip(ids, dense, sparse, payloads)]
         stored = list(stored_by_path.values())
@@ -256,10 +260,12 @@ class KnowledgeService:
         data["id"] = previous.id
         return InnovationMeta.model_validate(data)
 
-    async def _update(self, previous: InnovationSummary, meta: InnovationMeta, baseline: dict) -> InnovationSummary:
+    async def _update(self, previous: InnovationSummary, meta: InnovationMeta, baseline: dict,
+                      assessment_baseline: dict | None = None) -> InnovationSummary:
         payload = meta_to_card_payload(meta, files=previous.files, chunk_count=previous.chunk_count)
         payload["documents"] = [{**d.model_dump(), "object_key": d.object_key} for d in previous.documents]
         payload["import_baseline"] = baseline
+        payload["assessment_baseline"] = previous.assessment_baseline if assessment_baseline is None else assessment_baseline
         fields = {"title": meta.title, "categories": [c.value for c in meta.categories],
                   "primary_category": meta.primary_category.value, "verification": meta.verification}
         text = card_text(meta)
@@ -295,9 +301,9 @@ class KnowledgeService:
             for key, value in incoming.items():
                 if key in {"card", "assessment"}:
                     old = baseline.get(key, {})
+                    defaults = (InnovationCard() if key == "card" else InnovationAssessment()).model_dump(mode="json")
                     merged[key] = {
-                        field: new if current[key][field] == old.get(field, None if key == "assessment" and field != "next_step" else "")
-                        else current[key][field]
+                        field: new if current[key][field] == old.get(field, defaults[field]) else current[key][field]
                         for field, new in value.items()
                     }
                 else:
@@ -314,6 +320,29 @@ class KnowledgeService:
             if changed or baseline != incoming or updated.checked_at != previous.checked_at:
                 await self._update(previous, updated, incoming)
             return "updated" if changed else "unchanged"
+
+    async def apply_assessment(self, innovation_id: str, proposed: InnovationAssessment,
+                               maturity: Maturity | None) -> InnovationSummary:
+        """Three-way merge of an automatic assessment: a field is replaced only while it is empty or
+        still equals the previous automatic proposal, so editorial and source-confirmed notes survive."""
+        async with self._write_lock:
+            previous = await self.get(innovation_id)
+            defaults = InnovationAssessment().model_dump(mode="json")
+            current = previous.assessment.model_dump(mode="json")
+            old = previous.assessment_baseline.get("assessment", defaults)
+            new = proposed.model_dump(mode="json")
+            merged = {field: value if current[field] in (defaults[field], old.get(field, defaults[field])) else current[field]
+                      for field, value in new.items()}
+            merged.update(criteria_version=new["criteria_version"], assessed_at=new["assessed_at"])
+            data = previous.model_dump(include=set(InnovationMeta.model_fields))
+            data["assessment"] = merged
+            old_maturity = previous.assessment_baseline.get("maturity")
+            # Confirmed cards keep their documented stage; candidates take the estimate unless an editor set one.
+            if maturity and previous.verification == "kandydat" and (previous.maturity or None) in (None, old_maturity):
+                data["maturity"] = maturity
+            meta = InnovationMeta.model_validate(data)
+            baseline = {"assessment": new, "maturity": maturity.value if maturity else None}
+            return await self._update(previous, meta, previous.import_baseline, assessment_baseline=baseline)
 
     async def update_categories(self, innovation_id: str, update: CategoriesUpdate) -> InnovationSummary:
         async with self._write_lock:
@@ -347,19 +376,30 @@ class KnowledgeService:
         return await self.store.list_innovations(category)
 
     async def catalog(self, *, query: str, category: Category | None, area: InnovationArea | None,
-                      region: str | None, maturity: Maturity | None, include_candidates: bool,
-                      offset: int, limit: int) -> CatalogPage:
-        # shortcut: substring search scans matching cards; add indexed text search when the validated catalog grows.
-        items = await self.store.list_innovations(category, confirmed_only=not include_candidates)
+                      region: str | None, maturity: Maturity | None, confirmed_only: bool,
+                      min_credibility: int | None, offset: int, limit: int) -> CatalogPage:
+        # shortcut: substring search scans matching cards; add indexed text search when the catalog passes ~10k cards.
+        items = await self.store.list_innovations(category, confirmed_only=confirmed_only)
         regions = sorted({item.region for item in items if item.region})
         terms = query.casefold().split()
+
+        def score(item: InnovationSummary, criterion: str) -> int:
+            note = getattr(item.assessment, criterion)
+            return note.score or 0 if note else 0
+
         matches = []
         for item in items:
             if (area and item.area != area) or (region and item.region != region) or (maturity and item.maturity != maturity):
                 continue
-            text = " ".join([item.title, item.institution or "", *item.card.model_dump().values()]).casefold()
+            if min_credibility and score(item, "credibility") < min_credibility:
+                continue
+            text = " ".join([item.title, item.institution or "", item.assessment.summary,
+                             *item.card.model_dump().values()]).casefold()
             if all(term in text for term in terms):
                 matches.append(item)
+        # Strongest evidence first: confirmed use, then credibility, then deployment level.
+        matches.sort(key=lambda item: (item.verification != "potwierdzona", -score(item, "credibility"),
+                                       -score(item, "implementation"), item.title))
         return CatalogPage(items=matches[offset:offset + limit], total=len(matches), regions=regions)
 
     async def retrieve(

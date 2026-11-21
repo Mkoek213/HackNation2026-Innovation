@@ -97,7 +97,60 @@ MATURITY_LABELS: dict[Maturity, str] = {
     Maturity.IN_USE: "Stosowane w praktyce",
 }
 
+
+
+class Audience(StrEnum):
+    """FAQ target groups that can deploy, transfer or fund a solution."""
+    LOCAL_GOVERNMENT = "jst"
+    PUBLIC_INSTITUTION = "instytucja-publiczna"
+    UNIVERSITY = "uczelnia"
+    SCHOOL = "szkola"
+    COMPANY = "przedsiebiorstwo"
+    INVESTOR = "inwestor"
+
+
+AUDIENCE_LABELS: dict[Audience, str] = {
+    Audience.LOCAL_GOVERNMENT: "Samorząd (JST)",
+    Audience.PUBLIC_INSTITUTION: "Instytucja publiczna",
+    Audience.UNIVERSITY: "Uczelnia lub jednostka naukowa",
+    Audience.SCHOOL: "Szkoła lub placówka edukacyjna",
+    Audience.COMPANY: "Przedsiębiorstwo lub startup",
+    Audience.INVESTOR: "Inwestor",
+}
+
+
+class DevelopmentPath(StrEnum):
+    DEPLOYMENT = "wdrozenie"
+    TRANSFER = "transfer"
+    DEVELOPMENT = "rozwoj"
+    COMMERCIALISATION = "komercjalizacja"
+
+
+PATH_LABELS: dict[DevelopmentPath, str] = {
+    DevelopmentPath.DEPLOYMENT: "Wdrożenie w kolejnej instytucji",
+    DevelopmentPath.TRANSFER: "Transfer do innej organizacji lub branży",
+    DevelopmentPath.DEVELOPMENT: "Dalszy rozwój i testy",
+    DevelopmentPath.COMMERCIALISATION: "Komercjalizacja",
+}
+
+# The five FAQ criteria (section 5): key -> (label, what a high score means). Scores are 1-5.
+# Bump CRITERIA_VERSION whenever these texts or the scoring rules change; cards are then reassessed.
+CRITERIA_VERSION = "kryteria-2026-11"
+ASSESSMENT_CRITERIA: dict[str, tuple[str, str]] = {
+    "implementation": ("Poziom wdrożenia",
+                       "Etap od koncepcji do stosowania w praktyce. Wysoka ocena oznacza rzeczywiste użycie poza projektem."),
+    "trl": ("Dojrzałość technologiczna (TRL 1-9)",
+            "Tylko dla rozwiązań technologicznych. TRL 9 to system sprawdzony w środowisku operacyjnym."),
+    "novelty": ("Innowacyjność",
+                "Stopień nowości lub ulepszenia względem rozwiązań już stosowanych w Polsce (Oslo Manual 2018)."),
+    "transfer": ("Potencjał zastosowania",
+                 "Możliwość użycia w innych instytucjach, organizacjach lub branżach bez dużych zmian."),
+    "credibility": ("Wiarygodność",
+                    "Liczona regułami: oficjalne źródło, potwierdzenie wdrożenia, dokumenty i opis dowodów."),
+}
+
 assert INNOVATION_TYPE_LABELS.keys() == set(InnovationType)
 assert INSTITUTION_TYPE_LABELS.keys() == set(InstitutionType)
 assert MATURITY_LABELS.keys() == set(Maturity)
 assert Maturity("wdrozenie") is Maturity.IN_USE
+assert AUDIENCE_LABELS.keys() == set(Audience) and PATH_LABELS.keys() == set(DevelopmentPath)

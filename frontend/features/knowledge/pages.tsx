@@ -14,7 +14,7 @@ function Status({ data, what }: { data: unknown; what: string }) {
 }
 
 const pageSize = 24;
-const defaults = { q: "", category: "", area: "", region: "", maturity: "", include_candidates: "" };
+const defaults = { q: "", category: "", area: "", region: "", maturity: "", min_credibility: "", confirmed_only: "" };
 
 export function InnovationsPage() {
   const taxonomy = useLoad(getTaxonomy, "taxonomy");
@@ -28,14 +28,14 @@ export function InnovationsPage() {
   params.set("limit", String(pageSize));
   const key = params.toString();
   const results = useLoad(() => getCatalog(key), key);
-  const regionParams = filters.include_candidates ? "limit=1&include_candidates=true" : "limit=1";
+  const regionParams = filters.confirmed_only ? "limit=1&confirmed_only=true" : "limit=1";
   const regionPage = useLoad(() => getCatalog(regionParams), regionParams);
-  const regions = regionPage ? regionPage.regions : (filters.region ? [filters.region] : []);
+  const regions = (regionPage ? regionPage.regions : (filters.region ? [filters.region] : [])).toSorted((a, b) => a.localeCompare(b, "pl"));
 
   function setFilter(name: keyof typeof defaults, value: string) {
     setFilters(current => ({
       ...current, [name]: value,
-      ...(name === "include_candidates" ? { region: "" } : {}),
+      ...(name === "confirmed_only" ? { region: "" } : {}),
     }));
     setOffset(0);
   }
@@ -65,6 +65,7 @@ export function InnovationsPage() {
           ["area", "Obszar", Object.entries(innovationAreas)],
           ["region", "Województwo", regions.map(region => [region, region])],
           ["maturity", "Poziom wdrożenia", Object.entries(taxonomy.maturity)],
+          ["min_credibility", "Wiarygodność", [["3", "co najmniej 3/5"], ["4", "co najmniej 4/5"], ["5", "5/5"]]],
           ["category", "Sektor", Object.entries(taxonomy.sectors)],
         ] as const).map(([name, label, options]) =>
           <label key={name} className="field-block">{label}
@@ -76,8 +77,8 @@ export function InnovationsPage() {
         )}
       </div>
       <label className="flex items-center gap-2">
-        <input type="checkbox" checked={Boolean(filters.include_candidates)} onChange={e => setFilter("include_candidates", e.target.checked ? "true" : "")} />
-        Uwzględnij kandydatów do weryfikacji
+        <input type="checkbox" checked={Boolean(filters.confirmed_only)} onChange={e => setFilter("confirmed_only", e.target.checked ? "true" : "")} />
+        Tylko potwierdzone wdrożenia
       </label>
     </div>}
     {selected.length > 0 && <div className="flex flex-wrap items-center gap-2">

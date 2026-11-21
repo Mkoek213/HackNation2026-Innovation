@@ -3,7 +3,6 @@ import uuid
 from typing import Any, BinaryIO, Literal, Sequence
 
 from sqlalchemy import Select, func, or_, select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
 from app.exceptions import DependencyUnavailable, DomainError, NotFoundError, ValidationError

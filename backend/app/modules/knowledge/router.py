@@ -28,15 +28,17 @@ from .schemas import (
     Deleted,
     IngestResult,
     InnovationArea,
+    InnovationAssessment,
     InnovationDraft,
     InnovationMeta,
     InnovationSummary,
     InnovationUpdate,
 )
+from .assess import AssessmentUnavailable, assess, credibility
 from .service import KnowledgeService, get_knowledge_service
 from .settings import load_knowledge_settings
-from .taxonomy import (CATEGORY_LABELS, INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS,
-                       Category, Maturity)
+from .taxonomy import (ASSESSMENT_CRITERIA, AUDIENCE_LABELS, CATEGORY_LABELS, CRITERIA_VERSION,
+                       INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS, PATH_LABELS, Category, Maturity)
 
 ADMIN_TOKEN_HEADER = "X-Admin-Token"
 
@@ -102,13 +104,19 @@ class Taxonomy(BaseModel):
     innovation_types: dict[str, str]
     institution_types: dict[str, str]
     maturity: dict[str, str]
+    audiences: dict[str, str]
+    paths: dict[str, str]
+    criteria: dict[str, tuple[str, str]]
+    criteria_version: str
 
 
 @router.get("/taxonomy", response_model=Taxonomy, summary="Osie klasyfikacji innowacji")
 def get_taxonomy() -> Taxonomy:
     """Polish labels of every classification axis. Needs no knowledge base."""
     return Taxonomy(sectors=CATEGORY_LABELS, innovation_types=INNOVATION_TYPE_LABELS,
-                    institution_types=INSTITUTION_TYPE_LABELS, maturity=MATURITY_LABELS)
+                    institution_types=INSTITUTION_TYPE_LABELS, maturity=MATURITY_LABELS,
+                    audiences=AUDIENCE_LABELS, paths=PATH_LABELS, criteria=ASSESSMENT_CRITERIA,
+                    criteria_version=CRITERIA_VERSION)
 
 
 async def _save_uploads(files: list[UploadFile], directory: Path) -> list[Path]:
@@ -138,10 +146,12 @@ async def list_innovations(service: Service, category: Category | None = Query(d
 @router.get("/catalog", response_model=CatalogPage, summary="Wyszukaj innowacje")
 async def catalog(service: Service, q: str = Query(default="", max_length=200), category: Category | None = None,
                   area: InnovationArea | None = None, region: str | None = Query(default=None, max_length=60),
-                  maturity: Maturity | None = None, include_candidates: bool = False,
+                  maturity: Maturity | None = None, confirmed_only: bool = False,
+                  min_credibility: int | None = Query(default=None, ge=1, le=5),
                   offset: int = Query(default=0, ge=0), limit: int = Query(default=24, ge=1, le=100)):
     return await service.catalog(query=q, category=category, area=area, region=region, maturity=maturity,
-                                 include_candidates=include_candidates, offset=offset, limit=limit)
+                                 confirmed_only=confirmed_only, min_credibility=min_credibility,
+                                 offset=offset, limit=limit)
 
 
 @router.put("/innovations/{innovation_id}/refresh", summary="Odśwież rekord źródłowy", **_admin)
@@ -152,6 +162,28 @@ async def refresh_innovation(service: Service, innovation_id: InnovationId, inno
         except ValidationError as exc:
             raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Invalid merged assessment") from exc
         return {"status": result}
+
+
+@router.post("/innovations/{innovation_id}/assess", response_model=InnovationSummary,
+             summary="Oceń innowację według kryteriów", dependencies=_admin["dependencies"],
+             responses={**_admin["responses"], **_not_found_response})
+async def assess_innovation(service: Service, innovation_id: InnovationId):
+    """Score the card against the five FAQ criteria and recommend recipients, a path and measures.
+    Credibility follows fixed rules; the other criteria are model estimates marked "szacunek".
+    Notes edited by staff or confirmed by a source are kept. Raises 503 when Gemini is unavailable."""
+    with _not_found():
+        item = await service.get(innovation_id)
+        try:
+            proposed, maturity = await assess(item)
+        except AssessmentUnavailable as exc:
+            # The rule-based credibility needs no model; store it and report the rest as unavailable.
+            await service.apply_assessment(innovation_id, InnovationAssessment(credibility=credibility(item)), None)
+            code = status.HTTP_429_TOO_MANY_REQUESTS if exc.rate_limited else status.HTTP_503_SERVICE_UNAVAILABLE
+            raise HTTPException(code, "Automatic assessment unavailable; credibility updated") from exc
+        try:
+            return await service.apply_assessment(innovation_id, proposed, maturity)
+        except ValidationError as exc:
+            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "Invalid merged assessment") from exc
 
 
 @router.post("/innovations/draft", response_model=InnovationDraft, summary="Uzupełnij kartę z dokumentów", **_admin)

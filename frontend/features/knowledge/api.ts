@@ -5,10 +5,13 @@ export type InnovationCard = { problem: string; solution: string; novelty: strin
 export type InnovationDocument = { id: string; filename: string; content_type: string; download_url: string };
 export type Author = { name: string; affiliation: string | null };
 export const innovationAreas = { technologia: "Technologia", edukacja: "Edukacja", administracja: "Administracja" };
-export type AssessmentNote = { basis: "potwierdzone" | "szacunek"; rationale: string; source_url: string | null };
+export type AssessmentNote = { basis: "potwierdzone" | "szacunek"; rationale: string; source_url: string | null; score: number | null };
+export type Recipient = { audience: string; why: string };
 export type Assessment = {
   implementation: AssessmentNote | null; novelty: AssessmentNote | null; transfer: AssessmentNote | null;
   credibility: AssessmentNote | null; trl: number | null; trl_basis: AssessmentNote | null; next_step: string;
+  summary: string; recipients: Recipient[]; path: string | null; path_rationale: string; measures: string[];
+  criteria_version: string; assessed_at: string | null;
 };
 export type Discovery = {
   area: keyof typeof innovationAreas | null; region: string | null; checked_at: string | null;
@@ -23,6 +26,9 @@ export type Innovation = {
 export type Taxonomy = {
   sectors: Record<string, string>; innovation_types: Record<string, string>;
   institution_types: Record<string, string>; maturity: Record<string, string>;
+  audiences: Record<string, string>; paths: Record<string, string>;
+  criteria: Record<"implementation" | "trl" | "novelty" | "transfer" | "credibility", [string, string]>;
+  criteria_version: string;
 };
 
 const knowledge = <T,>(path: string) => api<T>(`api/v1/knowledge/${path}`);

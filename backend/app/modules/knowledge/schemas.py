@@ -1,10 +1,10 @@
 import datetime as dt
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 from app.schemas.tagging import AssignedLabel, Classification
-from .taxonomy import Category, InnovationType, InstitutionType, Maturity
+from .taxonomy import Audience, Category, DevelopmentPath, InnovationType, InstitutionType, Maturity
 
 DocType = Literal[
     "card",
@@ -29,12 +29,18 @@ class AssessmentNote(BaseModel):
     basis: Literal["potwierdzone", "szacunek"]
     rationale: str = Field(min_length=1, max_length=1200)
     source_url: HttpUrl | None = None
+    score: int | None = Field(default=None, ge=1, le=5, description="1-5 on the criterion's scale; null when not scored")
 
     @model_validator(mode="after")
     def _confirmed_has_source(self):
         if self.basis == "potwierdzone" and self.source_url is None:
             raise ValueError("Confirmed assessments require a source URL")
         return self
+
+
+class Recipient(BaseModel):
+    audience: Audience
+    why: str = Field(min_length=1, max_length=400)
 
 
 class InnovationAssessment(BaseModel):
@@ -45,6 +51,13 @@ class InnovationAssessment(BaseModel):
     trl: int | None = Field(default=None, ge=1, le=9)
     trl_basis: AssessmentNote | None = None
     next_step: str = Field(default="", max_length=1200)
+    summary: str = Field(default="", max_length=1200, description="Plain Polish summary of what the solution is")
+    recipients: list[Recipient] = Field(default_factory=list, max_length=4)
+    path: DevelopmentPath | None = None
+    path_rationale: str = Field(default="", max_length=1200)
+    measures: list[Annotated[str, Field(min_length=1, max_length=300)]] = Field(default_factory=list, max_length=4)
+    criteria_version: str = Field(default="", max_length=40, description="Set by the automatic assessment")
+    assessed_at: dt.date | None = None
 
 
 class InnovationCard(BaseModel):
@@ -164,6 +177,7 @@ class InnovationSummary(InnovationMeta):
     chunk_count: int = Field(default=0, examples=[42])
     files: list[str] = Field(default_factory=list, examples=[["opis-patentowy.pdf"]])
     import_baseline: dict = Field(default_factory=dict, exclude=True)
+    assessment_baseline: dict = Field(default_factory=dict, exclude=True)  # last automatic proposal
 
 
 class CatalogPage(BaseModel):
