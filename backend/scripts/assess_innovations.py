@@ -30,7 +30,7 @@ async def assess_one(client: httpx.AsyncClient, gate: asyncio.Semaphore, innovat
             response = await client.post(f"{PREFIX}/innovations/{innovation_id}/assess")
             if response.status_code != 429 or attempt == 3:
                 break
-            await asyncio.sleep(20 * (attempt + 1))  # provider rate limit; other errors are reported at once
+            await asyncio.sleep(20 * (attempt + 1))  # provider quota or overload; other errors are reported at once
         if response.is_success:
             return None
         return f"{innovation_id}: HTTP {response.status_code} {response.text[:200]}"

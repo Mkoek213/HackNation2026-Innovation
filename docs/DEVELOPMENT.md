@@ -133,7 +133,7 @@ Its endpoint is `http://localhost:${S3_PORT}` on the host and `http://s3:8333` i
 
 ## Chat provider
 
-The chat uses the Gemini Developer API through `google-genai` (`client.aio.models.generate_content_stream`), model `CHAT_GEMINI_MODEL` (default `gemini-3.1-flash-lite`).
+The chat uses the Gemini Developer API through `google-genai` (`client.aio.models.generate_content_stream`), model `CHAT_GEMINI_MODEL` (default `gemini-3.1-flash-lite`; `gemini-3.5-flash-lite` and `gemini-3.8-flash` are also accepted, and the local setup uses `gemini-3.5-flash-lite` because 3.1 hit quota and overload limits during the bulk assessment).
 Automatic function execution and SDK retries are disabled; the orchestrator in `backend/app/chat/service.py` runs tools itself and enforces the turn deadline and the input, output and tool-call budgets from `.env`.
 Only `GEMINI_API_KEY` is accepted, and it stays backend-only.
 Google documents 55-day abuse-monitoring retention for prompts and outputs; account tier and region determine training use, so do not send sensitive personal data.

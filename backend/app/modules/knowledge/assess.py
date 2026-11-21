@@ -153,7 +153,8 @@ async def assess(item: InnovationSummary) -> tuple[InnovationAssessment, Maturit
         payload = json.loads(response.text or "")
     except Exception as exc:
         logger.warning("Innovation assessment unavailable for %s (%s)", item.id, type(exc).__name__)
-        raise AssessmentUnavailable(str(exc), rate_limited=getattr(exc, "code", None) == 429) from exc
+        # 429 quota and 503 provider overload are transient; an invalid key (400) is not.
+        raise AssessmentUnavailable(str(exc), rate_limited=getattr(exc, "code", None) in (429, 503)) from exc
     finally:
         await client.aio.aclose()
         client.close()

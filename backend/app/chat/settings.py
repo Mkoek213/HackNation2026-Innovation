@@ -10,7 +10,7 @@ class ChatSettings(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
     gemini_api_key: SecretStr | None = Field(default=None, repr=False)
-    model: Literal["gemini-3.1-flash-lite", "gemini-3.8-flash"] = "gemini-3.1-flash-lite"
+    model: Literal["gemini-3.1-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash"] = "gemini-3.1-flash-lite"
     api_version: Literal["v1beta"] = "v1beta"
     provider_timeout_seconds: int = Field(default=60, ge=1, le=120)
     turn_deadline_seconds: int = Field(default=600, ge=1, le=600)
