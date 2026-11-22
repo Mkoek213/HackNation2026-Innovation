@@ -1,17 +1,17 @@
 # Deployment (Google Cloud Run)
 
 The deployment scripts target Google Cloud in region `europe-central2` (Warsaw).
-The project is not created yet: replace `CHANGE-ME-gcp-project` and the `CHANGE-ME` URL hash in `deploy/gcp/*.ps1` and `deploy/gcp/*-env.yaml` (and below) once it exists.
-No Radar environment has been deployed yet; the configuration below describes the intended target.
+GCP project `radar-innowacji` (number 138165247544).
+Deployed first on 2026-11-22; data (Qdrant collection, Postgres, documents) was copied 1:1 from the local stack.
 
 | What | Value |
 | --- | --- |
-| Frontend (app) | https://radar-frontend-CHANGE-ME.europe-central2.run.app |
-| Backend (API) | https://radar-backend-CHANGE-ME.europe-central2.run.app (`/healthcheck`) |
-| Images | `europe-central2-docker.pkg.dev/CHANGE-ME-gcp-project/radar/{backend,frontend}` |
+| Frontend (app) | https://radar-frontend-138165247544.europe-central2.run.app |
+| Backend (API) | https://radar-backend-138165247544.europe-central2.run.app (`/healthcheck`) |
+| Images | `europe-central2-docker.pkg.dev/radar-innowacji/radar/{backend,frontend}` |
 | Database | Cloud SQL Postgres 17 `radar-db` (`db-f1-micro`, no automated backups), database and user `radar` |
-| File storage | GCS bucket `CHANGE-ME-gcp-project-radar-documents`, accessed through the S3 API with an HMAC key |
-| Backend identity | Service account `radar-backend@CHANGE-ME-gcp-project.iam.gserviceaccount.com` (Cloud SQL client, Secret Manager accessor, bucket object admin) |
+| File storage | GCS bucket `radar-innowacji-radar-documents`, accessed through the S3 API with an HMAC key |
+| Backend identity | Service account `radar-backend@radar-innowacji.iam.gserviceaccount.com` (Cloud SQL client, Secret Manager accessor, bucket object admin) |
 
 ## Deploying a new version
 
@@ -26,7 +26,7 @@ powershell -ExecutionPolicy Bypass -File deploy/gcp/deploy.ps1 -Only frontend
 On Linux/macOS, use PowerShell 7 (`pwsh`) with the same script:
 
 ```bash
-gcloud config set project CHANGE-ME-gcp-project
+gcloud config set project radar-innowacji
 gcloud config set run/region europe-central2
 pwsh -NoProfile -File deploy/gcp/deploy.ps1                  # backend + frontend
 pwsh -NoProfile -File deploy/gcp/deploy.ps1 -Only backend
@@ -67,7 +67,7 @@ gcloud run services update-traffic radar-backend --region europe-central2 --to-r
   For a new project, inspect and configure [deploy/gcp/create-secrets.ps1](../deploy/gcp/create-secrets.ps1) before creating them. Preserve existing secrets.
   To add a secret: `gcloud secrets create <name> --data-file=<file>`, then add it to `--set-secrets` in `deploy.ps1`.
 - The frontend bakes `BACKEND_URL` and `NEXT_PUBLIC_API_BASE_URL` in at build time. Renaming the backend service requires a frontend rebuild.
-- Cloud Run URLs are deterministic (`https://<service>-CHANGE-ME.europe-central2.run.app`), so both URLs are hardcoded in the script and env files after the first deploy.
+- Cloud Run URLs are deterministic (`https://<service>-138165247544.europe-central2.run.app`), so both URLs are hardcoded in the script and env files after the first deploy.
 
 ### Scheduled conversation tagging
 

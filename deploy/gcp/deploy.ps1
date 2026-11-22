@@ -10,11 +10,11 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 
-$Project = 'CHANGE-ME-gcp-project'
+$Project = 'radar-innowacji'
 $Region = 'europe-central2'
 $Registry = "$Region-docker.pkg.dev/$Project/radar"
-$BackendUrl = 'https://radar-backend-CHANGE-ME.europe-central2.run.app'
-$FrontendUrl = 'https://radar-frontend-CHANGE-ME.europe-central2.run.app'
+$BackendUrl = 'https://radar-backend-138165247544.europe-central2.run.app'
+$FrontendUrl = 'https://radar-frontend-138165247544.europe-central2.run.app'
 $Here = $PSScriptRoot
 $Root = (Resolve-Path (Join-Path $Here '../..')).Path
 
