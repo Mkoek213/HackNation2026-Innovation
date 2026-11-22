@@ -28,3 +28,4 @@ __pycache__/
 # Local source documents and downloaded embedding models
 projects/
 backend/.cache/
+materials/*.pdf

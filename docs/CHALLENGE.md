@@ -1,7 +1,6 @@
 # Challenge: "Radar innowacji" (Podkarpackie Centrum Innowacji)
 
-Sources: [full challenge brief](../materials/PCI%20-%20Pe%C5%82na%20tre%C5%9B%C4%87%20zadania%20konkursowego.pdf)
-and [Radar Innowacji FAQ](../materials/Radar%20Innowacji%20FAQ.pdf) (HackNation 2026).
+Sources: the full challenge brief and the Radar Innowacji FAQ from the organizers (HackNation 2026, kept locally in `materials/`, not in Git).
 Use the FAQ to define the discovery product and the full brief for submission, evaluation and deployment.
 
 ## Requirement traceability
