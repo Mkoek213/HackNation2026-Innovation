@@ -423,7 +423,7 @@
    "authors": [],
    "maturity": "pilotaz",
    "source_name": "Gmina Grodzisko Dolne (samorzad.gov.pl)",
-   "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam",
+   "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/pilotazowe-zajecia-warsztatowe-z-robotyki-w-zespole-szkol-im-prof-franciszka-leji-w-grodzisku-gornym",
    "imported_at": "2026-11-21",
    "checked_at": "2026-11-21",
    "region": "Podkarpackie",
@@ -432,20 +432,20 @@
    "assessment": {
     "implementation": {
      "basis": "potwierdzone",
-     "rationale": "Do projektu zgłosiło się 771 szkół podstawowych. Rozwiązania są testowane pilotażowo w Zespole Szkół w Grodzisku Górnym.",
-     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam"
+     "rationale": "1 września 2024 r. w Zespole Szkół w Grodzisku Górnym rozpoczęły się pilotażowe warsztaty robotyki dla uczniów klas V–VIII.",
+     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/pilotazowe-zajecia-warsztatowe-z-robotyki-w-zespole-szkol-im-prof-franciszka-leji-w-grodzisku-gornym"
     },
     "novelty": {
      "basis": "szacunek",
-     "rationale": "Samorząd województwa prowadzi jeden program robotyki dla setek szkół i najpierw testuje go w szkole z doświadczeniem w robotyce.",
-     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam"
+     "rationale": "Regionalny program łączy robotykę i programowanie z praktycznym zastosowaniem matematyki i przedmiotów ścisłych.",
+     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/pilotazowe-zajecia-warsztatowe-z-robotyki-w-zespole-szkol-im-prof-franciszka-leji-w-grodzisku-gornym"
     },
     "transfer": {
      "basis": "szacunek",
-     "rationale": "Model regionalnego programu można przenieść do innego województwa. Warunkiem jest finansowanie EFS+ i przygotowanie nauczycieli.",
-     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam"
+     "rationale": "Inne szkoły mogą rozważyć podobne warsztaty po sprawdzeniu dostępności prowadzącego, pracowni i sprzętu.",
+     "source_url": "https://samorzad.gov.pl/web/gmina-grodzisko-dolne/pilotazowe-zajecia-warsztatowe-z-robotyki-w-zespole-szkol-im-prof-franciszka-leji-w-grodzisku-gornym"
     },
-    "next_step": "Inny samorząd może poprosić o wyniki pilotażu w Grodzisku Górnym i zmierzyć liczbę uczniów uczestniczących w zajęciach robotyki.",
+    "next_step": "Dyrekcja szkoły może poprosić Zespół Szkół w Grodzisku Górnym o opis pilotażu. Przed startem warsztatów warto wyznaczyć nauczyciela prowadzącego i sprawdzić dostępność sprzętu.",
     "summary": "",
     "recipients": [],
     "path_rationale": "",
@@ -457,7 +457,7 @@
     "solution": "Regionalny program nauczania robotyki z elementami programowania w szkołach podstawowych województwa podkarpackiego.",
     "novelty": "",
     "target_users": "",
-    "evidence": "Do projektu zgłosiło się 771 szkół podstawowych. Rozwiązania są testowane pilotażowo w Zespole Szkół w Grodzisku Górnym."
+    "evidence": "1 września 2024 r. w Zespole Szkół w Grodzisku Górnym rozpoczęły się pilotażowe warsztaty robotyki dla uczniów klas V–VIII."
    },
    "id": "podkarpackie-rap-steam"
   }

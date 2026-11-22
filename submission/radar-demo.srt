@@ -1,0 +1,148 @@
+1
+00:00:00,350 --> 00:00:04,847
+Mieszkańcy chcą płacić lokalne podatki
+przez internet. Urząd musi ustalić, jakie
+
+2
+00:00:04,847 --> 00:00:09,345
+rozwiązanie już działa i od czego zacząć
+u siebie. W tym pomaga Radar Innowacji.
+
+3
+00:00:10,350 --> 00:00:14,871
+Radar zbiera i porządkuje opisy z publicznych
+źródeł. Wpisuję płatności urzędowe i
+
+4
+00:00:14,871 --> 00:00:16,966
+wybieram tylko potwierdzone wdrożenia.
+
+5
+00:00:18,350 --> 00:00:23,318
+Karta pokazuje, że z ePłatności skorzystała
+Bydgoszcz. Widać dowód, podstawę każdej oceny
+
+6
+00:00:23,318 --> 00:00:28,119
+i link do źródła. Przy rozwiązaniach
+technicznych Radar ocenia też gotowość do użycia.
+
+7
+00:00:29,350 --> 00:00:32,954
+Na dole mogę sprawdzić podobne
+rozwiązania, zanim zacznę własny projekt.
+
+8
+00:00:34,350 --> 00:00:38,762
+Dwie karty mogę zestawić obok siebie i
+zobaczyć, co w każdej potwierdzają źródła.
+
+9
+00:00:42,350 --> 00:00:46,726
+A od czego zacząć w mojej gminie? Otwieram
+nową rozmowę i pytam zwykłym zdaniem, jak
+
+10
+00:00:46,726 --> 00:00:50,217
+uruchomić ePłatności i sprawdzić,
+czy mieszkańcy z nich korzystają.
+
+11
+00:00:57,350 --> 00:00:59,502
+Asystent sprawdza, co jest w bazie.
+
+12
+00:01:04,350 --> 00:01:08,767
+Asystent wskazuje wydział finansowy.
+Najpierw sprawdzamy, czy system gminy będzie
+
+13
+00:01:08,767 --> 00:01:13,294
+współpracował z usługą. Po miesiącu liczymy,
+ile płatności mieszkańcy zrobili przez
+
+14
+00:01:13,294 --> 00:01:17,547
+internet. To nasz miernik. Pokazuje, czy
+ludzie korzystają z nowej możliwości.
+
+15
+00:01:24,350 --> 00:01:28,882
+Chcę przekazać ustalenia zespołowi, więc
+proszę asystenta, żeby zapisał je jako kartę
+
+16
+00:01:28,882 --> 00:01:29,415
+innowacji.
+
+17
+00:01:33,350 --> 00:01:36,383
+Asystent przygotowuje z rozmowy
+roboczy dokument urzędu.
+
+18
+00:01:38,350 --> 00:01:42,397
+Pod odpowiedzią jest link do karty
+zapisanej w Moich sprawach. Otwieram go.
+
+19
+00:01:45,350 --> 00:01:49,886
+Tu mam problem, propozycję rozwiązania i
+pytania do sprawdzenia. Pobieram PDF, żeby
+
+20
+00:01:49,886 --> 00:01:51,034
+pokazać go zespołowi.
+
+21
+00:01:56,350 --> 00:02:00,569
+Jeśli chcesz omówić wdrożenie z PCI,
+możesz napisać przez zakładkę Kontakt.
+
+22
+00:02:03,350 --> 00:02:07,561
+Zgłaszam rozwiązanie, które już
+działa. Kreator najpierw pyta o źródło.
+
+23
+00:02:08,350 --> 00:02:11,036
+Wklejam link do relacji
+gminy o warsztatach robotyki.
+
+24
+00:02:13,350 --> 00:02:17,627
+Wpisuję, która szkoła je prowadziła.
+Kreator zaznacza, co już uzupełniliśmy.
+
+25
+00:02:20,350 --> 00:02:25,231
+Krótko opisuję program RaP STEAM. To warsztaty
+robotyki dla klas od piątej do ósmej.
+
+26
+00:02:28,350 --> 00:02:30,228
+Dopisuję, gdzie odbyły się zajęcia.
+
+27
+00:02:35,350 --> 00:02:39,756
+Przekazuję zgłoszenie do weryfikacji. Radar
+potwierdza, że sprawdzi je zespół PCI.
+
+28
+00:02:42,350 --> 00:02:46,461
+To samo zgłoszenie pojawia się w kolejce w
+Dokumentach. Pracownik może je otworzyć i
+
+29
+00:02:46,461 --> 00:02:47,782
+sprawdzić przed publikacją.
+
+30
+00:02:50,350 --> 00:02:55,508
+Analityka pokazuje, czego szukają użytkownicy.
+W pilotażu sprawdzimy, czy urzędy szybciej
+
+31
+00:02:55,508 --> 00:02:58,522
+znajdują rozwiązania i ile
+z nich zaczynają wdrażać.

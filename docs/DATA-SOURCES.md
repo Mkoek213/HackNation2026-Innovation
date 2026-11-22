@@ -51,7 +51,7 @@ CORDIS texts stay in English as published; the automatic assessment adds a Polis
 | Education | [Lekcja:Enter](https://lekcjaenter.pl/aktualnosci/zapraszamy-do-obejrzenia-filmu-podsumowujacego-nasz-projekt) | Participation figures from the programme operator, no causal estimate of learning gains. |
 | Education | [Laboratoria Przyszłości](https://www.gov.pl/web/nauka/niemal-miliard-zlotych-w-ramach-laboratoriow-przyszlosci-juz-w-szkolach-w-calej-polsce) | Over 99% of eligible schools joined, per the Ministry. |
 | Education | [OSE](https://www.gov.pl/web/cyfryzacja/ose-szybki-internet-w-szkolach-sprzet-dla-uczniow-i-nauczycieli) | Signed and connected schools, per the Ministry. |
-| Education | [RaP STEAM](https://samorzad.gov.pl/web/gmina-grodzisko-dolne/gmina-grodzisko-dolne-partnerem-programu-rap-steam) (Podkarpackie) | 771 schools joined; the pilot runs in Grodzisko Górne, so the stage is pilot. |
+| Education | [RaP STEAM](https://samorzad.gov.pl/web/gmina-grodzisko-dolne/pilotazowe-zajecia-warsztatowe-z-robotyki-w-zespole-szkol-im-prof-franciszka-leji-w-grodzisku-gornym) (Podkarpackie) | Gmina Grodzisko Dolne reports that robotics workshops for grades V–VIII started in Grodzisko Górne on 1 September 2024. |
 
 Reviewers register a report and its evidence phrases in `backend/scripts/import_deployments.py`.
 The refresh rechecks them; missing phrases on a readable page send the card back to review, and a failed fetch keeps the last version.

@@ -33,7 +33,7 @@ from .schemas import (
     StoredDocument,
 )
 from .settings import KnowledgeSettings, load_knowledge_settings
-from .store import PointData, QdrantStore, make_client, meta_to_card_payload, point_id
+from .store import SUBMITTED, PointData, QdrantStore, make_client, meta_to_card_payload, point_id
 from .taxonomy import (CATEGORY_LABELS, INNOVATION_TYPE_LABELS, INSTITUTION_TYPE_LABELS, MATURITY_LABELS,
                        Audience, Category, Maturity)
 
@@ -434,10 +434,16 @@ class KnowledgeService:
                            refreshed_at=refreshed)
 
     async def similar(self, innovation_id: str, limit: int) -> list[InnovationSummary]:
-        """Nearest public cards to this card's dense vector, to spot overlapping work."""
-        ids = await self.store.similar_cards(innovation_id, limit=limit)
+        """Prefer the same application area among the nearest public cards."""
+        original = await self.store.get_innovation(innovation_id)
+        if not original or original.verification == SUBMITTED:
+            return []
+        ids = await self.store.similar_cards(innovation_id, limit=limit * 4 if original.area else limit)
         found = await self.store.get_innovations(ids)
-        return [found[i] for i in ids if i in found]
+        related = [found[i] for i in ids if i in found and found[i].verification != SUBMITTED]
+        if original.area:
+            related.sort(key=lambda item: item.area != original.area)
+        return related[:limit]
 
     async def retrieve(
             self,

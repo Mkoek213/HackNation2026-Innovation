@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { RefreshCw, Search } from "@/components/ui/icons";
 import { recordVisit } from "@/features/workspace";
 import { Button } from "@/components/ui/button";
@@ -16,32 +16,15 @@ function Status({ data, what }: { data: unknown; what: string }) {
 
 const pageSize = 24;
 const defaults = { q: "", category: "", area: "", audience: "", region: "", maturity: "", min_credibility: "", confirmed_only: "" };
-// Matches the daily cron in docs/DEVELOPMENT.md (local time).
-const SYNC_HOUR = 4, SYNC_MINUTE = 15;
 const SOURCES = ["Raporty wdrożeń (gov.pl i samorządy)", "Fundusze Europejskie 2014-2020", "CORDIS Horyzont Europa", "Interreg 2021-2027", "RAD-on (projekty uczelni)"];
 const longDate = new Intl.DateTimeFormat("pl-PL", { dateStyle: "long" });
 
-function nextSync(now: Date) {
-  const next = new Date(now);
-  next.setHours(SYNC_HOUR, SYNC_MINUTE, 0, 0);
-  if (next <= now) next.setDate(next.getDate() + 1);
-  return next;
-}
-
-/** Corner badge for the scheduled source refresh; rendered only after data loads, so the clock is client-side. */
 function SyncStatus({ refreshedAt }: { refreshedAt: string | null }) {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 30000);
-    return () => clearInterval(timer);
-  }, []);
-  const minutes = Math.max(1, Math.ceil((nextSync(now).getTime() - now.getTime()) / 60000));
-  const left = minutes >= 60 ? `${Math.floor(minutes / 60)} godz. ${minutes % 60} min` : `${minutes} min`;
   return <details className="sync-status">
-    <summary><RefreshCw aria-hidden="true" size={15} />Synchronizacja źródeł za {left}</summary>
+    <summary><RefreshCw aria-hidden="true" size={15} />Synchronizacja źródeł</summary>
     <div className="sync-panel">
-      <p>Codziennie o {SYNC_HOUR}:{String(SYNC_MINUTE).padStart(2, "0")} Radar pobiera nowe i zmienione rekordy, ponownie sprawdza dowody wdrożeń i ocenia nowe karty według kryteriów.</p>
-      {refreshedAt && <p><strong>Ostatnia synchronizacja:</strong> {longDate.format(new Date(refreshedAt))}</p>}
+      <p><strong>Wstrzymana na czas demo.</strong></p>
+      {refreshedAt && <p><strong>Ostatnie sprawdzenie danych</strong> · {longDate.format(new Date(refreshedAt))}</p>}
       <ul>{SOURCES.map(source => <li key={source}>{source}</li>)}</ul>
     </div>
   </details>;

@@ -236,7 +236,7 @@ async def get_innovation(service: Service, admin: Admin, innovation_id: Innovati
             summary="Podobne rozwiązania")
 async def similar_innovations(service: Service, innovation_id: InnovationId,
                               limit: int = Query(default=4, ge=1, le=12)):
-    """Closest public cards by meaning, to spot similar solutions and duplicated work."""
+    """Closest public cards by meaning, with priority for the same application area."""
     return await service.similar(innovation_id, limit)
 
 

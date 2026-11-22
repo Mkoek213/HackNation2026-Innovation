@@ -130,6 +130,7 @@ class ChatService:
         # recent complete messages only; interrupted model output is not evidence.
         budget = self.settings.input_token_budget - len(system.encode()) - sum(len(t.model_dump_json(exclude_none=True).encode()) for t in offered) - RESULT_CAP
         contents = []
+        recent_innovations = []
         async with self.store.sessions() as db:
             guide_row = await db.get(ChatGuide, str(turn.conversation_id))
             started = (guide_row.data or {}).get("case_started_at") if guide_row else None
@@ -142,9 +143,9 @@ class ChatService:
             rows = (await db.scalars(query.order_by(ChatMessage.position.desc()).limit(100))).all()
             for row in rows:
                 content = row.content
-                if row.innovation_matches:
-                    content += "\nWybrane innowacje (metadane, odczytaj źródła ponownie): " + json.dumps([
-                        {"id": m["id"], "title": m["title"]} for m in row.innovation_matches], ensure_ascii=False)
+                matches = [{"id": m["id"], "title": m["title"]} for m in row.innovation_matches or []]
+                if matches:
+                    content += "\nWybrane innowacje (metadane, odczytaj źródła ponownie): " + json.dumps(matches, ensure_ascii=False)
                 cost = len(content.encode()) + 128
                 if cost > budget:
                     if not contents:
@@ -152,12 +153,14 @@ class ChatService:
                     break
                 contents.append(types.Content(role="user" if row.role == "user" else "model",
                                                parts=[types.Part(text=content)]))
+                if matches and not recent_innovations:
+                    recent_innovations = matches
                 budget -= cost
         contents.reverse()
         # Avoid beginning a truncated context with an unmatched model reply.
         while contents and contents[0].role != "user":
             contents.pop(0)
-        return contents
+        return contents, recent_innovations
 
     async def events(self, turn, *, artifact_id=None, disconnected=None, account=None):
         """`account` = (user_id, thread_id) for authenticated workspace turns; None keeps the anonymous behaviour."""
@@ -178,7 +181,7 @@ class ChatService:
                 guide = await Guide.load(self.store, turn.conversation_id)
                 creator = CreatorTools(guide, matters) if account else None
                 note = (lambda: guide.note() + creator_note(guide)) if account else guide.note
-                contents = await self.context(turn, base + note() + " " * GUIDE_NOTE_RESERVE, offered)
+                contents, recent_innovations = await self.context(turn, base + note() + " " * GUIDE_NOTE_RESERVE, offered)
                 await self.select(turn, contents, artifact_id)
                 if creator and contents and contents[-1].role == "user" and (hint := await creator.preset(contents[-1].parts[0].text)):
                     contents[-1].parts.append(types.Part(text=hint))  # Creator buttons; never persisted.
@@ -236,6 +239,7 @@ class ChatService:
                         request_contents = [types.Content(role="user", parts=[types.Part(text=json.dumps({
                             "earlier_user_messages": user_texts[:-1], "latest_request": user_texts[-1],
                             "creator_question": pending_creator_question,
+                            "recent_innovations": recent_innovations,
                         }, ensure_ascii=False))])]
                     step_started = time.monotonic()
                     draft_before = draft
@@ -371,6 +375,9 @@ class ChatService:
                                 route.requested_artifact = "application_draft" if guide.creator.get("finishing") else None
                             if route.requested_artifact:
                                 result["instruction"] = "The user already requested " + route.requested_artifact + ". Create the draft in Moje sprawy for an account, or as a conversation artifact otherwise; no further permission or complete intake is needed. Facts must be exact quotations; incomplete sections are permitted."
+                            if route.deployment_advice and any(m["id"] == route.deployment_context_id for m in recent_innovations):
+                                loaded = await tools.execute("get_innovation", {"innovation_id": route.deployment_context_id})
+                                result["deployment_context"] = bounded_result(loaded, result_budget)
                         elif route is None:
                             result = {"status": "invalid_tool"}
                         elif call.name in GUIDE_TOOL_NAMES:
@@ -427,7 +434,7 @@ class ChatService:
                         last_user = next(c for c in reversed(contents) if c.role == "user")
                         contents = [last_user, *contents[-2:]]
                         base = await self.system(turn, matters)
-                        tools.candidates.clear(); tools.evidence.clear(); tools.matches.clear()
+                        tools.candidates.clear(); tools.evidence.clear(); tools.matches.clear(); tools.loaded_cards.clear()
                         tools.searched = tools.selection_required = tools.selection_validated = False
                         tools.search_status = None
                         sources.sources.clear(); sources.evidence_packets.clear()
@@ -439,7 +446,8 @@ class ChatService:
                 review_started = time.monotonic()
                 text = await review_answer(self.provider, draft, contents=contents, guide=guide,
                     retrieval=tools, artifacts=artifacts, sources=sources, max_bytes=self.settings.input_token_budget - len(SYSTEM.encode()),
-                    required_question=creator_question(guide) if creator else None)
+                    required_question=creator_question(guide) if creator else None,
+                    deployment_advice=bool(route and route.deployment_advice))
                 logger.info("Chat review: seconds=%.2f", time.monotonic() - review_started)
                 await self.store.checkpoint(turn, text)
                 yield TextDeltaEvent(data=TextDeltaData(message_id=turn.assistant_message_id, delta=text))

@@ -51,6 +51,7 @@ class RetrievalTools:
     def __init__(self, factory=get_knowledge_service, timeout=15):
         self.factory, self.timeout = factory, timeout
         self.candidates = {}
+        self.loaded_cards = {}
         self.evidence = {}
         self.matches = []
         self.selection_validated = False
@@ -116,6 +117,7 @@ class RetrievalTools:
                 # Use the public retrieval boundary to reread indexed source passages too.
                 hits = await service.retrieve(meta.title, pool=5)
                 evidence = [e for h in hits if h.innovation.id == meta.id for e in h.evidence]
+                self.loaded_cards[meta.id] = None
                 return {"status": "ok", "candidate": self.packet(meta, evidence=evidence)}
         except ValidationError:
             return {"status": "invalid_arguments"}

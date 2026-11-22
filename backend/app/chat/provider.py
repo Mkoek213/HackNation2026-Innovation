@@ -3,6 +3,7 @@
 from collections.abc import AsyncIterator, Sequence
 from typing import Literal, Protocol
 
+import httpx
 from google import genai
 from google.genai import types
 
@@ -76,18 +77,24 @@ class GeminiProvider:
         tools: Sequence[types.Tool] = (),
         function_mode: Literal["AUTO", "ANY", "NONE"] = "AUTO",
     ) -> AsyncIterator[types.GenerateContentResponse]:
-        chunks = await self._client.aio.models.generate_content_stream(
-            model=self.settings.model, contents=[wire_content(c) for c in contents],
-            config=generation_config(
-                self.settings, system_instruction=system_instruction,
-                tools=tools, function_mode=function_mode,
-            ),
-        )
-        try:
-            async for chunk in chunks:
-                yield chunk
-        finally:
-            await chunks.aclose()
+        for attempt in range(2):
+            received = False
+            try:
+                chunks = await self._client.aio.models.generate_content_stream(
+                    model=self.settings.model, contents=[wire_content(c) for c in contents],
+                    config=generation_config(self.settings, system_instruction=system_instruction,
+                                             tools=tools, function_mode=function_mode),
+                )
+                try:
+                    async for chunk in chunks:
+                        received = True
+                        yield chunk
+                finally:
+                    await chunks.aclose()
+                return
+            except httpx.ReadTimeout:
+                if received or attempt:
+                    raise
 
     async def aclose(self) -> None:
         await self._client.aio.aclose()

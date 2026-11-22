@@ -82,6 +82,9 @@ Sources, filters and limitations are recorded in [the data source investigation]
 
 ### Daily source refresh
 
+The schedule is paused for the demo. The catalog's source panel shows the last check and
+available sources. Opening it does not start a refresh.
+
 From the root, run `bash backend/scripts/refresh_innovations.sh --dry-run` to inspect source
 counts, or omit `--dry-run` to publish. Limit a run to one feed using `--source` with
 `deployments`, `fundusze`, `cordis`, `interreg` or `radon`. A publishing run then calls `assess_innovations.py`, which scores cards that have no assessment on the current criteria.
@@ -94,7 +97,7 @@ Create `backend/.cache` before adding the following entry to the host's user cro
 (local time). Replace the absolute path with the checkout path:
 
 ```cron
-15 4 * * * /bin/bash /absolute/path/to/repo/backend/scripts/refresh_innovations.sh >> /absolute/path/to/repo/backend/.cache/innovation-refresh.log 2>&1
+15 4 * * * /bin/bash /absolute/path/to/repo/backend/scripts/refresh_innovations.sh >> /absolute/path/to/repo/backend/.cache/innovation-refresh.log 2>&1 # radar-innovation-refresh
 ```
 
 Check the refresh log and the card's last-checked date after each scheduled run. Imported
